@@ -3,10 +3,13 @@ from flask import Flask, request, render_template, jsonify
 import os
 import requests
 
+import spoonacular as sp
+
 app = Flask(__name__)
 app.secret_key = "SECRET"
 
-apiKey = os.environ['apiKey']
+# apiKey = os.environ['apiKey']
+api = sp.API(os.environ['apiKey'])
 
 @app.route("/")
 def show_homepage():
@@ -23,7 +26,13 @@ def show_search_form():
 @app.route("/recipe/search")
     """Search for recipes by entering main ingredient(s)"""
 
+    ingredients = request.args.get('ingredients')
+    num_recipes = request.args.get('num_recipes', 1)
+
+    url = 
     return render_template('recipe-search.html')
+
+
 
 # @app.route("/inventory")
 # #what type of form, able to save timestamp, quantity, location
