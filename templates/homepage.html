@@ -1,10 +1,14 @@
-function Homepage() {
-    return (
-      <React.Fragment>
+{% extends 'base.html' %}
 
-      </React.Fragment>
-    );
-  }
+{% block title %}Welcome{% endblock %}
+
+{% block body %}
+
+<!-- Mount your react components on to this element. -->
+<div id="app"></div>
+
+{% endblock %}
+
+{% block js %}
   
-  ReactDOM.render(<Homepage />, document.getElementById('app'));
-  
+{% endblock %}
