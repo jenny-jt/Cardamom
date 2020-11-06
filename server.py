@@ -26,6 +26,7 @@ def show_search_form():
 
 
 @app.route("/recipe/search")
+# find recipes in api, # find recipes in database, #call 2 functions find recipes
 def find_recipes():
     """"Search for recipes by entering main ingredient(s)"""
 
