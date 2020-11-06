@@ -37,7 +37,7 @@ class Inventory(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return f"<Ingredient id={self.ingredient_id} in_stock={self.in_stock} bought={self.bought} quantity={self.quantity}>"
+        return f"<Ingredient id={self.ingredient_id} in_stock:{self.in_stock} bought:{self.bought} quantity:{self.quantity}>"
 
 
 class Recipe(db.Model):
@@ -47,12 +47,12 @@ class Recipe(db.Model):
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     name = db.Column(db.String(20), nullable=False)
-    required_ingredients = db.Column(db.String(50), nullable=False)
+    req_ingredients = db.Column(db.String(50), nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return f"<Card card_id={self.card_id} name={self.name}>"
+        return f"<Recipe name={self.name} ingredients={self.req_ingredients}>"
 
 
 class MealPlan(db.Model):
@@ -61,12 +61,12 @@ class MealPlan(db.Model):
     __tablename__ = "mealplans"
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    date = db.Column(db.DateTime, nullable=False)
+    date = db.Column(db.DateTime(timezone=True), nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return f"<Card card_id={self.card_id} name={self.name}>"
+        return f"<Mealplan id={self.card_id} date={self.date}>"
         
 
 class Ingredients_Recipes(db.Model):

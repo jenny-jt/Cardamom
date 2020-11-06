@@ -29,11 +29,11 @@ def find_recipes():
     """"Search for recipes by entering main ingredient(s)"""
 
     ingredients = request.args.get('ingredients')
-    num_recipes = request.args.get('num_recipes', 1)
+    number = request.args.get('num_recipes', 1)
 
     url = 'https://api.spoonacular.com/recipes/findByIngredients'
 
-    response = api.search_recipes_by_ingredients(ingredients, num_recipes)
+    response = api.search_recipes_by_ingredients(ingredients, number)
     # response = api.parse_ingredients("3.5 cups King Arthur flour", servings=1)
     data = response.json()
 
@@ -41,7 +41,7 @@ def find_recipes():
 
 
 # @app.route("/inventory")
-# #what type of form, able to save timestamp, quantity, location
+# form with default values for location, able to save timestamp, quantity
 
 # @app.route("/mealplan")
 #   """ display meal plan for certain date """
