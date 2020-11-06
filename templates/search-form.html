@@ -1,14 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title %}Recipe Search{% endblock %}
+{% block title %} Search {% endblock %}
 
-{% block body %}
-<body>
-    <div id="root"></div>
-  
-    <form action='/recipesearch'>
-      Which ingredient(s) would you like to search a recipe for?
-      Ingredient: <input type="text" name="ingredient"><br>
+{% block body %} 
+    <form action="/search">
+      Which ingredient(s) would you like to search a recipe for? <br>
+      (Please enter multiple ingredients separated by commas)
+      Ingredient(s): <input type="text" name="ingredient"><br>
       How many recipes would you like to search for?
       <input type="radio" name="num_recipes" value=1>
       <label> 1 </label>
@@ -18,12 +16,4 @@
       <label> 3 </label>
       <input type="submit">
     </form>
-  
-<div id="app"></div>
-
 {% endblock %}
-
-{% block js %}
-  <script src="/static/js/homepage.jsx" type="text/jsx"></script>
-{% endblock %}
-

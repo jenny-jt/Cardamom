@@ -23,15 +23,21 @@ def show_search_form():
 
     return render_template('search-form.html')
 
+
 @app.route("/recipe/search")
-    """Search for recipes by entering main ingredient(s)"""
+def find_recipes():
+    """"Search for recipes by entering main ingredient(s)"""
 
     ingredients = request.args.get('ingredients')
     num_recipes = request.args.get('num_recipes', 1)
 
-    url = 
-    return render_template('recipe-search.html')
+    url = 'https://api.spoonacular.com/recipes/findByIngredients'
 
+    response = api.search_recipes_by_ingredients(ingredients, num_recipes)
+    # response = api.parse_ingredients("3.5 cups King Arthur flour", servings=1)
+    data = response.json()
+
+    return render_template('recipe-search.html')
 
 
 # @app.route("/inventory")

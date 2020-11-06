@@ -1,4 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime, timezone
 
 db = SQLAlchemy()
 
@@ -14,7 +15,7 @@ class Ingredient(db.Model):
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return f"<Card card_id={self.card_id} name={self.name}>"
+        return f"<ingredient ingredient_id={self.id} name={self.name}>"
 
 
 class Inventory(db.Model):
@@ -27,13 +28,16 @@ class Inventory(db.Model):
     mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.mealplan_id"))
     in_stock = db.Column(db.Boolean)
     use_this_week = db.Column(db.Boolean)
-    bought = db.Column(db.timestamp)
-    quantity = db.Column(db.Integer, nullable=True)
+    bought = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    quantity = db.Column(db.Integer)
+
+    ingredient = db.relationship('Ingredient', backref='inventories')
+    mealplan = db.relationship('Mealplan', backref='inventories')
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return f"<Card card_id={self.card_id} name={self.name}>"
+        return f"<Ingredient id={self.ingredient_id} in_stock={self.in_stock} bought={self.bought} quantity={self.quantity}>"
 
 
 class Recipe(db.Model):
@@ -57,7 +61,7 @@ class MealPlan(db.Model):
     __tablename__ = "mealplans"
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    date = db.Column(db.datetime, nullable=False)
+    date = db.Column(db.DateTime, nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -91,14 +95,16 @@ class Recipe_MealPlan(db.Model):
     mealplan = db.relationship('MealPlan', backref='recipes_mealplans')
     
 
-def connect_to_db(app):
+def connect_to_db(flask_app, db_uri='postgresql:///meals', echo=True):
     """Connect the database to our Flask app."""
+    flask_app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+    flask_app.config['SQLALCHEMY_ECHO'] = echo
+    flask_app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-    # Configure to use our PostgreSQL database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cards'
-    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    db.app = app
-    db.init_app(app)
+    db.app = flask_app
+    db.init_app(flask_app)
+
+    print('Connected to the db!')
 
 
 if __name__ == "__main__":
@@ -107,4 +113,4 @@ if __name__ == "__main__":
 
     from server import app
     connect_to_db(app)
-    print("Connected to DB.")
+ 
