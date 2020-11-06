@@ -16,6 +16,12 @@
 
 <body>
   {% block body %} {% endblock %}
+  <!-- Show flashed messages -->
+  {% with messages = get_flashed_messages() %}
+  {% for message in messages %}
+      <div class="alert alert-warning">{{ message }}</div>
+  {% endfor %}
+  {% endwith %}
 </body>
 
 </html>

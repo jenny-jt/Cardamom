@@ -2,6 +2,7 @@ from flask import Flask, request, render_template, jsonify
 
 import os
 import requests
+import jinja2
 
 import spoonacular as sp
 
@@ -28,23 +29,37 @@ def show_search_form():
 def find_recipes():
     """"Search for recipes by entering main ingredient(s)"""
 
-    ingredients = request.args.get('ingredients')
-    number = request.args.get('num_recipes', 1)
+    ingredients = request.args.get("ingredients")
+    number = request.args.get("num_recipes", 1)
 
-    url = 'https://api.spoonacular.com/recipes/findByIngredients'
+    response = api.search_recipes_by_ingredients(ingredients, number=number)
 
-    response = api.search_recipes_by_ingredients(ingredients, number)
-    # response = api.parse_ingredients("3.5 cups King Arthur flour", servings=1)
     data = response.json()
+    print(data)
+    recipe_title = data[0]['title']
+  
+    return render_template('recipe-search.html', title=recipe_title, ingredients=ingredients, data=data)
 
-    return render_template('recipe-search.html')
+
+@app.route("/inventory")
+def update_inventory():
+    """ form with default values for location, able to save timestamp, quantity """
+
+    return render_template('inventory.html')
 
 
-# @app.route("/inventory")
-# form with default values for location, able to save timestamp, quantity
+@app.route("/mealplan")
+def show_meal_plan():
+    """ display meal plan for certain date """
 
-# @app.route("/mealplan")
-#   """ display meal plan for certain date """
+    return render_template('meal-plan.html', date=date)
+
+
+@app.route("/recipe/display")
+def display_recipe():
+    """ display recipe printout via link"""
+
+    return render_template('recipe-display.html')
 
 
 if __name__ == "__main__":
