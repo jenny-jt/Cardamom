@@ -2,7 +2,7 @@
 
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from model import db, connect_to_db
+from model import db, connect_to_db, Ingredient, Inventory, Recipe, Ingredient_Recipe, Recipe_MealPlan
 
 def add_ingredient(name,location):
     """add ingredient"""
@@ -20,7 +20,21 @@ def add_recipe(name, ingredients):
 
     return recipe
 
-def update_inventory(ingredient, bought, use_this_week, in_stock, quantity)
+def add_mealplan(date):
+    """add meal plan with date"""
+    mealplan = MealPlan(date=date)
+
+    db.session.add(mealplan)
+    db.session.commit()
+
+    return mealplan
+
+def update_inventory(ingredient, bought, use_this_week, in_stock, quantity):
     """update inventory when ingredient bought or used"""
 
-    inventory = Inventory(ingredient=ingredient)
+    inventory = Inventory(ingredient_r=ingredient, bought=bought, use_this_week=use_this_week, in_stock=in_stock, quantity=quantity)
+    
+    db.session.add(inventory)
+    db.session.commit()
+
+    return inventory

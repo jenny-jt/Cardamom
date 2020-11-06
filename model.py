@@ -9,6 +9,9 @@ class Ingredient(db.Model):
     __tablename__ = "ingredients"
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
     name = db.Column(db.String(20), nullable=False)
     location = db.Column(db.String(20), nullable=False)
 
@@ -24,6 +27,9 @@ class Inventory(db.Model):
     __tablename__ = "inventories"
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
     ingredient_id = db.Column(db.Integer, db.ForeignKey("ingredients.ingredient_id"))
     mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.mealplan_id"))
     in_stock = db.Column(db.Boolean)
@@ -31,7 +37,7 @@ class Inventory(db.Model):
     bought = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
     quantity = db.Column(db.Integer)
 
-    ingredient = db.relationship('Ingredient', backref='inventories')
+    ingredient_r = db.relationship('Ingredient', backref='inventories')
     mealplan = db.relationship('Mealplan', backref='inventories')
 
     def __repr__(self):
@@ -46,6 +52,9 @@ class Recipe(db.Model):
     __tablename__ = "recipe"
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
     name = db.Column(db.String(20), nullable=False)
     req_ingredients = db.Column(db.String(50), nullable=False)
 
@@ -61,20 +70,26 @@ class MealPlan(db.Model):
     __tablename__ = "mealplans"
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
     date = db.Column(db.DateTime(timezone=True), nullable=False)
 
     def __repr__(self):
         """Provide helpful representation when printed."""
 
-        return f"<Mealplan id={self.card_id} date={self.date}>"
+        return f"<Mealplan id={self.id} date={self.date}>"
         
 
-class Ingredients_Recipes(db.Model):
+class Ingredient_Recipe(db.Model):
     """unique table created for each recipe """ 
 
     __tablename__ = "ingredients_recipes"
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
     ingredient_id = db.Column(db.Integer, db.ForeignKey("ingredients.ingredient_id"))
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.recipe_id"))
     
@@ -88,6 +103,9 @@ class Recipe_MealPlan(db.Model):
     __tablename__ = "recipes_mealplans"
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.recipe_id"))
     mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.mealplan_id"))
 
