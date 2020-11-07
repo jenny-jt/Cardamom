@@ -1,6 +1,14 @@
-from server import app
-from model import connect_to_db, db, Ingredient, Inventory, Recipe
+"""Script to seed db"""
+
+from datetime import datetime
+import os
+import json
+from model import connect_to_db, db, Ingredient, Inventory, Recipe, Recipe
 from crud import add_ingredient, add_recipe, add_mealplan, update_inventory
+from server import app
+
+# os.system('dropdb meals')
+# os.system('createdb meals')
 
 app = connect_to_db(app)
 app.app_context().push()
@@ -58,7 +66,7 @@ recipes = [{"name": "Taiwanese Ground Pork", "ingredients": ["ground pork"], "ur
             {"name": "Black Pepper Chicken", "ingredients": ["boneless chicken dark meat"], "url": "https://www.foodandwine.com/recipes/caramelized-black-pepper-chicken?printview"},
             {"name": "Korean Braised Chicken", "ingredients": ["chicken drumstick", "potato", "carrot"], "url": "https://mykoreankitchen.com/jjimdak/#wprm-recipe-container-9105"},
             {"name": "Coq Au Vin", "ingredients": ["chicken thigh", "onion", "carrots"], "url": "https://www.theendlessmeal.com/julia-childs-coq-au-vin/print/25522/"},
-            {"name": "Tuscan Butter Salmon", "ingredients": ["salmon", "sundried tomato". "spinach", "heavy whipping cream"], "url": "https://cafedelites.com/wprm_print/43059"},
+            {"name": "Tuscan Butter Salmon", "ingredients": ["salmon", "sundried tomato", "spinach", "heavy whipping cream"], "url": "https://cafedelites.com/wprm_print/43059"},
             {"name": "1-2-3-4-5 Spareribs", "ingredients": ["spareribs"], "url": "https://thewoksoflife.com/wprm_print/34693"},
             {"name": "Oxtail", "ingredients": ["oxtail", "carrot", "potato"], "url": "https://www.pressurecookrecipes.com/wprm_print/33544"},
             {"name": "Chicken Quinoa Casserole", "ingredients": ["quinoa", "boneless chicken dark meat", "cherry tomato", "tomato paste"], "url": "https://www.eatyourselfskinny.com/cheesy-caprese-chicken-quinoa-casserole/print/15214/"},

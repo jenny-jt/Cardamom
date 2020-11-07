@@ -39,3 +39,8 @@ def update_inventory(ingredient, bought, use_this_week, in_stock, quantity):
     db.session.commit()
 
     return inventory
+
+    
+if __name__ == '__main__':
+    from server import app
+    connect_to_db(app)
