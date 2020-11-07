@@ -92,8 +92,8 @@ class Ingredient_Recipe(db.Model):
     ingredient_id = db.Column(db.Integer, db.ForeignKey("ingredients.id"))
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
     
-    ingredient = db.relationship('Ingredient', backref='ingredients_recipes')
-    recipe = db.relationship('Recipe', backref='ingredients_recipes')
+    ingredient_r = db.relationship('Ingredient', backref='ingredients_recipes')
+    recipe_r = db.relationship('Recipe', backref='ingredients_recipes')
 
 
 class Recipe_MealPlan(db.Model):
@@ -108,8 +108,8 @@ class Recipe_MealPlan(db.Model):
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
     mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
 
-    recipe = db.relationship('Recipe', backref='recipes_mealplans')
-    mealplan = db.relationship('MealPlan', backref='recipes_mealplans')
+    recipe_r = db.relationship('Recipe', backref='recipes_mealplans')
+    mealplan_r = db.relationship('MealPlan', backref='recipes_mealplans')
     
 
 # def connect_to_db(flask_app, db_uri='postgresql:///meals', echo=True):

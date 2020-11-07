@@ -1,4 +1,9 @@
 from flask import Flask, request, render_template, jsonify
+from datetime import datetime
+import re
+import json
+from model import connect_to_db, db, Ingredient, Inventory, Recipe, Recipe
+from crud import add_ingredient, add_recipe, add_mealplan
 
 import os
 import requests
@@ -26,20 +31,44 @@ def show_search_form():
 
 
 @app.route("/recipe/search")
-# find recipes in api, # find recipes in database, #call 2 functions find recipes
-def find_recipes():
-    """"Search for recipes by entering main ingredient(s)"""
+def find_recipe_by_ingredients():
+    ingredients = str(request.args.get("ingredients")) #also want to match with regex single/plural items and output all as single
+    print(ingredients)
 
-    ingredients = request.args.get("ingredients")
-    number = request.args.get("num_recipes", 1)
+    number = request.args.get("num_recipes")
 
-    response = api.search_recipes_by_ingredients(ingredients, number=number)
+    re_ingredients = re.sub(r'(\w+)',r'"\1"', ingredients) #need to separate multiple ingredients and also make them single
 
-    data = response.json()
-    print(data)
-    recipe_title = data[0]['title']
+    print(re_ingredients)
+    
+
+    # db_ingredient = Ingredient.query.filter(Ingredient.name.contains(ingredients)).first()
+
+    # if db_ingredient:
+    #     find_recipes_db(db_ingredient)
+    # else:
+    #     find_recipes_api(ingredients, number=number)
+
+    return render_template('recipe-search.html', ingredients=ingredients)
+
+
+# def find_recipes_db(ingredients):
+#     """"Search for recipes in db with ingredients"""
+#     ingredients = request.args.get("ingredients")
+
+#     recipe = Recipe.query.filter(Recipe.ingredients.contains(ingredients)).first()
+
+#     return render_template('recipe-display.html', url=recipe.url)
+
+# def find_recipes_api(ingredients, number):
+#     """"Search for recipes by entering main ingredient(s)"""
+
+#     response = api.search_recipes_by_ingredients(ingredients, number=number)
+
+#     data = response.json()
+#     recipe_title = data[0]['title']
   
-    return render_template('recipe-search.html', title=recipe_title, ingredients=ingredients, data=data)
+#     return render_template('recipe-search.html', title=recipe_title, ingredients=ingredients)
 
 
 @app.route("/inventory")
@@ -59,7 +88,7 @@ def show_meal_plan():
 @app.route("/recipe/display")
 def display_recipe():
     """ display recipe printout via link"""
-
+    
     return render_template('recipe-display.html')
 
 
