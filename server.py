@@ -35,9 +35,10 @@ def show_search_form():
 
 @app.route("/recipe/search")
 def find_recipe_by_ingredients():
+    """take in ingredients from form and search db for recipe, if not found in db, api request for recipe"""
     ingredients = str(request.args.get("ingredients")) #also want to match with regex single/plural items and output all as single
 
-    number = request.args.get("num_recipes")
+    # number = request.args.get("num_recipes")
 
     # re_ingredients = re.sub(r'(\w+)',r'"\1"', ingredients) #need to separate multiple ingredients and also make them single
     # print(re_ingredients)
@@ -46,30 +47,36 @@ def find_recipe_by_ingredients():
 
     if db_recipe:
         url = str(db_recipe.url)
-        return redirect(url)
     else:
-        find_recipes_api(ingredients, number=number)
-        return redirect('/')
+        url= str(find_recipes_api(ingredients))
+        
+    return redirect(url)
 
 
-# def find_recipes_db(ingredients):
-#     """"Search for recipes in db with ingredients"""
-#     ingredients = request.args.get("ingredients")
-
-#     recipe = Recipe.query.filter(Recipe.ingredients.contains(ingredients)).first()
-
-#     return render_template('recipe-display.html', url=recipe.url)
-
-def find_recipes_api(ingredients, number):
+def find_recipes_api(ingredients):
     """"Search for recipes by entering main ingredient(s)"""
 
-    response = api.search_recipes_by_ingredients(ingredients, number=number)
+    response = api.search_recipes_by_ingredients(ingredients, number=1)
 
     data = response.json()
-    print(data)
     recipe_title = data[0]['title']
+    recipe_api_id = data[0]['id']
 
-    return data
+    source_url = find_recipe_info(recipe_api_id)
+
+    return source_url
+
+
+def find_recipe_info(recipe_api_id):
+    """find all pertinent recipe info to display on recipe card"""
+
+    response = api.get_recipe_information(id=recipe_api_id)
+    data = response.json()
+    # recipe_title = data[0]['title']
+    # recipe_img = data[0]['image']
+    # recipe_ingredients = data[0]['ingredients']
+    return data['sourceUrl']
+
 
 @app.route("/inventory")
 def update_inventory():
