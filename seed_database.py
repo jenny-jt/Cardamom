@@ -3,12 +3,12 @@
 from datetime import datetime
 import os
 import json
-from model import connect_to_db, db, Ingredient, Inventory, Recipe, Recipe
+from model import connect_to_db, db, Ingredient, Inventory, Recipe
 from crud import add_ingredient, add_recipe, add_mealplan, update_inventory
 from server import app
 
-# os.system('dropdb meals')
-# os.system('createdb meals')
+# os.system(dropdb meals)
+# os.system(createdb meals)
 
 app = connect_to_db(app)
 app.app_context().push()
@@ -79,7 +79,7 @@ recipes = [{"name": "Taiwanese Ground Pork", "ingredients": ["ground pork"], "ur
 # kabob url https://persianmama.com/kabob-koobideh-grilled-minced-meat-kabobs/
 
 for ingredient in ingredients:
-    add_ingredient(name=ingredient["name"], location=ingredient["location"])
+    add_ingredient(name=ingredient['name'], location=ingredient['location'])
 
 for recipe in recipes:
     ingredients = ", ".join(recipe['ingredients'])

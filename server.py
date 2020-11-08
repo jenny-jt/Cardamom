@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, jsonify
 from datetime import datetime
 import re
 import json
-from model import connect_to_db, db, Ingredient, Inventory, Recipe, Recipe
+from model import connect_to_db, db, Ingredient, Inventory, Recipe
 from crud import add_ingredient, add_recipe, add_mealplan
 
 import os
@@ -13,6 +13,9 @@ import spoonacular as sp
 
 app = Flask(__name__)
 app.secret_key = "SECRET"
+
+app = connect_to_db(app)
+app.app_context().push()
 
 # apiKey = os.environ['apiKey']
 api = sp.API(os.environ['apiKey'])
@@ -37,15 +40,15 @@ def find_recipe_by_ingredients():
 
     number = request.args.get("num_recipes")
 
-    re_ingredients = re.sub(r'(\w+)',r'"\1"', ingredients) #need to separate multiple ingredients and also make them single
-
-    print(re_ingredients)
+    # re_ingredients = re.sub(r'(\w+)',r'"\1"', ingredients) #need to separate multiple ingredients and also make them single
+    # print(re_ingredients)
     
+    db_recipe = Recipe.query.filter(Recipe.ingredients.contains(ingredients)).first()
+    print(db_recipe)
 
-    # db_ingredient = Ingredient.query.filter(Ingredient.name.contains(ingredients)).first()
-
-    # if db_ingredient:
+    # if db_recipe:
     #     find_recipes_db(db_ingredient)
+        # return redirect (db_recipe.url)
     # else:
     #     find_recipes_api(ingredients, number=number)
 
