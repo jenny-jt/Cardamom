@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, redirect
 from datetime import datetime
 import re
 import json
@@ -36,7 +36,6 @@ def show_search_form():
 @app.route("/recipe/search")
 def find_recipe_by_ingredients():
     ingredients = str(request.args.get("ingredients")) #also want to match with regex single/plural items and output all as single
-    print(ingredients)
 
     number = request.args.get("num_recipes")
 
@@ -44,15 +43,13 @@ def find_recipe_by_ingredients():
     # print(re_ingredients)
     
     db_recipe = Recipe.query.filter(Recipe.ingredients.contains(ingredients)).first()
-    print(db_recipe)
 
-    # if db_recipe:
-    #     find_recipes_db(db_ingredient)
-        # return redirect (db_recipe.url)
-    # else:
-    #     find_recipes_api(ingredients, number=number)
-
-    return render_template('recipe-search.html', ingredients=ingredients)
+    if db_recipe:
+        url = str(db_recipe.url)
+        return redirect(url)
+    else:
+        find_recipes_api(ingredients, number=number)
+        return redirect('/')
 
 
 # def find_recipes_db(ingredients):
@@ -63,16 +60,16 @@ def find_recipe_by_ingredients():
 
 #     return render_template('recipe-display.html', url=recipe.url)
 
-# def find_recipes_api(ingredients, number):
-#     """"Search for recipes by entering main ingredient(s)"""
+def find_recipes_api(ingredients, number):
+    """"Search for recipes by entering main ingredient(s)"""
 
-#     response = api.search_recipes_by_ingredients(ingredients, number=number)
+    response = api.search_recipes_by_ingredients(ingredients, number=number)
 
-#     data = response.json()
-#     recipe_title = data[0]['title']
-  
-#     return render_template('recipe-search.html', title=recipe_title, ingredients=ingredients)
+    data = response.json()
+    print(data)
+    recipe_title = data[0]['title']
 
+    return data
 
 @app.route("/inventory")
 def update_inventory():
