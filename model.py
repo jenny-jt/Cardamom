@@ -17,6 +17,15 @@ class Ingredient(db.Model):
     location = db.Column(db.String(20), nullable=False)
 
     recipes_r = db.relationship("Recipe", secondary="ingredients_recipes", backref="ingredients_r")
+    # >>> rice.recipes_r
+    # ['Fried Rice', 'sushi', 'steamed rice']
+
+    # >>> rice.recipes_ingredients
+    # [3, 7, 25]
+    # >>> for recipe in rice.recipes_ingredients:
+    # >>>   lst.append(recipe.Recipes.name)
+    # ['Fried Rice', 'sushi', 'steamed rice']
+
 
     def __repr__(self):
         """Provide helpful representation when printed."""

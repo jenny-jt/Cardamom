@@ -13,8 +13,8 @@ os.system('createdb meals')
 connect_to_db(app)
 db.create_all()
 
-ingredients = [{"name": "onion", "location": "fridge"}, 
-                {"name": "egg", "location": "fridge"},
+ingredients = [{"name": "onion", "location": "fridge"}, #id 1
+                {"name": "egg", "location": "fridge"},  #id 2
                 {"name": "kimchi", "location": "fridge"},
                 {"name": "bacon", "location": "fridge"},
                 {"name": "heavy whipping cream", "location": "fridge"},
@@ -58,15 +58,15 @@ ingredients = [{"name": "onion", "location": "fridge"},
                 # {"name": "", "location": "fridge"},
                 # {"name": "", "location": "freezer"},
 
-recipes = [{"name": "Taiwanese Ground Pork", "ingredients": ["ground pork"], "url":"https://ketchupwithlinda.com/taiwanese-meat-sauce/print/8317/"},
-            {"name": "Oyakodon", "ingredients": ["boneless chicken dark meat", "onion", "onions"], "url": "https://www.seriouseats.com/recipes/2016/08/print/oyakodon-japanese-chicken-and-egg-rice-bowl-recipe.html"},
+recipes = [{"name": "Taiwanese Ground Pork", "ingredients": ["ground pork"], "url":"https://ketchupwithlinda.com/taiwanese-meat-sauce/print/8317/"}, #id 1
+            {"name": "Oyakodon", "ingredients": ["boneless chicken dark meat", "onion", "onions", "egg"], "url": "https://www.seriouseats.com/recipes/2016/08/print/oyakodon-japanese-chicken-and-egg-rice-bowl-recipe.html"},
             {"name": "Cuban Shredded Beef", "ingredients": ["chuck roast", "onion" "onions"], "url": "https://thegingeredwhisk.com/shredded-cuban-beef-bowl-slow-cooker/"},
             {"name": "Beef Kabob", "ingredients": ["ground beef", "onion", "onions"], "url": "https://persianmama.com/easyrecipe-print/4465-0/"},
             {"name": "Hainan Chicken", "ingredients": ["chicken thigh", "ginger", "green onion"], "url": "https://www.pressurecookrecipes.com/wprm_print/37694"},
             {"name": "Black Pepper Chicken", "ingredients": ["boneless chicken dark meat"], "url": "https://www.foodandwine.com/recipes/caramelized-black-pepper-chicken?printview"},
             {"name": "Korean Braised Chicken", "ingredients": ["chicken drumstick", "potato", "potatoes", "carrots", "carrot"], "url": "https://mykoreankitchen.com/jjimdak/#wprm-recipe-container-9105"},
-            {"name": "Coq Au Vin", "ingredients": ["chicken thigh", "onion", "onions", "carrot", "carrots"], "url": "https://www.theendlessmeal.com/julia-childs-coq-au-vin/print/25522/"},
-            {"name": "Tuscan Butter Salmon", "ingredients": ["salmon", "sundried tomato", "sundried tomatoes", "spinach", "heavy whipping cream"], "url": "https://cafedelites.com/wprm_print/43059"},
+            {"name": "Coq Au Vin", "ingredients": ["chicken thigh", "onion", "onions", "carrot", "carrots", "bacon"], "url": "https://www.theendlessmeal.com/julia-childs-coq-au-vin/print/25522/"},
+            {"name": "Tuscan Butter Salmon", "ingredients": ["salmon", "sundried tomato", "sundried tomatoes", "spinach", "heavy whipping cream", "parmesan cheese"], "url": "https://cafedelites.com/wprm_print/43059"},
             {"name": "1-2-3-4-5 Spareribs", "ingredients": ["spareribs"], "url": "https://thewoksoflife.com/wprm_print/34693"},
             {"name": "Oxtail", "ingredients": ["oxtail", "carrot", "carrots", "potato", "potatoes"], "url": "https://www.pressurecookrecipes.com/wprm_print/33544"},
             {"name": "Chicken Quinoa Casserole", "ingredients": ["quinoa", "boneless chicken dark meat", "cherry tomato", "cherry tomatoes", "tomato paste"], "url": "https://www.eatyourselfskinny.com/cheesy-caprese-chicken-quinoa-casserole/print/15214/"},
@@ -74,9 +74,17 @@ recipes = [{"name": "Taiwanese Ground Pork", "ingredients": ["ground pork"], "ur
             {"name": "Crispy Persian Rice", "ingredients": ["basmati rice", "butter"], "url": "https://www.halfbakedharvest.com/crispy-persian-rice/"},
             {"name": "Creme Brulee", "ingredients": ["egg", "eggs", "heavy whipping cream"], "url": "https://www.averiecooks.com/the-best-and-the-easiest-classic-creme-brulee/"},
             {"name": "Salted Caramel", "ingredients": ["butter", "heavy whipping cream"], "url": "https://sallysbakingaddiction.com/homemade-salted-caramel-recipe/print-recipe/68127/"}]
-
 # {"name": "", "ingredients": [], "url": ""},       
 # kabob url https://persianmama.com/kabob-koobideh-grilled-minced-meat-kabobs/
+
+recipe_ingredients = [{"ingredient_id":1, "recipe_id":[2,3,4,8]}, {"ingredient_id":2, "recipe_id":[2, 15]}, {"ingredient_id":3, "recipe_id":[]}, 
+                        {"ingredient_id"4:, "recipe_id":[8]}, {"ingredient_id":5, "recipe_id":[9, 15, 16]}, {"ingredient_id":6, "recipe_id":[9]}, {"ingredient_id":7, "recipe_id":[]},
+                        {"ingredient_id":8, "recipe_id":[]}, {"ingredient_id":9, "recipe_id":[13]}, {"ingredient_id":10, "recipe_id":[]}, {"ingredient_id":11, "recipe_id":[14, 16]}, 
+                        {"ingredient_id":12, "recipe_id":[7,8,11]}, {"ingredient_id":13, "recipe_id":[3]}, {"ingredient_id":14, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]},
+                        {"ingredient_id":15, "recipe_id":[1]}] #{"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, 
+                        # {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]},
+                        # {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, 
+                        # {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]},]
 
 for ingredient in ingredients:
     add_ingredient(name=ingredient['name'], location=ingredient['location'])
@@ -85,5 +93,3 @@ for recipe in recipes:
     ingredients = ", ".join(recipe['ingredients'])
     add_recipe(name=recipe['name'], ingredients=ingredients, url=recipe["url"])
 
-
-# if __name__ == "__main__":    
