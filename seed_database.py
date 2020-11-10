@@ -5,13 +5,13 @@ import os
 import json
 from model import connect_to_db, db, Ingredient, Inventory, Recipe
 from crud import add_ingredient, add_recipe, add_mealplan, update_inventory
-from server import app
+from server import app    
 
-# os.system(dropdb meals)
-# os.system(createdb meals)
+os.system('dropdb meals')
+os.system('createdb meals')
 
-app = connect_to_db(app)
-app.app_context().push()
+connect_to_db(app)
+db.create_all()
 
 ingredients = [{"name": "onion", "location": "fridge"}, 
                 {"name": "egg", "location": "fridge"},
@@ -59,20 +59,20 @@ ingredients = [{"name": "onion", "location": "fridge"},
                 # {"name": "", "location": "freezer"},
 
 recipes = [{"name": "Taiwanese Ground Pork", "ingredients": ["ground pork"], "url":"https://ketchupwithlinda.com/taiwanese-meat-sauce/print/8317/"},
-            {"name": "Oyakodon", "ingredients": ["boneless chicken dark meat", "onion"], "url": "https://www.seriouseats.com/recipes/2016/08/print/oyakodon-japanese-chicken-and-egg-rice-bowl-recipe.html"},
-            {"name": "Cuban Shredded Beef", "ingredients": ["chuck roast", "onion"], "url": "https://thegingeredwhisk.com/shredded-cuban-beef-bowl-slow-cooker/"},
-            {"name": "Beef Kabob", "ingredients": ["ground beef", "onion"], "url": "https://persianmama.com/easyrecipe-print/4465-0/"},
+            {"name": "Oyakodon", "ingredients": ["boneless chicken dark meat", "onion", "onions"], "url": "https://www.seriouseats.com/recipes/2016/08/print/oyakodon-japanese-chicken-and-egg-rice-bowl-recipe.html"},
+            {"name": "Cuban Shredded Beef", "ingredients": ["chuck roast", "onion" "onions"], "url": "https://thegingeredwhisk.com/shredded-cuban-beef-bowl-slow-cooker/"},
+            {"name": "Beef Kabob", "ingredients": ["ground beef", "onion", "onions"], "url": "https://persianmama.com/easyrecipe-print/4465-0/"},
             {"name": "Hainan Chicken", "ingredients": ["chicken thigh", "ginger", "green onion"], "url": "https://www.pressurecookrecipes.com/wprm_print/37694"},
             {"name": "Black Pepper Chicken", "ingredients": ["boneless chicken dark meat"], "url": "https://www.foodandwine.com/recipes/caramelized-black-pepper-chicken?printview"},
-            {"name": "Korean Braised Chicken", "ingredients": ["chicken drumstick", "potato", "carrot"], "url": "https://mykoreankitchen.com/jjimdak/#wprm-recipe-container-9105"},
-            {"name": "Coq Au Vin", "ingredients": ["chicken thigh", "onion", "carrots"], "url": "https://www.theendlessmeal.com/julia-childs-coq-au-vin/print/25522/"},
-            {"name": "Tuscan Butter Salmon", "ingredients": ["salmon", "sundried tomato", "spinach", "heavy whipping cream"], "url": "https://cafedelites.com/wprm_print/43059"},
+            {"name": "Korean Braised Chicken", "ingredients": ["chicken drumstick", "potato", "potatoes", "carrots", "carrot"], "url": "https://mykoreankitchen.com/jjimdak/#wprm-recipe-container-9105"},
+            {"name": "Coq Au Vin", "ingredients": ["chicken thigh", "onion", "onions", "carrot", "carrots"], "url": "https://www.theendlessmeal.com/julia-childs-coq-au-vin/print/25522/"},
+            {"name": "Tuscan Butter Salmon", "ingredients": ["salmon", "sundried tomato", "sundried tomatoes", "spinach", "heavy whipping cream"], "url": "https://cafedelites.com/wprm_print/43059"},
             {"name": "1-2-3-4-5 Spareribs", "ingredients": ["spareribs"], "url": "https://thewoksoflife.com/wprm_print/34693"},
-            {"name": "Oxtail", "ingredients": ["oxtail", "carrot", "potato"], "url": "https://www.pressurecookrecipes.com/wprm_print/33544"},
-            {"name": "Chicken Quinoa Casserole", "ingredients": ["quinoa", "boneless chicken dark meat", "cherry tomato", "tomato paste"], "url": "https://www.eatyourselfskinny.com/cheesy-caprese-chicken-quinoa-casserole/print/15214/"},
-            {"name": "Green Beans", "ingredients": ["green beans"], "url": "https://www.myrecipes.com/recipe/quick-easy-green-beans?printview"},
+            {"name": "Oxtail", "ingredients": ["oxtail", "carrot", "carrots", "potato", "potatoes"], "url": "https://www.pressurecookrecipes.com/wprm_print/33544"},
+            {"name": "Chicken Quinoa Casserole", "ingredients": ["quinoa", "boneless chicken dark meat", "cherry tomato", "cherry tomatoes", "tomato paste"], "url": "https://www.eatyourselfskinny.com/cheesy-caprese-chicken-quinoa-casserole/print/15214/"},
+            {"name": "Green Beans", "ingredients": ["green bean", "green beans"], "url": "https://www.myrecipes.com/recipe/quick-easy-green-beans?printview"},
             {"name": "Crispy Persian Rice", "ingredients": ["basmati rice", "butter"], "url": "https://www.halfbakedharvest.com/crispy-persian-rice/"},
-            {"name": "Creme Brulee", "ingredients": ["egg", "heavy whipping cream"], "url": "https://www.averiecooks.com/the-best-and-the-easiest-classic-creme-brulee/"},
+            {"name": "Creme Brulee", "ingredients": ["egg", "eggs", "heavy whipping cream"], "url": "https://www.averiecooks.com/the-best-and-the-easiest-classic-creme-brulee/"},
             {"name": "Salted Caramel", "ingredients": ["butter", "heavy whipping cream"], "url": "https://sallysbakingaddiction.com/homemade-salted-caramel-recipe/print-recipe/68127/"}]
 
 # {"name": "", "ingredients": [], "url": ""},       
@@ -86,4 +86,4 @@ for recipe in recipes:
     add_recipe(name=recipe['name'], ingredients=ingredients, url=recipe["url"])
 
 
-
+# if __name__ == "__main__":    

@@ -1,5 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime, timezone
+import os
 
 db = SQLAlchemy()
 
@@ -14,6 +15,8 @@ class Ingredient(db.Model):
     deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     name = db.Column(db.String(), nullable=False)
     location = db.Column(db.String(20), nullable=False)
+
+    recipes_r = db.relationship("Recipe", secondary="ingredients_recipes", backref="ingredients_r")
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -32,6 +35,8 @@ class Recipe(db.Model):
     name = db.Column(db.String(), nullable=False)
     ingredients = db.Column(db.String(), nullable=False)
     url = db.Column(db.String(), nullable=False)
+    
+    recipes_r = db.relationship('Recipe', secondary='recipes_mealplans', backref="mealplans_r")
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -54,7 +59,12 @@ class MealPlan(db.Model):
         """Provide helpful representation when printed."""
 
         return f"<Mealplan id={self.id} date={self.date}>"
-        
+
+    def add_recipe_to_mealplan(self, recipe):
+        """Add recipe to mealplan"""
+        #ex mealplan1.recipes_r.append(recipe1)
+        self.recipes_r.append(recipe)
+
 class Inventory(db.Model):
     """inventory to be updated at each shopping trip """
 
@@ -71,8 +81,8 @@ class Inventory(db.Model):
     bought = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
     quantity = db.Column(db.Integer)
 
-    ingredient_r = db.relationship('Ingredient', backref='inventories')
-    mealplan_r = db.relationship('MealPlan', backref='inventories')
+    ingredient_r = db.relationship('Ingredient', backref='inventories_r')
+    mealplan_r = db.relationship('MealPlan', backref='inventories_r')
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -92,8 +102,8 @@ class Ingredient_Recipe(db.Model):
     ingredient_id = db.Column(db.Integer, db.ForeignKey("ingredients.id"))
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
     
-    ingredient_r = db.relationship('Ingredient', backref='ingredients_recipes')
-    recipe_r = db.relationship('Recipe', backref='ingredients_recipes')
+    # ingredient_r = db.relationship('Ingredient', backref='ingredients_recipes')
+    # recipe_r = db.relationship('Recipe', backref='ingredients_recipes')
 
 
 class Recipe_MealPlan(db.Model):
@@ -108,27 +118,23 @@ class Recipe_MealPlan(db.Model):
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
     mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
 
-    recipe_r = db.relationship('Recipe', backref='recipes_mealplans')
-    mealplan_r = db.relationship('MealPlan', backref='recipes_mealplans')
+    # recipe_r = db.relationship('Recipe', backref='recipes_mealplans')
+    # mealplan_r = db.relationship('MealPlan', backref='recipes_mealplans')
     
 
 # def connect_to_db(flask_app, db_uri='postgresql:///meals', echo=True):
 def connect_to_db(app):
     """Connect the database to our Flask app."""
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///meals'
-    # app.config['SQLALCHEMY_ECHO'] = echo
+    app.config['SQLALCHEMY_ECHO'] = True
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     db.app = app
     db.init_app(app)
 
     print('Connected to the db!')
-    return app
 
 if __name__ == "__main__":
-    # As a convenience, if we run this module interactively, it will leave
-    # you in a state of being able to work with the database directly.
     from server import app
     connect_to_db(app)
     db.create_all()
- 
