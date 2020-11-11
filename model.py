@@ -17,15 +17,6 @@ class Ingredient(db.Model):
     location = db.Column(db.String(20), nullable=False)
 
     recipes_r = db.relationship("Recipe", secondary="ingredients_recipes", backref="ingredients_r")
-    # >>> rice.recipes_r
-    # ['Fried Rice', 'sushi', 'steamed rice']
-
-    # >>> rice.recipes_ingredients
-    # [3, 7, 25]
-    # >>> for recipe in rice.recipes_ingredients:
-    # >>>   lst.append(recipe.Recipes.name)
-    # ['Fried Rice', 'sushi', 'steamed rice']
-
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -44,8 +35,6 @@ class Recipe(db.Model):
     name = db.Column(db.String(), nullable=False)
     ingredients = db.Column(db.String(), nullable=False)
     url = db.Column(db.String(), nullable=False)
-    
-    recipes_r = db.relationship('Recipe', secondary='recipes_mealplans', backref="mealplans_r")
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -64,6 +53,8 @@ class MealPlan(db.Model):
     deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     date = db.Column(db.DateTime(timezone=True), nullable=False)
 
+    recipes_r = db.relationship('Recipe', secondary='recipes_mealplans', backref="mealplans_r")
+
     def __repr__(self):
         """Provide helpful representation when printed."""
 
@@ -71,8 +62,8 @@ class MealPlan(db.Model):
 
     def add_recipe_to_mealplan(self, recipe):
         """Add recipe to mealplan"""
-        #ex mealplan1.recipes_r.append(recipe1)
         self.recipes_r.append(recipe)
+
 
 class Inventory(db.Model):
     """inventory to be updated at each shopping trip """
@@ -131,7 +122,6 @@ class Recipe_MealPlan(db.Model):
     # mealplan_r = db.relationship('MealPlan', backref='recipes_mealplans')
     
 
-# def connect_to_db(flask_app, db_uri='postgresql:///meals', echo=True):
 def connect_to_db(app):
     """Connect the database to our Flask app."""
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///meals'

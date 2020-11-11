@@ -4,8 +4,8 @@
 
 {% block body %} 
     <form action="/results/search">
-      What date do you want this meal plan for? <br>
-      Week starting: <input type="text" name="date"><br>
+      Which Monday do you want to start this meal plan? <br>
+      Week starting: <input type="date" name="date"><br>
 
       Which ingredient(s) would you like to search a recipe for? <br>
       (Please enter multiple ingredients separated by commas)
@@ -16,8 +16,8 @@
       <label> 1 </label>
       <input type="radio" name="num_recipes" value=2>
       <label> 2 </label>
-      <!-- <input type="radio" name="num_recipes" value=3>
-      <label> 3 </label> -->
+      <input type="radio" name="num_recipes" value=3>
+      <label> 3 </label>
       <input type="submit">
     </form>
 {% endblock %}

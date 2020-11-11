@@ -78,11 +78,10 @@ recipes = [{"name": "Taiwanese Ground Pork", "ingredients": ["ground pork"], "ur
 # kabob url https://persianmama.com/kabob-koobideh-grilled-minced-meat-kabobs/
 
 recipe_ingredients = [{"ingredient_id":1, "recipe_id":[2,3,4,8]}, {"ingredient_id":2, "recipe_id":[2, 15]}, {"ingredient_id":3, "recipe_id":[]}, 
-                        {"ingredient_id"4:, "recipe_id":[8]}, {"ingredient_id":5, "recipe_id":[9, 15, 16]}, {"ingredient_id":6, "recipe_id":[9]}, {"ingredient_id":7, "recipe_id":[]},
+                        {"ingredient_id":4, "recipe_id":[8]}, {"ingredient_id":5, "recipe_id":[9, 15, 16]}, {"ingredient_id":6, "recipe_id":[9]}, {"ingredient_id":7, "recipe_id":[]},
                         {"ingredient_id":8, "recipe_id":[]}, {"ingredient_id":9, "recipe_id":[13]}, {"ingredient_id":10, "recipe_id":[]}, {"ingredient_id":11, "recipe_id":[14, 16]}, 
-                        {"ingredient_id":12, "recipe_id":[7,8,11]}, {"ingredient_id":13, "recipe_id":[3]}, {"ingredient_id":14, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]},
-                        {"ingredient_id":15, "recipe_id":[1]}] #{"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, 
-                        # {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]},
+                        {"ingredient_id":12, "recipe_id":[7,8,11]}, {"ingredient_id":13, "recipe_id":[3]}, {"ingredient_id":14, "recipe_id":[]}, {"ingredient_id":15, "recipe_id":[1]}] #{"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, 
+                        # {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]},
                         # {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, 
                         # {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]},]
 
