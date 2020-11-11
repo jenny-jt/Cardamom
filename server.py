@@ -5,7 +5,7 @@ import json
 from model import connect_to_db, MealPlan
 import crud
 import os
-
+import random
 import requests
 import jinja2
 
@@ -31,32 +31,59 @@ def search_results():
     """take in date for mealplan, ingredients, and number of recipes, outputs mealplan and recipes"""
     ingredients = request.args.get("ingredients").split(",")
     number = int(request.args.get("num_recipes"))
+    print(number)
     date = request.args.get("date")
     
     mealplan = MealPlan.query.filter(MealPlan.date == date).first()
-    print("mealplan query result", mealplan)
+    print("mealplan query result", mealplan) #confused why this always returns something
 
     if not mealplan: 
         mealplan = crud.add_mealplan(date)
 
-    while number > 0: 
-        print(number)
-        db_recipes = crud.db_recipe_search(ingredients)
-        print("initial query of db with ingredients:", db_recipes)
-        if len(db_recipes) > 1:
-            for item in db_recipes:
-                crud.mealplan_add_recipe(mealplan, item) 
-                print("db recipe item:", item)
-                number -= 1     
-        else: 
-            api_recipes = crud.api_recipe_search(ingredients, number)
-            for item in api_recipes:
-                recipe = crud.recipe_info(item)
-                print("api recipe id:", item)
-                crud.mealplan_add_recipe(mealplan, recipe)
-                number -= 1
+    db_recipes = crud.db_recipe_search(ingredients)
+    
+    api_recipe_ids = crud.api_recipe_search(ingredients, number)
+    api_recipes = api_recipes_list(api_recipe_ids)
 
-    print("after creating mealplan", mealplan.recipes_r)
+    count = 0
+    while count < number:
+        if db_recipes:
+            item = pick_db_recipes(db_recipes)
+            crud.mealplan_add_recipe(mealplan, item)
+            count += 1
+        else:
+            item = pick_db_recipes(api_recipes)
+            crud.mealplan_add_recipe(mealplan, item)
+            count += 1
+
+    recipes = mealplan.recipes_r
+    print(recipes)
+
+    return render_template('recipe-display.html', recipes=recipes)
+
+def api_recipes_list(api_recipe_ids):
+    """takes in list of recipe ids and outputs list of assoc recipes"""
+    api_recipes = []
+
+    for id in api_recipe_ids:
+        recipe = crud.recipe_info(id)
+        api_recipes.append(recipe)
+    
+    return api_recipes
+
+def pick_db_recipes(db_recipes):
+    """takes in list of db_recipes, adds random recipes from that list to meal plan and increases count"""
+    item = random.choice(db_recipes)
+
+    return item    
+
+
+def pick_api_recipes(api_recipes):
+    """takes in list of api_recipes, adds recipes to mealplan and increases count"""
+    item = random.choice(api_recipes)
+    
+    return item  
+
 
 def db_ingredient():
     """turn form inputs into singular form"""

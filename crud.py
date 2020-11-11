@@ -48,14 +48,19 @@ def db_recipe_search(ingredients):
     """if not have one recipe that contains db_recipe = Recipe.query.filter(Recipe.ingredients.contains(ingredients)).all()all ingredients, loop over list of ingredients and search for ingredients individually"""
     # will make a list (or empty list) for each ingredient
     # want it to make a list containing recipes from search of all ingredients
+    db_recipes =[]
+  
     for ingredient in ingredients: 
-        db_recipe = Recipe.query.filter(Recipe.ingredients.contains(ingredient)).all()
+        db_recipe = Recipe.query.filter(Recipe.ingredients.contains(ingredient)).distinct().all()
+        print("for ingredient loop in db_recipe_search:", db_recipe)
         if db_recipe:
-            return db_recipe
+            db_recipes.extend(db_recipe)
+    print(db_recipes)        
+    return db_recipes
 
 
 def api_recipe_search(ingredients, number):
-    """"Search for recipes in API by entering main ingredient(s) and number of recipes, returns list of recipe ids"""
+    """"takes in main ingredient(s) and number of recipes, returns list of recipe ids that match"""
     response = api.search_recipes_by_ingredients(ingredients, number)
     data = response.json()
     api_recipe_ids = []
@@ -64,7 +69,7 @@ def api_recipe_search(ingredients, number):
         # recipe_title = data[i]['title']
         api_id = data[i]['id']
         api_recipe_ids.append(api_id)
-    print(api_recipe_ids)
+
     return api_recipe_ids
 
 
@@ -74,17 +79,20 @@ def recipe_info(recipe_api_id):
     data = response.json()
     # recipe_img = data['image']
     name = data['title']
+    # cook time = data[‘readyInMinutes’]
 
     recipe_ingredients = []
     for i, item in enumerate(data['extendedIngredients']):
         recipe_ingredients.append(data['extendedIngredients'][i]['name'])
-    print("recipe ingredients:", recipe_ingredients)
 
     url = data['sourceUrl']
 
-    recipe = add_recipe(name, recipe_ingredients, url)  
+    check_recipe_db = Recipe.query.filter(Recipe.name == name).first()
 
-    return recipe
+    if not check_recipe_db:
+        recipe = add_recipe(name, recipe_ingredients, url)  
+        return recipe
+
 
 def mealplan_add_recipe(mealplan, recipe): 
     """add recipe to mealplan"""

@@ -36,6 +36,8 @@ class Recipe(db.Model):
     ingredients = db.Column(db.String(), nullable=False)
     url = db.Column(db.String(), nullable=False)
 
+    # ingredients_r = db.relationship("Ingredient", secondary="ingredients_recipes", backref="recipes_r")
+
     def __repr__(self):
         """Provide helpful representation when printed."""
 
