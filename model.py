@@ -98,15 +98,11 @@ class Ingredient_Recipe(db.Model):
     __tablename__ = "ingredients_recipes"
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
-    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
-    deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
+    # created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    # updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    # deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     ingredient_id = db.Column(db.Integer, db.ForeignKey("ingredients.id"))
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
-    
-    # ingredient_r = db.relationship('Ingredient', backref='ingredients_recipes')
-    # recipe_r = db.relationship('Recipe', backref='ingredients_recipes')
-
 
 class Recipe_MealPlan(db.Model):
     """unique table created for each recipe """ 

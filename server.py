@@ -14,10 +14,15 @@ import spoonacular as sp
 app = Flask(__name__)
 app.secret_key = os.environ['secret_key']
 
+# gcal = build_calendar_service()
+
 @app.route("/")
 def show_homepage():
     """Show the application's homepage."""
+    
+    # events = gcal.events().list()
 
+    # return render_template('homepage.html', events=events)
     return render_template('homepage.html')
 
 @app.route("/search")
@@ -28,10 +33,9 @@ def show_search_form():
 
 @app.route("/results/search")
 def search_results(): 
-    """take in date for mealplan, ingredients, and number of recipes, outputs mealplan and recipes"""
+    """take in date for mealplan, ingredients, and number of recipes, outputs mealplan with attached recipes"""
     ingredients = request.args.get("ingredients").split(",")
     number = int(request.args.get("num_recipes"))
-    print(number)
     date = request.args.get("date")
     
     mealplan = MealPlan.query.filter(MealPlan.date == date).first()

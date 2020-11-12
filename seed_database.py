@@ -77,13 +77,13 @@ recipes = [{"name": "Taiwanese Ground Pork", "ingredients": ["ground pork"], "ur
 # {"name": "", "ingredients": [], "url": ""},       
 # kabob url https://persianmama.com/kabob-koobideh-grilled-minced-meat-kabobs/
 
-recipe_ingredients = [{"ingredient_id":1, "recipe_id":[2,3,4,8]}, {"ingredient_id":2, "recipe_id":[2, 15]}, {"ingredient_id":3, "recipe_id":[]}, 
-                        {"ingredient_id":4, "recipe_id":[8]}, {"ingredient_id":5, "recipe_id":[9, 15, 16]}, {"ingredient_id":6, "recipe_id":[9]}, {"ingredient_id":7, "recipe_id":[]},
-                        {"ingredient_id":8, "recipe_id":[]}, {"ingredient_id":9, "recipe_id":[13]}, {"ingredient_id":10, "recipe_id":[]}, {"ingredient_id":11, "recipe_id":[14, 16]}, 
-                        {"ingredient_id":12, "recipe_id":[7,8,11]}, {"ingredient_id":13, "recipe_id":[3]}, {"ingredient_id":14, "recipe_id":[]}, {"ingredient_id":15, "recipe_id":[1]}] #{"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, 
-                        # {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]},
-                        # {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, 
-                        # {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]},]
+# recipe_ingredients = [{"ingredient_id":1, "recipe_id":[2,3,4,8]}, {"ingredient_id":2, "recipe_id":[2, 15]}, {"ingredient_id":3, "recipe_id":[]}, 
+#                         {"ingredient_id":4, "recipe_id":[8]}, {"ingredient_id":5, "recipe_id":[9, 15, 16]}, {"ingredient_id":6, "recipe_id":[9]}, {"ingredient_id":7, "recipe_id":[]},
+#                         {"ingredient_id":8, "recipe_id":[]}, {"ingredient_id":9, "recipe_id":[13]}, {"ingredient_id":10, "recipe_id":[]}, {"ingredient_id":11, "recipe_id":[14, 16]}, 
+#                         {"ingredient_id":12, "recipe_id":[7,8,11]}, {"ingredient_id":13, "recipe_id":[3]}, {"ingredient_id":14, "recipe_id":[]}, {"ingredient_id":15, "recipe_id":[1]}] #{"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, 
+#                         # {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]},
+#                         # {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, 
+#                         # {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]}, {"ingredient_id":, "recipe_id":[]},]
 
 for ingredient in ingredients:
     add_ingredient(name=ingredient['name'], location=ingredient['location'])
@@ -92,3 +92,20 @@ for recipe in recipes:
     ingredients = ", ".join(recipe['ingredients'])
     add_recipe(name=recipe['name'], ingredients=ingredients, url=recipe["url"])
 
+# from random import choice
+
+# location = ["freezer", "fridge", "pantry"]
+
+# for recipe in recipes:
+#     db_recipe = Recipe(name=recipe["name"], url=recipe["url"])
+#     for ingr in recipe["ingredients"]:
+#         db_ingr = Ingredient.query.filter_by(name=ingr).one()
+#         if not db_ingr:
+#             db_ingr = Ingredient(name=ingr, location=choice(location))
+
+#         db_recipe.ingredients_r.append(db_ingr)
+#     db.session.add(db_recipe)
+#     db.session.commit()
+    
+# onion = Ingredient.query.filter_by(name="onion").one()
+# print(onion.recipes_r)
