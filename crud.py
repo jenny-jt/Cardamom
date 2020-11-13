@@ -1,7 +1,7 @@
 """CRUD operations."""
 import os
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from random import choice
 from model import db, connect_to_db, Ingredient, Inventory, Recipe, MealPlan
 import spoonacular as sp
 
@@ -43,55 +43,82 @@ def update_inventory(ingredient, bought, use_this_week, in_stock, quantity):
 
     return inventory
 
+
 def db_recipe_search(ingredients):
-    """takes in ingredients and num_recipes from form, outputs list of recipes from db"""
+    """takes in ingredients and num_recipes from form, outputs unique list of recipes from db"""
     """if not have one recipe that contains db_recipe = Recipe.query.filter(Recipe.ingredients.contains(ingredients)).all()all ingredients, loop over list of ingredients and search for ingredients individually"""
     # will make a list (or empty list) for each ingredient
     # want it to make a list containing recipes from search of all ingredients
     db_recipes =[]
   
     for ingredient in ingredients: 
-        db_recipe = Recipe.query.filter(Recipe.ingredients.contains(ingredient)).distinct().all()
-        print("for ingredient loop in db_recipe_search:", db_recipe)
+        db_recipe = Recipe.query.filter(
+            Recipe.ingredients.contains(ingredient)).distinct()
         if db_recipe:
             db_recipes.extend(db_recipe)
-    print(db_recipes)        
+    print(f"\nlist of all db_recipes: {db_recipes}\n")  
+    db_recipes = set(db_recipes)
+    db_recipes = list(db_recipes)
+    print(f"\nlist of all db_recipes: {db_recipes}\n")      
+
+    return db_recipes
+
+def db_recipe_r(ingredients):
+    """takes list of ingredients from form and outputs unique list of recipes associated with those ingredients"""
+    db_recipes = []
+
+    for ingredient in ingredients:
+        ingr = Ingredient.query.filter(Ingredient.name == ingredient).first()
+        if not ingr:
+            ingr = add_ingredient(name=ingredient, location=choice(location))
+        ingr_recipes = ingr.recipes_r
+        db_recipes.extend(ingr_recipes)
+
+    db_recipes = set(db_recipes)
+    db_recipes = list(db_recipes)
+
     return db_recipes
 
 
-def api_recipe_search(ingredients, number):
-    """"takes in main ingredient(s) and number of recipes, returns list of recipe ids that match"""
-    response = api.search_recipes_by_ingredients(ingredients, number)
-    data = response.json()
-    api_recipe_ids = []
+# def api_recipe_search(ingredients, number):
+#     """"takes in main ingredient(s) and number of recipes, returns list of recipe ids that match"""
+#     response = api.search_recipes_by_ingredients(ingredients, number)
+#     data = response.json()
+#     print(f"this is the data response from api: {data}")
+#     api_recipe_ids = set()
 
-    for i in range(number):
-        # recipe_title = data[i]['title']
-        api_id = data[i]['id']
-        api_recipe_ids.append(api_id)
+#     for i in range(number):
+#         # recipe_title = data[i]['title']
+#         api_id = data[i]['id']
+#         print(f"this is the api id extracted from the api response: {api_id}")
+#         api_recipe_ids.add(api_id)
+#     api_recipe_ids = list(api_recipe_ids)
+    
+#     return api_recipe_ids
 
-    return api_recipe_ids
+# #TODO: may need to add secondary table code here to keep db updated
+# def recipe_info(recipe_api_id):
+#     """take in id of api recipe and retrieve recipe info and add recipe to db, returns recipe object"""
+#     response = api.get_recipe_information(id=recipe_api_id)
+#     data = response.json()
+#     # recipe_img = data['image']
+#     name = str(data['title'])
+#     print(f"this is the name of the api recipe: {name}")
+#     # cook time = data[‘readyInMinutes’]
 
+#     recipe_ingredients = []
+#     print(f"ingredients from api recipe: {data['extendedIngredients']}")
+#     for i, item in enumerate(data['extendedIngredients']):
+#         print(f"data in ingredients list: {data['extendedIngredients'][i]['name']}")
+#         recipe_ingredients.append(data['extendedIngredients'][i]['name'])
 
-def recipe_info(recipe_api_id):
-    """retrieve recipe info and add recipe to database, returns recipe object. DO I WANT TO GROW DB??"""
-    response = api.get_recipe_information(id=recipe_api_id)
-    data = response.json()
-    # recipe_img = data['image']
-    name = data['title']
-    # cook time = data[‘readyInMinutes’]
+#     url = data['sourceUrl']
 
-    recipe_ingredients = []
-    for i, item in enumerate(data['extendedIngredients']):
-        recipe_ingredients.append(data['extendedIngredients'][i]['name'])
+#     check_recipe_db = Recipe.query.filter(Recipe.name == name).first()
 
-    url = data['sourceUrl']
-
-    check_recipe_db = Recipe.query.filter(Recipe.name == name).first()
-
-    if not check_recipe_db:
-        recipe = add_recipe(name, recipe_ingredients, url)  
-        return recipe
+#     if not check_recipe_db:
+#         recipe = add_recipe(name, recipe_ingredients, url)  
+#         return recipe
 
 
 def mealplan_add_recipe(mealplan, recipe): 
@@ -100,6 +127,9 @@ def mealplan_add_recipe(mealplan, recipe):
 
     print("recipe added to mealplan")
 
+
+# onion = Ingredient.query.filter_by(name="onion").one()
+# print(onion.recipes_r)
  
 if __name__ == '__main__':
     from server import app

@@ -6,6 +6,7 @@ import json
 from model import connect_to_db, db, Ingredient, Inventory, Recipe
 from crud import add_ingredient, add_recipe, add_mealplan, update_inventory
 from server import app    
+from random import choice
 
 os.system('dropdb meals')
 os.system('createdb meals')
@@ -88,24 +89,27 @@ recipes = [{"name": "Taiwanese Ground Pork", "ingredients": ["ground pork"], "ur
 for ingredient in ingredients:
     add_ingredient(name=ingredient['name'], location=ingredient['location'])
 
+# for recipe in recipes:
+#     ingredients = ", ".join(recipe['ingredients'])
+#     add_recipe(name=recipe['name'], ingredients=ingredients, url=recipe["url"])
+
+location = ["freezer", "fridge", "pantry"]
+
+#making secondary table
 for recipe in recipes:
     ingredients = ", ".join(recipe['ingredients'])
-    add_recipe(name=recipe['name'], ingredients=ingredients, url=recipe["url"])
-
-# from random import choice
-
-# location = ["freezer", "fridge", "pantry"]
-
-# for recipe in recipes:
-#     db_recipe = Recipe(name=recipe["name"], url=recipe["url"])
-#     for ingr in recipe["ingredients"]:
-#         db_ingr = Ingredient.query.filter_by(name=ingr).one()
-#         if not db_ingr:
-#             db_ingr = Ingredient(name=ingr, location=choice(location))
-
-#         db_recipe.ingredients_r.append(db_ingr)
-#     db.session.add(db_recipe)
-#     db.session.commit()
-    
-# onion = Ingredient.query.filter_by(name="onion").one()
-# print(onion.recipes_r)
+    db_recipe = add_recipe(name=recipe['name'], ingredients=ingredients, url=recipe["url"])
+    #create recipe object for each recipe in recipes list
+    # print(f'recipe is:\n{db_recipe}\n')
+    for ingr in recipe["ingredients"]:
+        #for each recipe ingredient, query to see if ingredient in db
+        db_ingr = Ingredient.query.filter(Ingredient.name==ingr).first()
+        if not db_ingr:
+            db_ingr = add_ingredient(name=ingr, location=choice(location))
+        # print(f'ingredient is:\n{db_ingr}\n')
+        #if ingredient is not in db, make a new one with a random location
+        db_recipe.ingredients_r.append(db_ingr)
+        # print(f'list of recipe ingredients:\n{db_recipe.ingredients_r}\n')
+        #append ingredient object to ingredient relationship of recipe
+    db.session.add(db_recipe)
+    db.session.commit()
