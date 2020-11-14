@@ -12,9 +12,7 @@ import jinja2
 import spoonacular as sp
 import google.oauth2.credentials
 import google_auth_oauthlib.flow
-import googleapiclient.discovery
-from apiclient.discovery import build
-import httplib2
+from googleapiclient.discovery import build
 from urllib.parse import parse_qs
 from oauth2client import file, client, GOOGLE_TOKEN_URI
 
@@ -23,7 +21,7 @@ app = Flask(__name__)
 app.secret_key = os.environ['secret_key']
 
 CLIENT_SECRETS_FILE = 'client_secret.json'
-API_SERVICE_NAME = 'drive'
+API_SERVICE_NAME = 'cal'
 API_VERSION = 'v3'
 SCOPES = ['https://www.googleapis.com/auth/calendar.events']
 
@@ -50,22 +48,36 @@ def search_results():
     ingredients = request.args.get("ingredients").split(",")
     number = int(request.args.get("num_recipes"))
     date = request.args.get("date")
-    location = ["freezer", "fridge", "pantry"]
     
+    #make sure there is a mealplan obj
+    check_mealplan(date)
+
+    # this is the way without using secondary table
+    # db_recipes = crud.db_recipe_search(ingredients) 
+    db_recipes = crud.db_recipe_r(ingredients)
+    
+    if len(db_recipes) < number:
+        api_recipe_ids = crud.api_id_search(ingredients, number)
+        api_recipes = crud.api_recipes_list(api_recipe_ids)
+    print(f"this is api recipe list: {api_recipes}")    
+
+    return render_template('recipe-display.html', recipes=recipe_list)
+
+
+def check_mealplan(date):
+    """checks if mealplan exists, otherwise makes a new mealplan object"""
     mealplan = MealPlan.query.filter(MealPlan.date == date).first()
 
-    if not mealplan: 
+    if not mealplan:
         mealplan = crud.add_mealplan(date)
+        
+    return mealplan
 
-    # db_recipes = crud.db_recipe_search(ingredients)
-    db_recipes = crud.db_recipe_r(ingredients)
 
-    api_recipe_ids = crud.api_recipe_search(ingredients, number)
-    api_recipes = api_recipes_list(api_recipe_ids)
-    print(f"this is api recipe list: {api_recipes}")
-
-# should separate this out into post because modified db *******
+def make_recipe_list(number, db_recipes, api_recipes):
+    """makes a list of recipes that is the number requested by user"""
     count = 0
+    recipe_list = []
     while count < number:
         if db_recipes:
             item = pick_recipes(db_recipes)
@@ -73,72 +85,46 @@ def search_results():
         else:
             item = pick_recipes(api_recipes)
             api_recipes.remove(item)
-                
-        crud.mealplan_add_recipe(mealplan, item)
-        count += 1    
 
-    recipes = mealplan.recipes_r
+        recipe_list.append(item)
+        count += 1   
+    print(f"this is the final recipe list output: {recipe_list}")     
 
-    return render_template('recipe-display.html', recipes=recipes)
-
-
-def api_recipes_list(api_recipe_ids):
-    """takes in list of recipe ids and outputs list of assoc recipes"""
-    api_recipes = []
-
-    for api_id in api_recipe_ids:
-        recipe = crud.recipe_info(api_id)
-        api_recipes.append(recipe)
-    print(f"this is the list of recipes from api: {api_recipes}")
-    return api_recipes
+    return recipe_list
 
 
 def pick_recipes(recipes):
     """takes in list of recipes, picks a random recipe from list"""
     item = choice(recipes)
 
-    return item    
-
-
-@app.route("/inventory")
-def update_inventory():
-    """ form with default values for location, able to save timestamp, quantity """
-
-    return render_template('inventory.html')
+    return item
 
 
 @app.route("/mealplan")
-def show_meal_plan():
+def show_meal_plan(date):
     """ display meal plan for certain dates """
 
     return render_template('meal-plan.html', date=date)
-
-
-@app.route("/recipe/display")
-def display_recipe():
-    """ display recipe printout via link"""
-    
-    return render_template('recipe-display.html')
 
 
 @app.route('/authorize')
 def authorize():
     '''Asks user for authorization to google calendar account'''
 
-    #creates flow instance to manage OAuth grant access
+    # creates flow instance to manage OAuth grant access
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes=SCOPES)
 
-    #uri configured in API Google console
+    # uri configured in API Google console
     flow.redirect_uri = 'http://localhost:5000/oauth2callback'
 
-    #finds authorization url
+    # finds authorization url
     authorization_url, state = flow.authorization_url(
                                 access_type='offline', 
                                 include_granted_scopes='true')
     print('\n{authorization_url}\n')
     session['state'] = state
 
-    #redirect user through authorization url 
+    # redirect user through authorization url 
     return redirect(authorization_url)
 
 
@@ -146,7 +132,7 @@ def authorize():
 def oauth2callback():
     '''Processes response for google calendar authorization'''
 
-    #creates flow instance to manage OAuth grant access
+    # creates flow instance to manage OAuth grant access
     flow = google_auth_oauthlib.flow.Flow.from_client_secrets_file(CLIENT_SECRETS_FILE, scopes=SCOPES)
 
     flow.redirect_uri = 'http://localhost:5000/oauth2callback'
@@ -155,45 +141,43 @@ def oauth2callback():
     authorization_response = request.url
                             # = request.build_absolute_uri()
 
-    #fetch tocken for the authorization response
+    # fetch tocken for the authorization response
     flow.fetch_token(authorization_response=authorization_response)
 
-    #credentials stored
+    # credentials stored
     credentials = flow.credentials
 
     session['credentials'] = credentials_to_dict(credentials)
-    flash('Succesfully logged in to Google Calendar! Try adding again.')
-    return redirect('/cal')
 
+    flash('Succesfully logged in to Google Calendar!')
+    return render_template('meal-plan.html')
 
-@app.route('/cal')
-def cal():
-    return "yay"
 
 #TODO: get request to retrieve meal plan as json blob. user says looks good, add to gcal. This pg will post to make_calendar_event
 @app.route('/add-to-calendar', methods=['GET'])
 def make_calendar_event():
     '''Add all-day recipe event to user's google calendar with OAUTH'''
     
-    #checks if credentials not already in session
+    # checks if credentials not already in session
     if 'credentials' not in session:
         return redirect('/authorize')
-    #gets information about recipe to add to calendar
+    # gets information about recipe to add to calendar
     # recipes = [<Recipe name = 3-Ingredient Bacon Stuffed Mushrooms ingredients = {"button mushrooms", "cooked bacon", "feta cheese"}>, 
     #     <Recipe name = Easy Pesto Stuffed Mushrooms ingredients = {"button mushrooms", parmesan, pesto }>]
-    #grabs stored OAuth credentials
+    # grabs stored OAuth credentials
     credentials = google.oauth2.credentials.Credentials(**session['credentials'])
 
-    #client a google api client to make google calendar event
-    drive = googleapiclient.discovery.build(
-      'calendar', API_VERSION, credentials=credentials)
+    # client a google api client to make google calendar event
+    cal = build('calendar', API_VERSION, credentials=credentials)
 
     event = create_google_calendar_event()
 
-    #creates google calendar event with session stored moon phase info
-    # session['event'] = create_google_calendar_event(recipe.name, recipe.url)
-    #adds the calendar event to the google calendar
-    event_to_add = drive.events().insert(calendarId='primary', sendNotifications=True, body=event).execute()
+    # creates google calendar event
+    session['event'] = create_cal_event(mealplan)
+
+    # adds the calendar event to the google calendar
+    add_event = cal.events().insert(calendarId='tl9a33nl5al9k337lh45f40av8@group.calendar.google.com', sendNotifications=True, body=event).execute()
+
     flash('Event added to calendar!')
 
     return "success"
@@ -212,18 +196,43 @@ def credentials_to_dict(credentials):
 
 
 def create_google_calendar_event():
-  """Takes recipe object and uses name and url to turn into google calendar event"""
-  name= "recipe_name"
-  description="description"
+    """Takes in mealplan object, turns all the associated recipe objects into gcal events
+    date of event: mealplan date (or random choice of mealplan dates)
+    name of event: recipe name 
+    description of event: cook time
+    source: recipe url
+    """
+#   for recipe in mealplan.recipes_r:
+#       name = recipe.name
+#       url = recipe.url
+#       description = "recipe cook time"
+    name = "name"
+    description = ""
+    # url = ""
 
-  #dictionary for google event information
-  event = {
+    # dictionary for google event information
+    event = {
                 'summary': name,
                 'start': {"date": "2020-11-13"},
                 'end': {"date": "2020-11-13"},
-                'description': description
+                'description': description,
+                # 'source': {"url": url}
             }
-  return event
+    return event
+
+
+@app.route("/recipe/display")
+def display_recipe():
+    """ display recipe printout via link"""
+    
+    return render_template('recipe-display.html')
+
+
+@app.route("/inventory")
+def update_inventory():
+    """ form with default values for location, able to save timestamp, quantity """
+
+    return render_template('inventory.html')
 
 
 if __name__ == "__main__":

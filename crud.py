@@ -80,53 +80,71 @@ def db_recipe_r(ingredients):
     return db_recipes
 
 
-# def api_recipe_search(ingredients, number):
-#     """"takes in main ingredient(s) and number of recipes, returns list of recipe ids that match"""
-#     response = api.search_recipes_by_ingredients(ingredients, number)
-#     data = response.json()
-#     print(f"this is the data response from api: {data}")
-#     api_recipe_ids = set()
+def api_id_search(ingredients, number):
+    """"takes in main ingredient(s) and number of recipes,
+     returns list (length of number) of unique recipe ids
+    """
+    response = api.search_recipes_by_ingredients(ingredients, number)
+    #search API for number of recipes with ingredients
+    data = response.json()
+    print(f"this is the data response from api: {data}")
+    api_recipe_ids = set()
 
-#     for i in range(number):
-#         # recipe_title = data[i]['title']
-#         api_id = data[i]['id']
-#         print(f"this is the api id extracted from the api response: {api_id}")
-#         api_recipe_ids.add(api_id)
-#     api_recipe_ids = list(api_recipe_ids)
+    for i in range(number):
+        # recipe_title = data[i]['title']
+        api_id = data[i]['id']
+        print(f"this is the api id extracted from the api request: {api_id}")
+        api_recipe_ids.add(api_id)  # add id to a set
+    api_recipe_ids = list(api_recipe_ids)  # turn set of ids into a list
     
-#     return api_recipe_ids
-
-# #TODO: may need to add secondary table code here to keep db updated
-# def recipe_info(recipe_api_id):
-#     """take in id of api recipe and retrieve recipe info and add recipe to db, returns recipe object"""
-#     response = api.get_recipe_information(id=recipe_api_id)
-#     data = response.json()
-#     # recipe_img = data['image']
-#     name = str(data['title'])
-#     print(f"this is the name of the api recipe: {name}")
-#     # cook time = data[‘readyInMinutes’]
-
-#     recipe_ingredients = []
-#     print(f"ingredients from api recipe: {data['extendedIngredients']}")
-#     for i, item in enumerate(data['extendedIngredients']):
-#         print(f"data in ingredients list: {data['extendedIngredients'][i]['name']}")
-#         recipe_ingredients.append(data['extendedIngredients'][i]['name'])
-
-#     url = data['sourceUrl']
-
-#     check_recipe_db = Recipe.query.filter(Recipe.name == name).first()
-
-#     if not check_recipe_db:
-#         recipe = add_recipe(name, recipe_ingredients, url)  
-#         return recipe
+    return api_recipe_ids
 
 
-def mealplan_add_recipe(mealplan, recipe): 
-    """add recipe to mealplan"""
-    mealplan.add_recipe_to_mealplan(recipe) 
+def api_recipes_list(api_recipe_ids):
+    """takes in list of recipe ids and outputs list of assoc recipes"""
+    api_recipes = []
 
-    print("recipe added to mealplan")
+    for api_id in api_recipe_ids:
+        recipe = recipe_info(api_id)
+        api_recipes.append(recipe)
+    print(f"this is the list of api recipes from crud: {api_recipes}")
+    return api_recipes
 
+
+#TODO: may need to add secondary table code here to keep db updated
+def recipe_info(recipe_api_id):
+    """take in id of api recipe and retrieve recipe info and add recipe to db, returns recipe object"""
+    response = api.get_recipe_information(id=recipe_api_id)
+    data = response.json()
+    # recipe_img = data['image']
+    name = str(data['title'])
+    print(f"this is the name of the api recipe: {name}")
+    # cook time = data[‘readyInMinutes’]
+
+    recipe_ingredients = []
+    print(f"ingredients from api recipe: {data['extendedIngredients']}")
+    for i, item in enumerate(data['extendedIngredients']):
+        print(f"data in ingredients list: {data['extendedIngredients'][i]['name']}")
+        recipe_ingredients.append(data['extendedIngredients'][i]['name'])
+
+    url = data['sourceUrl']
+
+    check_recipe_db = Recipe.query.filter(Recipe.name == name).first()
+
+    if not check_recipe_db:
+        recipe = add_recipe(name, recipe_ingredients, url)  
+        return recipe
+
+
+#TODO: add for loop
+def mealplan_add_recipe(mealplan, item): 
+    """takes in mealplan and adds recipe to mealplan via a method, returns list of recipes associated with mealplan obj"""
+
+    mealplan.add_recipe_to_mealplan(item) 
+    recipes = mealplan.recipes_r
+
+    print("recipes added to mealplan")
+    return recipes
 
 # onion = Ingredient.query.filter_by(name="onion").one()
 # print(onion.recipes_r)

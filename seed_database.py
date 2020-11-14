@@ -95,7 +95,7 @@ for ingredient in ingredients:
 
 location = ["freezer", "fridge", "pantry"]
 
-#making secondary table
+#making secondary table, having ingredients associated with recipes and vice versa
 for recipe in recipes:
     ingredients = ", ".join(recipe['ingredients'])
     db_recipe = add_recipe(name=recipe['name'], ingredients=ingredients, url=recipe["url"])

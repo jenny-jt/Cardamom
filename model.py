@@ -11,7 +11,7 @@ class Ingredient(db.Model):
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
-    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     name = db.Column(db.String(), nullable=False)
     location = db.Column(db.String(20), nullable=False)
@@ -30,7 +30,7 @@ class Recipe(db.Model):
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
-    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     name = db.Column(db.String(), nullable=False)
     ingredients = db.Column(db.String(), nullable=False)
@@ -51,7 +51,7 @@ class MealPlan(db.Model):
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
-    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     date = db.Column(db.DateTime(timezone=True), nullable=False)
 
@@ -74,7 +74,7 @@ class Inventory(db.Model):
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
-    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     ingredient_id = db.Column(db.Integer, db.ForeignKey("ingredients.id"))
     mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
@@ -104,6 +104,7 @@ class Ingredient_Recipe(db.Model):
     ingredient_id = db.Column(db.Integer, db.ForeignKey("ingredients.id"))
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
 
+
 class Recipe_MealPlan(db.Model):
     """unique table created for each recipe """ 
 
@@ -118,7 +119,7 @@ class Recipe_MealPlan(db.Model):
 
     # recipe_r = db.relationship('Recipe', backref='recipes_mealplans')
     # mealplan_r = db.relationship('MealPlan', backref='recipes_mealplans')
-    
+
 
 def connect_to_db(app):
     """Connect the database to our Flask app."""
@@ -131,7 +132,9 @@ def connect_to_db(app):
 
     print('Connected to the db!')
 
+
 if __name__ == "__main__":
     from server import app
     connect_to_db(app)
+    os.system('createdb meals')
     db.create_all()
