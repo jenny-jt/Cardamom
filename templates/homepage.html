@@ -2,4 +2,11 @@
 
 {% block title %} Homepage {% endblock %}
 
-{% block body %} Welcome {% endblock %}
+{% block body %} 
+Welcome! 
+MealPlanner needs access to your Google Calendar in order to display recipes.
+<form action="/authorize">
+    Authorize MealPlanner to access Google Calendar
+    <button type="submit"> Authorize </button>
+</form>
+{% endblock %}

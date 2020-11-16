@@ -1,5 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
+from flask import json
 from datetime import datetime, timezone
+import jsonpickle
+from json import JSONEncoder
 import os
 
 db = SQLAlchemy()
@@ -23,6 +26,7 @@ class Ingredient(db.Model):
 
         return f"<ingredient ingredient_id={self.id} name={self.name} location={self.location}>"
 
+
 class Recipe(db.Model):
     """unique table created for each recipe """ 
 
@@ -34,6 +38,7 @@ class Recipe(db.Model):
     deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     name = db.Column(db.String(), nullable=False)
     ingredients = db.Column(db.String(), nullable=False)
+    cook_time = db.Column(db.Integer, nullable=True)
     url = db.Column(db.String(), nullable=False)
 
     # ingredients_r = db.relationship("Ingredient", secondary="ingredients_recipes", backref="recipes_r")
@@ -59,12 +64,15 @@ class MealPlan(db.Model):
 
     def __repr__(self):
         """Provide helpful representation when printed."""
-
         return f"<Mealplan id={self.id} date={self.date}>"
 
     def add_recipe_to_mealplan(self, recipe):
         """Add recipe to mealplan"""
         self.recipes_r.append(recipe)
+
+    # def toJson(self):
+    #     return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+        # when use this method with server.py, get error: weakref obj has no attribute '__dict__'
 
 
 class Inventory(db.Model):
