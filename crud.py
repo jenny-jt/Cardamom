@@ -1,11 +1,12 @@
 """CRUD operations."""
 import os
-from flask_sqlalchemy import SQLAlchemy
+# from flask_sqlalchemy import SQLAlchemy
 from random import choice
 from model import db, connect_to_db, Ingredient, Inventory, Recipe, MealPlan
 import spoonacular as sp
 
 api = sp.API(os.environ['apiKey'])
+
 
 def add_ingredient(name,location):
     """add ingredient"""
@@ -14,6 +15,7 @@ def add_ingredient(name,location):
     db.session.commit()
 
     return ingredient
+
 
 def add_recipe(name, ingredients, url, cook_time="n/a"):
     """add recipes with required ingredient(s)"""
@@ -33,35 +35,18 @@ def add_mealplan(date):
     return mealplan
 
 
-def update_inventory(ingredient, bought, use_this_week, in_stock, quantity):
-    """update inventory when ingredient bought or used"""
+def all_recipes():
+    """output all recipes in database"""
+    recipes = Recipe.query.all()
 
-    inventory = Inventory(ingredient_r=ingredient, bought=bought, use_this_week=use_this_week, in_stock=in_stock, quantity=quantity)
-
-    db.session.add(inventory)
-    db.session.commit()
-
-    return inventory
+    return recipes
 
 
-# this is the way to get db_recipes without secondary table
-def db_recipe_search(ingredients):
-    """takes in ingredients and num_recipes from form, outputs unique list of recipes from db"""
-    """if not have one recipe that contains db_recipe = Recipe.query.filter(Recipe.ingredients.contains(ingredients)).all()all ingredients, loop over list of ingredients and search for ingredients individually"""
-    # will make a list (or empty list) for each ingredient
-    # want it to make a list containing recipes from search of all ingredients
-    db_recipes = []
+def all_mealplans():
+    """output all mealplans in database"""
+    mealplans = MealPlan.query.all()
 
-    for ingredient in ingredients:
-        db_recipe = Recipe.query.filter(
-            Recipe.ingredients.contains(ingredient)).distinct()
-        if db_recipe:
-            db_recipes.extend(db_recipe)
-
-    db_recipes = set(db_recipes)
-    db_recipes = list(db_recipes)
-
-    return db_recipes
+    return mealplans
 
 
 # this utilizes secondary table to generate db_recipes
@@ -83,33 +68,28 @@ def db_recipe_r(ingredients):
     return db_recipes
 
 
+def create_api_recipes(ingredients, num):
+    api_ids = api_id_search(ingredients, num)
+    api_recipes = api_recipes_list(api_ids)
+
+    return api_recipes
+
+
 def api_id_search(ingredients, number):
     """"takes in main ingredient(s) and number of recipes,
      returns list (length of number) of unique recipe ids
     """
-    # number = session['num']
+    # response from API for number of recipes, will extract recipe ids
     response = api.search_recipes_by_ingredients(ingredients, number=number, ranking=1)
     data = response.json()
     api_recipe_ids = set()
 
     for i in range(number):
-        # recipe_title = data[i]['title']
         api_id = data[i]['id']
         api_recipe_ids.add(api_id)  # add id to a set
     api_recipe_ids = list(api_recipe_ids)  # turn set of ids into a list
 
     return api_recipe_ids
-
-
-def api_recipes_list(api_recipe_ids):
-    """takes in list of recipe ids and outputs list of assoc recipes"""
-    api_recipes = []
-
-    for api_id in api_recipe_ids:
-        recipe = recipe_info(api_id)
-        api_recipes.append(recipe)
-    print(f"this is the list of api recipes from crud: {api_recipes}")
-    return api_recipes
 
 
 # TODO: refactor
@@ -172,19 +152,62 @@ def recipe_info(recipe_api_id):
     return check_db
 
 
-# TODO: check if mealplan obj is accumulating more recipes
+def api_recipes_list(api_recipe_ids):
+    """takes in list of recipe ids and outputs list of assoc recipes"""
+    api_recipes = []
+
+    for api_id in api_recipe_ids:
+        recipe = recipe_info(api_id)
+        api_recipes.append(recipe)
+    print(f"this is the list of api recipes from crud: {api_recipes}")
+    return api_recipes
+
+
 def mealplan_add_recipe(mealplan, recipes_list):
     """takes in mealplan obj and list of recipes
     adds recipes to mealplan via a method,
-    returns list of recipes associated with mealplan obj
+    returns list of unique recipes associated with mealplan obj
     """
     for item in recipes_list:
-        mealplan.add_recipe_to_mealplan(item) 
+        if item not in mealplan.recipes_r:
+            mealplan.add_recipe_to_mealplan(item)
+            db.session.commit()
 
-    recipes = mealplan.recipes_r  # this should keep accumulating more recipes?
-    db.session.commit()
-    print(f"recipe objects associated with mealplan: {recipes} ")
+    recipes = mealplan.recipes_r
+
+    print(f"recipe objects associated with mealplan: {recipes}")
     return recipes
+
+
+def update_inventory(ingredient, bought, use_this_week, in_stock, quantity):
+    """update inventory when ingredient bought or used"""
+
+    inventory = Inventory(ingredient_r=ingredient, bought=bought, use_this_week=use_this_week, in_stock=in_stock, quantity=quantity)
+
+    db.session.add(inventory)
+    db.session.commit()
+
+    return inventory
+
+
+# this is the way to get db_recipes without secondary table
+def db_recipe_search(ingredients):
+    """takes in ingredients and num_recipes from form, outputs unique list of recipes from db"""
+    """if not have one recipe that contains db_recipe = Recipe.query.filter(Recipe.ingredients.contains(ingredients)).all()all ingredients, loop over list of ingredients and search for ingredients individually"""
+    # will make a list (or empty list) for each ingredient
+    # want it to make a list containing recipes from search of all ingredients
+    db_recipes = []
+
+    for ingredient in ingredients:
+        db_recipe = Recipe.query.filter(
+            Recipe.ingredients.contains(ingredient)).distinct()
+        if db_recipe:
+            db_recipes.extend(db_recipe)
+
+    db_recipes = set(db_recipes)
+    db_recipes = list(db_recipes)
+
+    return db_recipes
 
 
 if __name__ == '__main__':

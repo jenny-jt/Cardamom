@@ -4,9 +4,16 @@
 
 {% block body %} 
 Welcome!<br>
-MealPlanner needs access to your Google Calendar in order to display recipes.
-<form action="/authorize">
-    Authorize MealPlanner to access Google Calendar
-    <button type="submit"> Authorize </button>
+<form action="/recipes">
+    View all recipes <br>
+    <button type="submit"> Recipes </button>
+</form>
+<form action="/mealplans">
+    View all mealplans <br>
+    <button type="submit"> Meal plans </button>
+</form>
+<form action="/create">
+    Create a new mealplan
+    <button type="submit"> Create </button>
 </form>
 {% endblock %}
