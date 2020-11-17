@@ -48,7 +48,9 @@ class Recipe(db.Model):
 
         return f"<Recipe name={self.name} ingredients={self.ingredients}>"
 
-
+# TODO: reason to change timezone=True, automatically saves as isostring
+    # start_at = db.Column(db.DateTime)
+    # end_at = db.Column(db.DateTime)
 class MealPlan(db.Model):
     """unique table created for each recipe """ 
 
@@ -69,10 +71,6 @@ class MealPlan(db.Model):
     def add_recipe_to_mealplan(self, recipe):
         """Add recipe to mealplan"""
         self.recipes_r.append(recipe)
-
-    # def toJson(self):
-    #     return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
-        # when use this method with server.py, get error: weakref obj has no attribute '__dict__'
 
 
 class Inventory(db.Model):

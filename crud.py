@@ -92,7 +92,7 @@ def api_id_search(ingredients, number):
     data = response.json()
     api_recipe_ids = set()
 
-    for i in range(num):
+    for i in range(number):
         # recipe_title = data[i]['title']
         api_id = data[i]['id']
         api_recipe_ids.add(api_id)  # add id to a set
@@ -112,7 +112,7 @@ def api_recipes_list(api_recipe_ids):
     return api_recipes
 
 
-# TODO: may need to add secondary table code here to keep db updated
+# TODO: refactor
 def recipe_info(recipe_api_id):
     """take in id of api recipe and retrieve recipe info and add recipe to db, returns recipe object"""
     response = api.get_recipe_information(id=recipe_api_id)
@@ -124,9 +124,15 @@ def recipe_info(recipe_api_id):
     cook_time = int(data['readyInMinutes'])
     url = data['sourceUrl']
 
-    recipe_ingredients = []
+    recipe_ingredients = set()
     ingr_data = data['extendedIngredients']
-    print(f"\nthis is the recipe ingredient data: {data}\n")
+    for ingr in ingr_data:
+        if ingr["id"]:  # if the ID exists
+            print(f"id: {ingr['id']}")
+            print(f"name: {ingr['name']}")
+
+    # ingr_data = data['analyzedInstructions'][0]['steps'][0]['ingredients']  # a list of dictionary objects
+    print(f"\nthis is the extended ingredient data: {data}\n")
 
     for i, item in enumerate(ingr_data):
         ingredient_id = ingr_data[i]['id']
@@ -134,14 +140,32 @@ def recipe_info(recipe_api_id):
         ingredient_name = ingr_data[i]['name']
         print(f"name: {ingredient_name}")
         if ingredient_id != "None":
-            recipe_ingredients.append(ingredient_name)
+            recipe_ingredients.add(ingredient_name)
     print(f"\nthis is the recipe ingredient data: {recipe_ingredients}\n")
+    recipe_ingredients = list(recipe_ingredients)
 
+    # check if recipe already exists in db
     check_db = Recipe.query.filter(Recipe.name == name).first()
 
     if not check_db:
         ingredients = ", ".join(recipe_ingredients)
         recipe = add_recipe(name=name, ingredients=ingredients, url=url, cook_time=cook_time)
+
+        location = ["freezer", "fridge", "pantry"]
+
+        for ingr in ingredients:
+            # for each recipe ingredient, query to see if ingredient in db
+            db_ingr = Ingredient.query.filter(Ingredient.name == ingr).first()
+
+            # if ingredient is not in db, make a new one with a random location
+            if not db_ingr:
+                db_ingr = add_ingredient(name=ingr, location=choice(location))
+            # append ingredient object to ingredient relationship of recipe
+            recipe.ingredients_r.append(db_ingr)
+        # print(f'list of recipe ingredients:\n{db_recipe.ingredients_r}\n')
+
+        db.session.add(recipe)
+        db.session.commit()
         print(f"\nnew api recipe added to db: {recipe}\n")
         return recipe
 
@@ -157,12 +181,10 @@ def mealplan_add_recipe(mealplan, recipes_list):
     for item in recipes_list:
         mealplan.add_recipe_to_mealplan(item) 
 
-    recipes = mealplan.recipes_r  #this should keep accumulating more recipes?
-    print(f"recipes in mealplan: {recipes} ")
+    recipes = mealplan.recipes_r  # this should keep accumulating more recipes?
+    db.session.commit()
+    print(f"recipe objects associated with mealplan: {recipes} ")
     return recipes
-
-# onion = Ingredient.query.filter_by(name="onion").one()
-# print(onion.recipes_r)
 
 
 if __name__ == '__main__':
