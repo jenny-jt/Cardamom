@@ -16,9 +16,9 @@ def add_ingredient(name,location):
     return ingredient
 
 
-def add_recipe(name, ingredients, url, cook_time="n/a"):
+def add_recipe(name, ingredients, url, cook_time="n/a", image="none"):
     """add recipes with required ingredient(s)"""
-    recipe = Recipe(name=name, ingredients=ingredients, url=url, cook_time=cook_time)
+    recipe = Recipe(name=name, ingredients=ingredients, url=url, cook_time=cook_time, image=image)
     db.session.add(recipe)
     db.session.commit()
 
@@ -112,6 +112,7 @@ def recipe_info(api_id):
     name = str(data['title'])
     cook_time = int(data['readyInMinutes'])
     url = data['sourceUrl']
+    image = data['image']
 
     ingr_data = data['extendedIngredients']
     recipe_ingredients = add_ingr(ingr_data)
@@ -120,7 +121,7 @@ def recipe_info(api_id):
 
     if not check_db:
         ingredients = ", ".join(recipe_ingredients)
-        recipe = add_recipe(name=name, ingredients=ingredients, url=url, cook_time=cook_time)
+        recipe = add_recipe(name=name, ingredients=ingredients, url=url, cook_time=cook_time, image=image)
         location = ["freezer", "fridge", "pantry"]
 
         for ingr in ingredients:

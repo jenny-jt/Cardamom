@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect, session, flash
 import os
 
 from model import db, connect_to_db, MealPlan, Recipe
-from helper import check_mealplan, make_cal_event, cred_dict, create_recipe_list
+from helper import check_mealplan, make_cal_event, cred_dict, create_recipe_list, pick_recipes
 from crud import all_recipes, all_mealplans, create_db_recipes, mealplan_add_recipe
 
 from google_auth_oauthlib.flow import Flow
@@ -121,6 +121,44 @@ def search_results():
                            alt_recipes=alt_recipes)
 
 
+@app.route('/modify', methods=['POST'])
+def modify_recipes():
+    """remove select recipes and replace with additional db/api recipes"""
+    # pass mealplan object in
+    mealplan_id = request.form.get("mealplan_id")
+    mealplan = MealPlan.query.get(mealplan_id)
+    # display all recipes associated with MealPlan
+    recipes = mealplan.recipes_r
+    # select recipe that should be removed
+    recipe_name = request.form.get("recipe_name")
+    recipe = Recipe.query.filter(Recipe.name == recipe_name).first()
+    # remove recipe
+    recipes.remove(recipe)
+    print(f"this is the recipes list after removal: {recipes}")
+    db.session.commit()
+
+    # 1. randomly select recipes from alt_recipes to add to mealplan
+    new_recipes = []
+    new_recipe = pick_recipes(alt_recipes)
+    new_recipes.append(new_recipe)
+
+    # 2. select recipes by form from alt_recipes
+    new_recipes = []
+    new_recipe = request.form.get("new_recipe_name")  # what if there are multiple recipes selected to add. does this 
+    new_recipes.append(new_recipe)
+
+    # add new recipes
+    new_recipes = mealplan_add_recipe(mealplan, new_recipes)  # do i need this list of new recipes?
+    db.session.commit()
+
+    flash('Recipes removed and added')
+    return redirect('/modified')  # redirects to Method Not Allowed (for requested url /cal)
+    # display all recipes again and ask for approval
+    # rel = Recipe_Mealplan.query.filter(recipe_id==recipe_id and mealplan.id==mealplan_id).first()
+    # db.session.delete(rel)
+
+
+@app.route('/modified', methods=['POST'])
 @app.route('/cal', methods=['POST'])
 def make_calendar_event():
     """Add all-day recipe event to user's google calendar with OAUTH"""
@@ -144,31 +182,6 @@ def make_calendar_event():
     flash('Recipes added to MealPlan calendar!')
 
     return render_template('homepage.html')
-
-
-@app.route('/modify', methods=['POST'])
-def modify_recipes():
-    """remove select recipes and replace with additional db/api recipes"""
-    # pass mealplan object in
-    mealplan_id = request.form.get("mealplan_id")
-    mealplan = MealPlan.query.get(mealplan_id)
-    # display all recipes associated with MealPlan
-    recipes = mealplan.recipes_r
-    # select recipe that should be removed
-    recipe_name = request.form.get("recipe_name")
-    recipe = Recipe.query.filter(Recipe.name == recipe_name).first()
-    recipes.remove(recipe)
-    db.session.commit()
-
-    # select recipe from alt_ recipes to add to mealplan
-    
-    # add recipe
-
-    # rel = Recipe_Mealplan.query.filter(recipe_id==recipe_id and mealplan.id==mealplan_id).first()
-    # db.session.delete(rel)
-    flash('Recipe removed') 
-    return redirect('/cal') # redirects to Method Not Allowed (for requested url /cal)
-    # display all recipes again and ask for approval
 
 
 # @app.route("/inventory")

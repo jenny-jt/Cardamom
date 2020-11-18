@@ -37,6 +37,7 @@ class Recipe(db.Model):
     ingredients = db.Column(db.String(), nullable=False)
     cook_time = db.Column(db.Integer, nullable=True)
     url = db.Column(db.String(), nullable=False)
+    image = db.Column(db.String(), nullable=True)
 
     # ingredients_r = db.relationship("Ingredient", secondary="ingredients_recipes", backref="recipes_r")
 
