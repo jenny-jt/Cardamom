@@ -1,8 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from flask import json
 from datetime import datetime, timezone
-import jsonpickle
-from json import JSONEncoder
 import os
 
 db = SQLAlchemy()

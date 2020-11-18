@@ -1,9 +1,9 @@
 from flask import Flask, request, render_template, redirect, session, flash
 import os
 
-from model import connect_to_db, MealPlan
+from model import db, connect_to_db, MealPlan, Recipe
 from helper import check_mealplan, make_cal_event, cred_dict, create_recipe_list
-from crud import all_recipes, all_mealplans, db_recipe_r, mealplan_add_recipe
+from crud import all_recipes, all_mealplans, create_db_recipes, mealplan_add_recipe
 
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
@@ -61,14 +61,13 @@ def create_mealplan():
 @app.route('/authorize')
 def authorize():
     """OAuth"""
-    # unpack authorization url and state
+
     authorization_url, state = flow.authorization_url(
                                 access_type='offline',
                                 include_granted_scopes='true')
 
     session['state'] = state
 
-    # redirect user
     return redirect(authorization_url)
 
 
@@ -78,12 +77,10 @@ def callback():
     # google making a request to flask server with code attached
     authorization_response = request.url
 
-    # fetch tocken for the authorization response
     flow.fetch_token(authorization_response=authorization_response)
 
     credentials = flow.credentials
 
-    # store credentials in dict format in session
     session['credentials'] = cred_dict(credentials)
 
     flash('Succesfully logged in to Google Calendar!')
@@ -96,31 +93,34 @@ def search_results():
        outputs list of recipes that are associated with mealplan obj
     """
     ingredients = request.args.get("ingredients").split(",")
-
     num = int(request.args.get("num_recipes"))
-    session['num'] = num
-
     date = request.args.get("date")
+
+    session['num'] = num
     session['date'] = date
 
-    # make sure there is a mealplan obj
     mealplan = check_mealplan(date)
+    db_recipes = create_db_recipes(ingredients)
 
-    db_recipes = db_recipe_r(ingredients)
-    # session['db_recipes'] = db_recipes
+    lists = create_recipe_list(ingredients, num, db_recipes)
+    print(f"\nthis is the lists**: {lists}\n")
+    recipes = mealplan_add_recipe(mealplan, lists[0])
 
-    recipe_list = create_recipe_list(ingredients, num, db_recipes)
+    if len(lists) > 2:
+        alt_recipes = lists[1] + lists[2]
+    else:
+        alt_recipes = lists[1]
 
-    recipes = mealplan_add_recipe(mealplan, recipe_list)
+    if alt_recipes:
+        # if run out, query api
+        print(f"\nthis is the list of alternate recipes: {alt_recipes}\n")
 
-    return render_template('cal.html', recipes=recipes, mealplan=mealplan)
+    return render_template('cal.html',
+                           recipes=recipes,
+                           mealplan=mealplan,
+                           alt_recipes=alt_recipes)
 
 
-# TODO: figure out how to query mealplan obj using date stored in session
-    # get mealplan obj using date
-    # mealplan = MealPlan.query.get(date)
-    # dummy data
-    # recipes = Recipe.query.filter(Recipe.ingredients.contains("carrot")).distinct()
 @app.route('/cal', methods=['POST'])
 def make_calendar_event():
     """Add all-day recipe event to user's google calendar with OAUTH"""
@@ -130,27 +130,15 @@ def make_calendar_event():
 
     # google api client to make google calendar event
     cal = build('calendar', API_VERSION, credentials=credentials)
-
     cal_id = 'tl9a33nl5al9k337lh45f40av8@group.calendar.google.com'
-
     date = session["date"]
 
-    # from template hidden form input
     mealplan_id = request.form.get("mealplan_id")
-
-    # get mealplan obj using id
     mealplan = MealPlan.query.get(mealplan_id)
-    print(f"this is the mealplan object {mealplan}")
-
     recipes = mealplan.recipes_r
-    print(f"this is the list of recipe objects from mealplan: {recipes}")
-    # creates google calendar event for each recipe in mealplan 
 
-    print(f"\nrecipe list to make events: {recipes}\n")
-    # no duplicates here
     for recipe in recipes:
         event = make_cal_event(recipe, date)
-        # adds the calendar event to the google calendar
         add_event = cal.events().insert(calendarId=cal_id, sendNotifications=True, body=event).execute()
 
     flash('Recipes added to MealPlan calendar!')
@@ -161,19 +149,25 @@ def make_calendar_event():
 @app.route('/modify', methods=['POST'])
 def modify_recipes():
     """remove select recipes and replace with additional db/api recipes"""
-    # db_recipes = session['db_recipes']
-    # api_recipes = session['api_recipes']
-
+    # pass mealplan object in
+    mealplan_id = request.form.get("mealplan_id")
+    mealplan = MealPlan.query.get(mealplan_id)
     # display all recipes associated with MealPlan
+    recipes = mealplan.recipes_r
+    # select recipe that should be removed
+    recipe_name = request.form.get("recipe_name")
+    recipe = Recipe.query.filter(Recipe.name == recipe_name).first()
+    recipes.remove(recipe)
+    db.session.commit()
 
-    # recipe = selected recipe to remove
-
-    # remove(recipe)
-
-    # select recipe to add to mealplan
-
+    # select recipe from alt_ recipes to add to mealplan
+    
     # add recipe
 
+    # rel = Recipe_Mealplan.query.filter(recipe_id==recipe_id and mealplan.id==mealplan_id).first()
+    # db.session.delete(rel)
+    flash('Recipe removed') 
+    return redirect('/cal') # redirects to Method Not Allowed (for requested url /cal)
     # display all recipes again and ask for approval
 
 
