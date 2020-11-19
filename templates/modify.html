@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %} Mealplan recipes {% endblock %}
+
+{% block body %} 
+
+Mealplan for: {{mealplan.date}}<br>
+
+Modify mealplan recipes<br>
+
+<form action="/modify" method='POST'>
+    <input type="hidden" name="mealplan_id" value="{{ mealplan.id }}">
+Please select the recipes you would like to remove:<br>
+    {% for recipe in recipes %}
+    <div>
+        Name: {{ recipe.name }} <br>
+        <img src="{{ recipe.image }}" width="150" height="150" alt="{{ recipe.name }}"
+            style="float:left; margin-right:10px; margin:5px"><br>
+        Coook time: {{ recipe.cook_time }} minutes <br>
+        Link: <a href="recipe.url"> Go to Recipe</a><br>
+        <input type="checkbox" name="remove" value="{{ recipe.id }}">
+    </div>
+    {% endfor %}
+
+Please select the recipes you would like to add:<br>
+    {% for recipe in alt_recipes %}
+    <div>
+        Name: {{ recipe.name }} <br>
+        <img src="{{ recipe.image }}" width="150" height="150" alt="{{ recipe.name }}"
+            style="float:left; margin-right:10px; margin:5px"><br>
+        Coook time: {{ recipe.cook_time }} minutes <br>
+        Link: <a href="recipe.url"> Go to Recipe</a><br>
+        <input type="checkbox" name="add" value="{{ recipe.id }}">
+    </div>
+    {% endfor %}
+
+    <input type="submit" value="Make Changes"><br>
+
+Add to Calendar<br>
+<form action="/events" method='POST'>
+    <!-- hidden form input to store mealplan_id -->
+    <input type="hidden" name="mealplan_id"value="{{ mealplan.id }}">
+
+    Here are the recipes for this mealplan:
+    Looks Good <button type="submit"> Add to Calendar </button>
+</form>
+{% endblock %}

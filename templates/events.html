@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %} Mealplan recipes {% endblock %}
+
+{% block body %} 
+
+Mealplan for: {{mealplan.date}}<br>
+
+Final Meal Plan Recipes<br>
+
+    {% for recipe in recipes %}
+    <div>
+        Name: {{ recipe.name }} <br>
+        <img src="{{ recipe.image }}" width="150" height="150" alt="{{ recipe.name }}"
+            style="float:left; margin-right:10px; margin:5px"><br>
+        Coook time: {{ recipe.cook_time }} minutes <br>
+        Link: <a href="recipe.url"> Go to Recipe</a><br>
+    </div>
+    {% endfor %}
+
+Add to Calendar<br>
+<form action="/cal" method='POST'>
+    Would you like to add this mealplan to your Google Calendar?
+    Looks Good <button type="submit"> Add to Calendar </button>
+</form>
+{% endblock %}
