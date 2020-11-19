@@ -3,7 +3,7 @@ import os
 
 from model import db, connect_to_db, MealPlan, Recipe
 from helper import check_mealplan, make_cal_event, cred_dict, create_recipe_list, pick_recipes
-from crud import all_recipes, all_mealplans, create_db_recipes, mealplan_add_recipe
+from crud import all_recipes, all_mealplans, create_db_recipes, mealplan_add_recipe, create_api_recipes
 
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
@@ -22,7 +22,7 @@ flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE,
                                      redirect_uri='http://localhost:5000/callback')
 
 
-@app.route("/")
+@app.route("/", methods=['GET', 'POST'])
 def homepage():
     """Show options to view all recipes, all mealplans, or create new mealplan"""
 
@@ -111,11 +111,13 @@ def search_results():
     else:
         alt_recipes = lists[1]
 
-    if alt_recipes:
-        # if run out, query api
-        print(f"\nthis is the list of alternate recipes: {alt_recipes}\n")
+    if not alt_recipes:
+        new_api_recipes = create_api_recipes(ingredients, (num+5))
+        for recipe in new_api_recipes:
+            if recipe not in mealplan.recipes_r:
+                alt_recipes.append(recipe)
 
-    return render_template('cal.html',
+    return render_template('modify.html',
                            recipes=recipes,
                            mealplan=mealplan,
                            alt_recipes=alt_recipes)
@@ -124,41 +126,42 @@ def search_results():
 @app.route('/modify', methods=['POST'])
 def modify_recipes():
     """remove select recipes and replace with additional db/api recipes"""
-    # pass mealplan object in
+
     mealplan_id = request.form.get("mealplan_id")
+    session['mealplan_id'] = mealplan_id
     mealplan = MealPlan.query.get(mealplan_id)
-    # display all recipes associated with MealPlan
+
     recipes = mealplan.recipes_r
-    # select recipe that should be removed
-    recipe_name = request.form.get("recipe_name")
-    recipe = Recipe.query.filter(Recipe.name == recipe_name).first()
-    # remove recipe
-    recipes.remove(recipe)
+    id_remove_recipes = request.form.getlist('remove')
+    id_add_recipes = request.form.getlist('add')
+
+    remove = []
+    for recipe_id in id_remove_recipes:
+        recipe = Recipe.query.get(recipe_id)
+        remove.append(recipe)
+
+    add = []
+    for recipe_id in id_add_recipes:
+        recipe = Recipe.query.get(recipe_id)
+        add.append(recipe)
+
+    for recipe in remove:
+        recipes.remove(recipe)
+
+    for recipe in add:
+        if recipe not in recipes:
+            recipes.append(recipe)
+        else:
+            flash('recipe already in mealplan')
+
     print(f"this is the recipes list after removal: {recipes}")
-    db.session.commit()
 
-    # 1. randomly select recipes from alt_recipes to add to mealplan
-    new_recipes = []
-    new_recipe = pick_recipes(alt_recipes)
-    new_recipes.append(new_recipe)
-
-    # 2. select recipes by form from alt_recipes
-    new_recipes = []
-    new_recipe = request.form.get("new_recipe_name")  # what if there are multiple recipes selected to add. does this 
-    new_recipes.append(new_recipe)
-
-    # add new recipes
-    new_recipes = mealplan_add_recipe(mealplan, new_recipes)  # do i need this list of new recipes?
     db.session.commit()
 
     flash('Recipes removed and added')
-    return redirect('/modified')  # redirects to Method Not Allowed (for requested url /cal)
-    # display all recipes again and ask for approval
-    # rel = Recipe_Mealplan.query.filter(recipe_id==recipe_id and mealplan.id==mealplan_id).first()
-    # db.session.delete(rel)
+    return render_template('events.html', recipes=recipes, mealplan=mealplan)
 
 
-@app.route('/modified', methods=['POST'])
 @app.route('/cal', methods=['POST'])
 def make_calendar_event():
     """Add all-day recipe event to user's google calendar with OAUTH"""
@@ -171,7 +174,7 @@ def make_calendar_event():
     cal_id = 'tl9a33nl5al9k337lh45f40av8@group.calendar.google.com'
     date = session["date"]
 
-    mealplan_id = request.form.get("mealplan_id")
+    mealplan_id = session['mealplan_id']
     mealplan = MealPlan.query.get(mealplan_id)
     recipes = mealplan.recipes_r
 
