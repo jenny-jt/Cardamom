@@ -71,6 +71,11 @@ class MealPlan(db.Model):
         self.recipes_r.append(recipe)
 
 
+class User(db.Model):
+    """user logging into app"""
+    pass
+
+
 class Inventory(db.Model):
     """inventory to be updated at each shopping trip """
 
