@@ -4,8 +4,8 @@ from datetime import datetime
 import os
 import json
 from model import connect_to_db, db, Ingredient, Inventory, Recipe
-from crud import add_ingredient, add_recipe, add_mealplan, update_inventory
-from server import app    
+from crud import add_user, add_ingredient, add_recipe, add_mealplan
+from server import app
 from random import choice
 
 os.system('dropdb meals')
@@ -118,6 +118,11 @@ recipes = [{"name": "Taiwanese Ground Pork", "ingredients": ["ground pork"],
 # {"name": "", "ingredients": [], "url": ""},       
 # kabob url https://persianmama.com/kabob-koobideh-grilled-minced-meat-kabobs/
 
+users = [{"email": "email", "password": "pw"},
+         {"email": "1", "password": "1"},
+         {"email": "2", "password": "2"},
+         {"email": "3", "password": "3"}]
+
 for ingredient in ingredients:
     ingr = add_ingredient(name=ingredient['name'], location=ingredient['location'])
     db.session.add(ingr)
@@ -141,4 +146,9 @@ for recipe in recipes:
         db_recipe.ingredients_r.append(db_ingr)
         # append ingredient object to ingredient relationship of recipe
     db.session.add(db_recipe)
+    db.session.commit()
+
+for user in users:
+    user = add_user(email=user['email'], password=user['password'])
+    db.session.add(user)
     db.session.commit()

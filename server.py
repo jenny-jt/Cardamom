@@ -38,9 +38,9 @@ def show_recipes():
 
 
 @app.route("/mealplans")
-def show_mealplans():
+def show_mealplans(user):
     """Show all mealplans"""
-    mealplans = all_mealplans()
+    mealplans = user.mealplans_r
 
     return render_template('mealplans.html', mealplans=mealplans)
 
@@ -103,7 +103,7 @@ def search_results():
     db_recipes = create_db_recipes(ingredients)
 
     lists = create_recipe_list(ingredients, num, db_recipes)
-    print(f"\nthis is the lists**: {lists}\n")
+
     recipes = mealplan_add_recipe(mealplan, lists[0])
 
     if len(lists) > 2:

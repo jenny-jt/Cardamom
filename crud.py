@@ -7,8 +7,17 @@ import spoonacular as sp
 api = sp.API(os.environ['apiKey'])
 
 
-def add_ingredient(name,location):
-    """add ingredient"""
+def add_user(email, password):
+    """add and return user"""
+    user = User(email=email, password=password)
+    db.session.add(user)
+    db.session.commit()
+
+    return user
+
+
+def add_ingredient(name, location):
+    """add and return ingredient"""
     ingredient = Ingredient(name=name, location=location)
     db.session.add(ingredient)
     db.session.commit()
@@ -17,7 +26,7 @@ def add_ingredient(name,location):
 
 
 def add_recipe(name, ingredients, url, cook_time="n/a", image="none"):
-    """add recipes with required ingredient(s)"""
+    """add and return recipe with required ingredient(s)"""
     recipe = Recipe(name=name, ingredients=ingredients, url=url, cook_time=cook_time, image=image)
     db.session.add(recipe)
     db.session.commit()
@@ -39,13 +48,6 @@ def all_recipes():
     recipes = Recipe.query.all()
 
     return recipes
-
-
-def all_mealplans():
-    """output all mealplans in database"""
-    mealplans = MealPlan.query.all()
-
-    return mealplans
 
 
 def create_db_recipes(ingredients):

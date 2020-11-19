@@ -46,6 +46,7 @@ class Recipe(db.Model):
 
         return f"<Recipe name={self.name} ingredients={self.ingredients}>"
 
+
 # TODO: reason to change timezone=True, automatically saves as isostring
     # start_at = db.Column(db.DateTime)
     # end_at = db.Column(db.DateTime)
@@ -73,7 +74,62 @@ class MealPlan(db.Model):
 
 class User(db.Model):
     """user logging into app"""
-    pass
+
+    __tablename__ = "users"
+
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    email = db.Column(db.String(), unique=True)
+    password = db.Column(db.String())
+
+    mealplans_r = db.relationship('MealPlan', backref="users_r")
+
+    def __repr__(self):
+        return f'<User user_id={self.id} email={self.email}>'
+
+
+##########################relationships###############################
+
+
+class Ingredient_Recipe(db.Model):
+    """association table between ingredient and recipe """
+
+    __tablename__ = "ingredients_recipes"
+
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    # created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    # updated = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
+    # deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
+    ingredient_id = db.Column(db.Integer, db.ForeignKey("ingredients.id"))
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
+
+
+class Recipe_MealPlan(db.Model):
+    """association table between recipe and meaalplan """
+
+    __tablename__ = "recipes_mealplans"
+
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    # created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+    # updated = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
+    # deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
+    mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
+
+
+# class User_MealPlan(db.Model):
+#     """association table between user and meaalplan. don't need one because it's a one to many instead of many to many"""
+
+#     __tablename__ = "recipes_mealplans"
+
+#     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+#     # created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
+#     # updated = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
+#     # deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
+#     user_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
+#     mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
+
+
+##########################relationships###############################
 
 
 class Inventory(db.Model):
@@ -99,35 +155,6 @@ class Inventory(db.Model):
         """Provide helpful representation when printed."""
 
         return f"<Ingredient id={self.ingredient_id} in_stock:{self.in_stock} bought:{self.bought} quantity:{self.quantity}>"
-
-
-class Ingredient_Recipe(db.Model):
-    """unique table created for each recipe """ 
-
-    __tablename__ = "ingredients_recipes"
-
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    # created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
-    # updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
-    # deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
-    ingredient_id = db.Column(db.Integer, db.ForeignKey("ingredients.id"))
-    recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
-
-
-class Recipe_MealPlan(db.Model):
-    """unique table created for each recipe """ 
-
-    __tablename__ = "recipes_mealplans"
-
-    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
-    updated = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
-    deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
-    recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
-    mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
-
-    # recipe_r = db.relationship('Recipe', backref='recipes_mealplans')
-    # mealplan_r = db.relationship('MealPlan', backref='recipes_mealplans')
 
 
 def connect_to_db(app):
