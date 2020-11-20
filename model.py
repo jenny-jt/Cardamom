@@ -47,11 +47,8 @@ class Recipe(db.Model):
         return f"<Recipe name={self.name} ingredients={self.ingredients}>"
 
 
-# TODO: reason to change timezone=True, automatically saves as isostring
-    # start_at = db.Column(db.DateTime)
-    # end_at = db.Column(db.DateTime)
 class MealPlan(db.Model):
-    """unique table created for each recipe """ 
+    """unique table created for each recipe """
 
     __tablename__ = "mealplans"
 
@@ -62,7 +59,8 @@ class MealPlan(db.Model):
     date = db.Column(db.DateTime(timezone=True), nullable=False)
 
     recipes_r = db.relationship('Recipe', secondary='recipes_mealplans', backref="mealplans_r")
-    # recipes_mealplans_r = db.relationship('Recipe_MealPlan')
+    altrecipes_r = db.relationship('Recipe', secondary='altrecipes_mealplans')
+    user = db.relationship('User')
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -71,6 +69,10 @@ class MealPlan(db.Model):
     def add_recipe_to_mealplan(self, recipe):
         """Add recipe to mealplan"""
         self.recipes_r.append(recipe)
+
+    def add_altrecipe_to_mealplan(self, recipe):
+        """Add altrecipe to mealplan"""
+        self.altrecipes_r.append(recipe)
 
 
 class User(db.Model):
@@ -81,12 +83,15 @@ class User(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(), unique=True)
     password = db.Column(db.String())
-    mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
 
-    mealplans_r = db.relationship('MealPlan', backref="users_r")
+    mealplans = db.relationship('MealPlan', backref="user")
 
     def __repr__(self):
         return f'<User user_id={self.id} email={self.email}>'
+
+    def add_mealplan_to_user(self, mealplan):
+        """Add mealplan object to user"""
+        self.mealplans.append(mealplan)
 
 
 ##########################relationships###############################
@@ -98,38 +103,30 @@ class Ingredient_Recipe(db.Model):
     __tablename__ = "ingredients_recipes"
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    # created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
-    # updated = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
-    # deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     ingredient_id = db.Column(db.Integer, db.ForeignKey("ingredients.id"))
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
 
 
 class Recipe_MealPlan(db.Model):
-    """association table between recipe and meaalplan """
+    """association table between recipe and mealplan """
 
     __tablename__ = "recipes_mealplans"
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    # created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
-    # updated = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
-    # deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
     mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
 
     recipe_r = db.relationship("Recipe")
 
-# class User_MealPlan(db.Model):
-#     """association table between user and meaalplan. don't need one because it's a one to many instead of many to many"""
 
-#     __tablename__ = "recipes_mealplans"
+class AltRecipe_MealPlan(db.Model):
+    """association table between alternate recipes and mealplan"""
 
-#     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-#     # created = db.Column(db.TIMESTAMP(timezone=True), nullable=False, default=datetime.now(tz=timezone.utc))
-#     # updated = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
-#     # deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
-#     user_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
-#     mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
+    __tablename__ = "altrecipes_mealplans"
+
+    id = db.Column(db.Integer, autoincrement=True, primary_key=True)
+    recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
+    mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
 
 
 ##########################relationships###############################

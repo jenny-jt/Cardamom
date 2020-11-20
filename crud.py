@@ -3,6 +3,7 @@ import os
 from random import choice
 from model import db, connect_to_db, Ingredient, Inventory, Recipe, User, MealPlan
 import spoonacular as sp
+from flask import session
 
 api = sp.API(os.environ['apiKey'])
 
@@ -34,9 +35,10 @@ def add_recipe(name, ingredients, url, cook_time="n/a", image="none"):
     return recipe
 
 
-def add_mealplan(date):
+def add_mealplan(date, user):
     """add meal plan with date"""
     mealplan = MealPlan(date=date)
+    user_add_mealplan(mealplan, user)
     db.session.add(mealplan)
     db.session.commit()
 
@@ -48,6 +50,29 @@ def all_recipes():
     recipes = Recipe.query.all()
 
     return recipes
+
+
+def all_mealplans():
+    """output all mealplans in database"""
+    mealplans = MealPlan.query.all()
+
+    return mealplans
+
+
+def user_by_id(user_id):
+    """get user by id"""
+
+    user = User.query.get(user_id)
+
+    return user
+
+
+def user_by_email(email):
+    """get user by email"""
+
+    user = User.query.filter(User.email == email).first()
+
+    return user
 
 
 def create_db_recipes(ingredients):
@@ -136,7 +161,7 @@ def recipe_info(api_id):
 
         db.session.add(recipe)
         db.session.commit()
-        
+
         return recipe
 
     return check_db
@@ -155,21 +180,44 @@ def add_ingr(ingr_data):
     return recipe_ingredients
 
 
-def mealplan_add_recipe(mealplan, recipes_list):
+def user_add_mealplan(mealplan, user):
+    """called when mealplan added to db, adds mealplan to user"""
+    user.add_mealplan_to_user(mealplan)
+
+
+def mealplan_add_recipe(mealplan, recipes_list, num_recipes):
     """takes in mealplan obj and list of recipes
     adds recipes to mealplan via a method, removes those from recipes_list
     returns list of unique recipes associated with mealplan obj
     """
-    for item in recipes_list:
-        if item not in mealplan.recipes_r:
-            mealplan.add_recipe_to_mealplan(item)
-            recipes_list.remove(item)
-            db.session.commit()
 
     recipes = mealplan.recipes_r
 
-    print(f"recipe objects associated with mealplan: {recipes}")
+    while len(recipes) < num_recipes:
+        for item in recipes_list:
+            if item not in mealplan.recipes_r:
+                mealplan.add_recipe_to_mealplan(item)
+                recipes_list.remove(item)
+                db.session.commit()
+
+    print(f"\n crud version: recipe objects associated with mealplan: {recipes}\n")
     return recipes
+
+
+def mealplan_add_altrecipe(mealplan, alt_recipes):
+    """takes in mealplan obj and list of recipes
+    adds recipes to mealplan via a method, removes those from recipes_list
+    returns list of unique recipes associated with mealplan obj
+    """
+    for item in alt_recipes:
+        if item not in mealplan.recipes_r:
+            mealplan.add_altrecipe_to_mealplan(item)
+            db.session.commit()
+
+    altrecipes = mealplan.altrecipes_r
+
+    print(f"\n crud version: alternate recipe objects associated with mealplan: {altrecipes}\n")
+    return altrecipes
 
 
 def update_inventory(ingredient, bought, use_this_week, in_stock, quantity):

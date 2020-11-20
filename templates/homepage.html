@@ -3,23 +3,19 @@
 {% block title %} Homepage {% endblock %}
 
 {% block body %} 
-Welcome!<br>
-
-<form action="/login">
-    Please sign in:
-    Email: <input type="text" name="email">
-    Password: <input type="text" name="email">
-</form>
+Menu<br>
 
 <form action="/recipes">
     View all recipes <br>
     <button type="submit"> Recipes </button>
 </form>
+
 <form action="/mealplans">
     View all mealplans <br>
     <button type="submit"> Meal plans </button>
 </form>
-<form action="/create">
+
+<form action="/create_mealplan">
     Create a new mealplan
     <button type="submit"> Create </button>
 </form>

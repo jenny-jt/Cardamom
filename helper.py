@@ -17,43 +17,7 @@ def cred_dict(credentials):
             'scopes': credentials.scopes}
 
 
-def check_mealplan(date):
-    """checks if mealplan exists, otherwise makes a new mealplan object"""
-    mealplan = MealPlan.query.filter(MealPlan.date == date).first()
 
-    if not mealplan:
-        mealplan = add_mealplan(date)
-
-    return mealplan
-
-
-#######################################
-# start_date = 2020-11-18
-# end_date = 2020-11-27
-
-# start_date.split("-") --> [2020, 11, 18]
-# compare months to make sure youre in the same months
-# duration = end_array[-1] - start_array[-1] --> 9 days
-
-# for day in range(duration):
-#     current_iso = ' '.join()
-#     check_mealplan()
-
-# ex of mealplan.date = Mealplan for: 2020-11-26 00:00:00+00:00
-# from datetime import timedelta, date
-#####################################################
-
-# def daterange(start_date, end_date):
-#     for n in range(int((end_date - start_date).days)):
-# #         yield start_date + timedelta(n)
-
-# start_date = date(2013, 1, 1)
-# end_date = date(2015, 6, 2)
-
-# for date in daterange(start_date, end_date):
-#     checkmealplan(date)
-
-# #     print(single_date.strftime("%Y-%m-%d"))
 
 
 def create_recipe_list(ingredients, num, db_recipes):
@@ -62,23 +26,27 @@ def create_recipe_list(ingredients, num, db_recipes):
        returns recipe list that is num long (picked randomly from db only or db + api)
        also returns leftover db_recipes (lists[1]) and api_recipes (lists[2]) lists
     """
+    db_num = len(db_recipes)
+    api_num = num - db_num + 3
+
     if len(db_recipes) < num:
-        api_recipes = create_api_recipes(ingredients, num)
-        lists = make_recipe_list(num, db_recipes, api_recipes)
+        api_recipes = create_api_recipes(ingredients, api_num)
+        master_list = make_recipe_lists(num, db_recipes, api_recipes)
     else:
-        lists = make_recipe_list(num, db_recipes)
+        master_list = make_recipe_lists(num, db_recipes)
 
-    return lists
+    return master_list  # recipe_list, db_recipes, api_recipes
 
 
-def make_recipe_list(number, db_recipes, api_recipes=[]):
+def make_recipe_lists(num, db_recipes, api_recipes=[]):
     """takes in db and api recipe lists, selects number of them to generate recipe list
        also contains the leftovers of the db and api lists
     """
 
     count = 0
     recipe_list = []
-    while count < number:
+
+    while count < num:
         if db_recipes:
             item = pick_recipes(db_recipes)
             db_recipes.remove(item)
@@ -89,7 +57,7 @@ def make_recipe_list(number, db_recipes, api_recipes=[]):
         recipe_list.append(item)
         count += 1
 
-    return recipe_list, api_recipes, db_recipes
+    return recipe_list, db_recipes, api_recipes
 
 
 def pick_recipes(recipes):
@@ -115,16 +83,16 @@ def make_cal_event(recipe, date):
     return event
 
 
-def create_alt_recipes(lists, ingredients, num, mealplan):
+def create_alt_recipes(master_list, ingredients, num_recipes, mealplan):
     """creates list of alternate recipes"""
 
-    if len(lists) > 2:
-        alt_recipes = lists[1] + lists[2]
+    if len(master_list) > 2:
+        alt_recipes = master_list[1] + master_list[2]
     else:
-        alt_recipes = lists[1]
+        alt_recipes = master_list[1]
 
-    if not alt_recipes:
-        new_api_recipes = create_api_recipes(ingredients, (num+5))
+    if len(alt_recipes) < 3:
+        new_api_recipes = create_api_recipes(ingredients, 3)
         for recipe in new_api_recipes:
             if recipe not in mealplan.recipes_r:
                 alt_recipes.append(recipe)
@@ -153,7 +121,17 @@ def num_days(start_date, end_date):
     return num_days
 
 
-def mealplan_dates(start_date, end_date):
+def check_mealplan(date, user):
+    """checks if mealplan exists, otherwise makes a new mealplan object"""
+    mealplan = MealPlan.query.filter(MealPlan.date == date).first()
+
+    if not mealplan:
+        mealplan = add_mealplan(date, user)  # also adds mp to user
+
+    return mealplan
+
+
+def mealplan_dates(start_date, end_date, user):
     """take in start and end dates from form,
        check if mealplan exists for each date in range
        if not exist, then create new mealplan for each date
@@ -164,8 +142,7 @@ def mealplan_dates(start_date, end_date):
 
     while start_date <= end_date:
         start_date_string = start_date.strftime("%Y-%m-%d")
-        print(start_date_string)
-        mealplan = check_mealplan(start_date_string)
+        mealplan = check_mealplan(start_date_string, user)
         mealplans.append(mealplan)
         start_date += delta
 

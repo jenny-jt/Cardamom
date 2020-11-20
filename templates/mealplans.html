@@ -8,7 +8,10 @@ Mealplans are in database for the following dates: <br>
 
 {% for mealplan in mealplans %}
 
-    {{mealplan.date}} <br>
+<div> 
+<a href="/mealplans/{{mealplan.id}}"> {{mealplan.date}} </a> 
+</div>
+
 
 {% endfor %}
 

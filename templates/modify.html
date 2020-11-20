@@ -4,13 +4,13 @@
 
 {% block body %} 
 
-<form action="/modify" method='POST'>
-{% for mealplan in mealplans %}
-    Mealplan for: {{mealplan.date}}<br>
-    Modify mealplan recipes<br>
-    <input type="hidden" name="mealplans" value="{{ mealplans }}">
+Mealplan for: {{mealplan.date}}<br>
 
-    Please select the recipes you would like to remove:<br>
+Modify mealplan recipes<br>
+
+<form action="/modify" method='POST'>
+    <input type="hidden" name="mealplan_id" value="{{ mealplan.id }}">
+Please select the recipes you would like to remove:<br>
     {% for recipe in mealplan.recipes_r %}
     <div>
         Name: {{ recipe.name }} <br>
@@ -18,29 +18,26 @@
             style="float:left; margin-right:10px; margin:5px"><br>
         Coook time: {{ recipe.cook_time }} minutes <br>
         Link: <a href="recipe.url"> Go to Recipe</a><br>
-        <input type="checkbox" name="remove" value="{{ recipe.id }}"><br><br><br><br><br>
+        <input type="checkbox" name="remove" value="{{ recipe.id }}">
     </div>
     {% endfor %}
 
-    Please select the recipes you would like to add:<br>
-    {% for recipe in alternate_recipes['{{mealplan.id}}'] %}
+Please select the recipes you would like to add:<br>
+    {% for recipe in mealplan.alt_recipes_r %}
     <div>
         Name: {{ recipe.name }} <br>
         <img src="{{ recipe.image }}" width="150" height="150" alt="{{ recipe.name }}"
             style="float:left; margin-right:10px; margin:5px"><br>
         Coook time: {{ recipe.cook_time }} minutes <br>
         Link: <a href="recipe.url"> Go to Recipe</a><br>
-        <input type="checkbox" name="add" value="{{ recipe.id }}"><br><br><br><br><br>
+        <input type="checkbox" name="add" value="{{ recipe.id }}">
     </div>
     {% endfor %}
+
     <input type="submit" value="Make Changes"><br>
-{% endfor %}
-</form>
 
-Everything looks good!<br>
-<form action="/cal" method='POST'>
-    I would like to add everything to Calendar
-    <button type="submit"> Add to Calendar </button>
+Go back to Homepage/Main Menu
+<form action="/">
+    <input type="submit" value="Homepage"><br>
 </form>
-
 {% endblock %}
