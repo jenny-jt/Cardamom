@@ -62,6 +62,7 @@ class MealPlan(db.Model):
     date = db.Column(db.DateTime(timezone=True), nullable=False)
 
     recipes_r = db.relationship('Recipe', secondary='recipes_mealplans', backref="mealplans_r")
+    # recipes_mealplans_r = db.relationship('Recipe_MealPlan')
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -80,6 +81,7 @@ class User(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(), unique=True)
     password = db.Column(db.String())
+    mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
 
     mealplans_r = db.relationship('MealPlan', backref="users_r")
 
@@ -115,6 +117,7 @@ class Recipe_MealPlan(db.Model):
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
     mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
 
+    recipe_r = db.relationship("Recipe")
 
 # class User_MealPlan(db.Model):
 #     """association table between user and meaalplan. don't need one because it's a one to many instead of many to many"""

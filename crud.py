@@ -1,7 +1,7 @@
 """CRUD operations."""
 import os
 from random import choice
-from model import db, connect_to_db, Ingredient, Inventory, Recipe, MealPlan
+from model import db, connect_to_db, Ingredient, Inventory, Recipe, User, MealPlan
 import spoonacular as sp
 
 api = sp.API(os.environ['apiKey'])
@@ -136,7 +136,7 @@ def recipe_info(api_id):
 
         db.session.add(recipe)
         db.session.commit()
-        print(f"\nnew api recipe added to db: {recipe}\n")
+        
         return recipe
 
     return check_db
@@ -151,19 +151,19 @@ def add_ingr(ingr_data):
             recipe_ingredients.add(ingr['name'])
 
     recipe_ingredients = list(recipe_ingredients)
-    print(f"\nthis is the recipe ingredient data: {recipe_ingredients}\n")
 
     return recipe_ingredients
 
 
 def mealplan_add_recipe(mealplan, recipes_list):
     """takes in mealplan obj and list of recipes
-    adds recipes to mealplan via a method,
+    adds recipes to mealplan via a method, removes those from recipes_list
     returns list of unique recipes associated with mealplan obj
     """
     for item in recipes_list:
         if item not in mealplan.recipes_r:
             mealplan.add_recipe_to_mealplan(item)
+            recipes_list.remove(item)
             db.session.commit()
 
     recipes = mealplan.recipes_r

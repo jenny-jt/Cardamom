@@ -3,7 +3,7 @@
 from datetime import datetime
 import os
 import json
-from model import connect_to_db, db, Ingredient, Inventory, Recipe
+from model import connect_to_db, db, Ingredient, Inventory, Recipe, User
 from crud import add_user, add_ingredient, add_recipe, add_mealplan
 from server import app
 from random import choice

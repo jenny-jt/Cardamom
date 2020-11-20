@@ -4,44 +4,43 @@
 
 {% block body %} 
 
-Mealplan for: {{mealplan.date}}<br>
-
-Modify mealplan recipes<br>
-
 <form action="/modify" method='POST'>
-    <input type="hidden" name="mealplan_id" value="{{ mealplan.id }}">
-Please select the recipes you would like to remove:<br>
-    {% for recipe in recipes %}
+{% for mealplan in mealplans %}
+    Mealplan for: {{mealplan.date}}<br>
+    Modify mealplan recipes<br>
+    <input type="hidden" name="mealplans" value="{{ mealplans }}">
+
+    Please select the recipes you would like to remove:<br>
+    {% for recipe in mealplan.recipes_r %}
     <div>
         Name: {{ recipe.name }} <br>
         <img src="{{ recipe.image }}" width="150" height="150" alt="{{ recipe.name }}"
             style="float:left; margin-right:10px; margin:5px"><br>
         Coook time: {{ recipe.cook_time }} minutes <br>
         Link: <a href="recipe.url"> Go to Recipe</a><br>
-        <input type="checkbox" name="remove" value="{{ recipe.id }}">
+        <input type="checkbox" name="remove" value="{{ recipe.id }}"><br><br><br><br><br>
     </div>
     {% endfor %}
 
-Please select the recipes you would like to add:<br>
-    {% for recipe in alt_recipes %}
+    Please select the recipes you would like to add:<br>
+    {% for recipe in alternate_recipes['{{mealplan.id}}'] %}
     <div>
         Name: {{ recipe.name }} <br>
         <img src="{{ recipe.image }}" width="150" height="150" alt="{{ recipe.name }}"
             style="float:left; margin-right:10px; margin:5px"><br>
         Coook time: {{ recipe.cook_time }} minutes <br>
         Link: <a href="recipe.url"> Go to Recipe</a><br>
-        <input type="checkbox" name="add" value="{{ recipe.id }}">
+        <input type="checkbox" name="add" value="{{ recipe.id }}"><br><br><br><br><br>
     </div>
     {% endfor %}
-
     <input type="submit" value="Make Changes"><br>
-
-Add to Calendar<br>
-<form action="/events" method='POST'>
-    <!-- hidden form input to store mealplan_id -->
-    <input type="hidden" name="mealplan_id"value="{{ mealplan.id }}">
-
-    Here are the recipes for this mealplan:
-    Looks Good <button type="submit"> Add to Calendar </button>
+{% endfor %}
 </form>
+
+Everything looks good!<br>
+<form action="/cal" method='POST'>
+    I would like to add everything to Calendar
+    <button type="submit"> Add to Calendar </button>
+</form>
+
 {% endblock %}

@@ -2,6 +2,7 @@
 from model import MealPlan
 from random import choice
 from crud import add_mealplan, create_api_recipes
+from datetime import datetime, timedelta
 
 
 def cred_dict(credentials):
@@ -58,7 +59,8 @@ def check_mealplan(date):
 def create_recipe_list(ingredients, num, db_recipes):
     """takes in num as well as list of recipes from db
        will make api recipe list if needed
-       outputs recipe list that is num long (either from db only or db + api)
+       returns recipe list that is num long (picked randomly from db only or db + api)
+       also returns leftover db_recipes (lists[1]) and api_recipes (lists[2]) lists
     """
     if len(db_recipes) < num:
         api_recipes = create_api_recipes(ingredients, num)
@@ -111,3 +113,60 @@ def make_cal_event(recipe, date):
             }
 
     return event
+
+
+def create_alt_recipes(lists, ingredients, num, mealplan):
+    """creates list of alternate recipes"""
+
+    if len(lists) > 2:
+        alt_recipes = lists[1] + lists[2]
+    else:
+        alt_recipes = lists[1]
+
+    if not alt_recipes:
+        new_api_recipes = create_api_recipes(ingredients, (num+5))
+        for recipe in new_api_recipes:
+            if recipe not in mealplan.recipes_r:
+                alt_recipes.append(recipe)
+
+    return alt_recipes
+
+
+def convert_dates(start, end):  
+    """take in start and end date strings from form, returns date time objects"""
+
+    dt_format = "%Y-%m-%d"
+
+    start_date = datetime.strptime(start, dt_format)
+    end_date = datetime.strptime(end, dt_format)
+
+    return start_date, end_date
+
+
+def num_days(start_date, end_date):
+    """take in start and end dates, returns number of days in date range"""
+
+    date_range = end_date - start_date
+
+    num_days = date_range.days
+
+    return num_days
+
+
+def mealplan_dates(start_date, end_date):
+    """take in start and end dates from form,
+       check if mealplan exists for each date in range
+       if not exist, then create new mealplan for each date
+       returns list of mealplans for date range
+    """
+    mealplans = []
+    delta = timedelta(days=1)
+
+    while start_date <= end_date:
+        start_date_string = start_date.strftime("%Y-%m-%d")
+        print(start_date_string)
+        mealplan = check_mealplan(start_date_string)
+        mealplans.append(mealplan)
+        start_date += delta
+
+    return mealplans

@@ -2,8 +2,8 @@ from flask import Flask, request, render_template, redirect, session, flash
 import os
 
 from model import db, connect_to_db, MealPlan, Recipe
-from helper import check_mealplan, make_cal_event, cred_dict, create_recipe_list, pick_recipes
-from crud import all_recipes, all_mealplans, create_db_recipes, mealplan_add_recipe, create_api_recipes
+from helper import check_mealplan, make_cal_event, cred_dict, create_recipe_list, pick_recipes, create_alt_recipes, convert_dates, mealplan_dates, num_days
+from crud import all_recipes, create_db_recipes, mealplan_add_recipe, create_api_recipes
 
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
@@ -37,12 +37,12 @@ def show_recipes():
     return render_template('recipes.html', recipes=recipes)
 
 
-@app.route("/mealplans")
-def show_mealplans(user):
-    """Show all mealplans"""
-    mealplans = user.mealplans_r
+# @app.route("/mealplans")
+# def show_mealplans(user):
+#     """Show all mealplans"""
+#     mealplans = user.mealplans_r
 
-    return render_template('mealplans.html', mealplans=mealplans)
+#     return render_template('mealplans.html', mealplans=mealplans)
 
 
 @app.route("/create")
@@ -93,47 +93,43 @@ def search_results():
        outputs list of recipes that are associated with mealplan obj
     """
     ingredients = request.args.get("ingredients").split(",")
-    num = int(request.args.get("num_recipes"))
-    date = request.args.get("date")
+    num = int(request.args.get("recipes_per_day"))
 
-    session['num'] = num
-    session['date'] = date
+    start = request.args.get("start_date")
+    end = request.args.get("end_date")
+    start_date, end_date = convert_dates(start, end)
+    days = num_days(start_date, end_date)
 
-    mealplan = check_mealplan(date)
+    num_recipes = num * days
+    mealplans = mealplan_dates(start_date, end_date)
     db_recipes = create_db_recipes(ingredients)
+    lists = create_recipe_list(ingredients, num_recipes, db_recipes)
+    recipe_list = lists[0]
+    alternate_recipes = {}
 
-    lists = create_recipe_list(ingredients, num, db_recipes)
+    # all mealplans will be created from same recipe_list, to avoid duplicate recipes in mealplan cluster
+    for mealplan in mealplans:
+        mealplan_add_recipe(mealplan, recipe_list)
+        print("recipes added to mealplan")
+        # mealplan_id = mealplan.id
+        alt_recipe = create_alt_recipes(lists, ingredients, num, mealplan)
+        alternate_recipes[mealplan.id] = alt_recipe
 
-    recipes = mealplan_add_recipe(mealplan, lists[0])
-
-    if len(lists) > 2:
-        alt_recipes = lists[1] + lists[2]
-    else:
-        alt_recipes = lists[1]
-
-    if not alt_recipes:
-        new_api_recipes = create_api_recipes(ingredients, (num+5))
-        for recipe in new_api_recipes:
-            if recipe not in mealplan.recipes_r:
-                alt_recipes.append(recipe)
+        print(f"\nthis is the dictionary of id/alt_recipes list: {alternate_recipes}\n")
 
     return render_template('modify.html',
-                           recipes=recipes,
-                           mealplan=mealplan,
-                           alt_recipes=alt_recipes)
+                           mealplans=mealplans,
+                           alternate_recipes=alternate_recipes)
 
 
 @app.route('/modify', methods=['POST'])
 def modify_recipes():
     """remove select recipes and replace with additional db/api recipes"""
 
-    mealplan_id = request.form.get("mealplan_id")
-    session['mealplan_id'] = mealplan_id
-    mealplan = MealPlan.query.get(mealplan_id)
-
-    recipes = mealplan.recipes_r
     id_remove_recipes = request.form.getlist('remove')
     id_add_recipes = request.form.getlist('add')
+    mealplans = request.form.getlist("mealplans")
+    session['mealplans'] = mealplans  # need not obj
 
     remove = []
     for recipe_id in id_remove_recipes:
@@ -145,6 +141,10 @@ def modify_recipes():
         recipe = Recipe.query.get(recipe_id)
         add.append(recipe)
 
+    for mealplan in mealplans:
+        recipes = mealplan.recipes_r
+        print(f"this is the recipes list after removal: {recipes}")
+
     for recipe in remove:
         recipes.remove(recipe)
 
@@ -153,8 +153,6 @@ def modify_recipes():
             recipes.append(recipe)
         else:
             flash('recipe already in mealplan')
-
-    print(f"this is the recipes list after removal: {recipes}")
 
     db.session.commit()
 
@@ -172,21 +170,28 @@ def make_calendar_event():
     # google api client to make google calendar event
     cal = build('calendar', API_VERSION, credentials=credentials)
     cal_id = 'tl9a33nl5al9k337lh45f40av8@group.calendar.google.com'
-    date = session["date"]
+    # print(session)
+    # date = session["date"] should just query dates to get mealplan
+    # print(session)
 
-    mealplan_id = session['mealplan_id']
-    mealplan = MealPlan.query.get(mealplan_id)
-    recipes = mealplan.recipes_r
+    # mealplans = session['mealplans'] #need not obj
+    for mealplan in mealplans:
+        recipes = mealplan.recipes_r
 
-    for recipe in recipes:
-        event = make_cal_event(recipe, date)
-        add_event = cal.events().insert(calendarId=cal_id, sendNotifications=True, body=event).execute()
+        for recipe in recipes:
+            event = make_cal_event(recipe, date)
+            add_event = cal.events().insert(calendarId=cal_id, sendNotifications=True, body=event).execute()
 
     flash('Recipes added to MealPlan calendar!')
 
     return render_template('homepage.html')
 
-
+@app.route("/mealplan/<int:mealplan_id>")
+def modify_mealplan(mealplan_id):
+    mealplan_id = int(mealplan_id)
+    mealplan = MealPlan.query.get(mealplan_id)
+    print(mealplan)
+    return "hi"
 # @app.route("/inventory")
 # def update_inventory():
 #     """ form with default values for location, able to save timestamp, quantity """
