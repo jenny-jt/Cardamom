@@ -4,6 +4,7 @@ import os
 
 db = SQLAlchemy()
 
+
 class Ingredient(db.Model):
     """list of ingredients that will be searched for/used in recipes """
 
@@ -25,7 +26,7 @@ class Ingredient(db.Model):
 
 
 class Recipe(db.Model):
-    """unique table created for each recipe """ 
+    """unique table created for each recipe """
 
     __tablename__ = "recipes"
 
@@ -83,8 +84,9 @@ class User(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(), unique=True)
     password = db.Column(db.String())
+    mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
 
-    mealplans = db.relationship('MealPlan', backref="user")
+    mealplans = db.relationship('MealPlan')
 
     def __repr__(self):
         return f'<User user_id={self.id} email={self.email}>'

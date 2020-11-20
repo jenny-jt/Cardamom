@@ -17,9 +17,6 @@ def cred_dict(credentials):
             'scopes': credentials.scopes}
 
 
-
-
-
 def create_recipe_list(ingredients, num, db_recipes):
     """takes in num as well as list of recipes from db
        will make api recipe list if needed

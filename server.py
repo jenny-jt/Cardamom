@@ -2,8 +2,8 @@ from flask import Flask, request, render_template, redirect, session, flash
 import os
 
 from model import db, connect_to_db, MealPlan, Recipe
-from helper import check_mealplan, make_cal_event, cred_dict, create_recipe_list, pick_recipes, create_alt_recipes, convert_dates, mealplan_dates, num_days
-from crud import all_recipes, all_mealplans, create_db_recipes, add_user, user_by_id, user_by_email, mealplan_add_recipe, mealplan_add_altrecipe, create_api_recipes
+from helper import make_cal_event, cred_dict, create_recipe_list, convert_dates, mealplan_dates, num_days
+from crud import all_recipes, create_db_recipes, add_user, user_by_id, user_by_email, mealplan_add_recipe, mealplan_add_altrecipe
 
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
@@ -16,10 +16,22 @@ CLIENT_SECRETS_FILE = 'client_secret.json'
 API_SERVICE_NAME = 'cal'
 API_VERSION = 'v3'
 SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events']
-# creates flow instance to manage OAuth grant access, uri configured in API Google console
-flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE,
-                                     scopes=SCOPES,
-                                     redirect_uri='http://localhost:5000/callback')
+
+
+def newflow(var):
+    """returns new flow instance to manage OAuth grant access, 
+       uri configured in API Google console
+       var is my session info that I want to keep after oauth
+    """
+    # var = session['user_id'] = ?var=57
+    var = str(var)
+    new_url = 'http://localhost:5000/callback'+var
+
+    flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE,
+                                         scopes=SCOPES,
+                                         redirect_uri=new_url)
+
+    return flow
 
 
 @app.route("/")
@@ -28,10 +40,6 @@ def show_login():
 
     if 'user_id' in session:
         user_id = session['user_id']
-    else:
-        session['user_id'] = '' 
-
-    if session['user_id']:
         flash(f'User {user_id} logged in!')
         return redirect('/menu')
 
@@ -49,14 +57,10 @@ def login():
 
     if user:
         if user.password == password:
-            print(session)
             session['user_id'] = user.id
-            print(session)
-            print(user)
-            print(f"this is the user id after setting session{session['user_id']}")
+            flash("Logged in successfully")
             return redirect('/menu')
         else:
-            session['user_id'] = ''
             flash('Wrong password! Please try again')
             return redirect('/')
     else:
@@ -82,7 +86,7 @@ def create_user():
 def homepage():
     """Show options to view all recipes, all mealplans, or create new mealplan"""
 
-    return render_template('homepage.html')
+    return render_template('menu.html')
 
 
 @app.route("/recipes")
@@ -98,7 +102,6 @@ def show_mealplans():
     """Show all mealplans for user"""
     # mealplans = all_mealplans()
 
-    # user_id = 1
     user_id = session['user_id']
     user = user_by_id(user_id)
     mealplans = user.mealplans
@@ -117,7 +120,7 @@ def create_mealplan():
     if yes: display form to gather info to create mealplan
     if no: redirect to authorize
     """
-    print(session)
+    print(f"session in create_mealplan route: {session}")
 
     if 'credentials' not in session:
         return redirect('/authorize')
@@ -125,9 +128,12 @@ def create_mealplan():
     return render_template('search.html')
 
 
+
 @app.route('/authorize')
 def authorize():
     """OAuth"""
+    var = session['user_id']
+    flow = newflow(var)
 
     authorization_url, state = flow.authorization_url(
                                 access_type='offline',
@@ -142,16 +148,18 @@ def authorize():
 @app.route('/callback')
 def callback():
     """Processes response for google calendar authorization"""
-    print(session)
-    # google making a request to flask server with code attached
+    # might need flow here
     authorization_response = request.url
+
+    var = request.args.get('var')
+    session['user_id'] = var
+    print(f"\nthis is var {var}\n")
 
     flow.fetch_token(authorization_response=authorization_response)
 
     credentials = flow.credentials
-    print(session)
     session['credentials'] = cred_dict(credentials)
-    print(session)
+
     flash('Succesfully logged in to Google Calendar!')
 
     return render_template('search.html')
@@ -274,7 +282,6 @@ def make_calendar_event():
     flash('Recipes added to MealPlan calendar!')
 
     return render_template('homepage.html')
-
 
 
 # @app.route("/inventory")
