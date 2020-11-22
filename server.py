@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect, session, flash
 import os
 
 from model import db, connect_to_db, MealPlan, Recipe
-from helper import make_cal_event, cred_dict, create_recipe_list, convert_dates, mealplan_dates, num_days
+from helper import make_cal_event, cred_dict, create_recipe_list, create_alt_recipes, convert_dates, mealplan_dates, num_days
 from crud import all_recipes, create_db_recipes, add_user, user_by_id, user_by_email, mealplan_add_recipe, mealplan_add_altrecipe
 
 from google_auth_oauthlib.flow import Flow
@@ -17,26 +17,17 @@ API_SERVICE_NAME = 'cal'
 API_VERSION = 'v3'
 SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events']
 
-
-def newflow(var):
-    """returns new flow instance to manage OAuth grant access, 
-       uri configured in API Google console
-       var is my session info that I want to keep after oauth
-    """
-    # var = session['user_id'] = ?var=57
-    var = str(var)
-    new_url = 'http://localhost:5000/callback'+var
-
-    flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE,
+flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE,
                                          scopes=SCOPES,
-                                         redirect_uri=new_url)
+                                         redirect_uri='http://localhost:5000/callback')
 
-    return flow
 
 
 @app.route("/")
 def show_login():
     """show log in form"""
+    if 'credentials' not in session:
+        return redirect('/authorize')
 
     if 'user_id' in session:
         user_id = session['user_id']
@@ -122,19 +113,12 @@ def create_mealplan():
     """
     print(f"session in create_mealplan route: {session}")
 
-    if 'credentials' not in session:
-        return redirect('/authorize')
-
     return render_template('search.html')
-
 
 
 @app.route('/authorize')
 def authorize():
     """OAuth"""
-    var = session['user_id']
-    flow = newflow(var)
-
     authorization_url, state = flow.authorization_url(
                                 access_type='offline',
                                 include_granted_scopes='true')
@@ -148,12 +132,7 @@ def authorize():
 @app.route('/callback')
 def callback():
     """Processes response for google calendar authorization"""
-    # might need flow here
     authorization_response = request.url
-
-    var = request.args.get('var')
-    session['user_id'] = var
-    print(f"\nthis is var {var}\n")
 
     flow.fetch_token(authorization_response=authorization_response)
 
@@ -162,7 +141,7 @@ def callback():
 
     flash('Succesfully logged in to Google Calendar!')
 
-    return render_template('search.html')
+    return redirect("/")
 
 
 @app.route("/search")
@@ -181,12 +160,10 @@ def search_results():
     print(user)
 
     start = request.args.get("start_date")
-    print(f"session before adding start: {session}")
     session['start'] = start
-    print(f"session after adding start: {session}")
     end = request.args.get("end_date")
     session['end'] = end
-    print(f"session before adding end: {session}")
+    print(f"session after adding end: {session}")
 
     start_date, end_date = convert_dates(start, end)
     days = num_days(start_date, end_date)

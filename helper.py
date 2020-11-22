@@ -144,3 +144,18 @@ def mealplan_dates(start_date, end_date, user):
         start_date += delta
 
     return mealplans
+
+
+# def newflow(var):
+#     """returns new flow instance to manage OAuth grant access, 
+#        uri configured in API Google console
+#        var is my session info that I want to keep after oauth
+#     """
+#     var = str(var)
+#     new_url = 'http://localhost:5000/callback'+var
+
+#     flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE,
+#                                          scopes=SCOPES,
+#                                          redirect_uri=new_url)
+
+#     return flow
