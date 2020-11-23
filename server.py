@@ -17,21 +17,9 @@ API_SERVICE_NAME = 'cal'
 API_VERSION = 'v3'
 SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events']
 
-
-def newflow(var):
-    """returns new flow instance to manage OAuth grant access, 
-       uri configured in API Google console
-       var is my session info that I want to keep after oauth
-    """
-    # var = session['user_id'] = ?var=57
-    var = str(var)
-    new_url = 'http://localhost:5000/callback'+var
-
-    flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE,
-                                         scopes=SCOPES,
-                                         redirect_uri=new_url)
-
-    return flow
+flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE,
+                                     scopes=SCOPES,
+                                     redirect_uri='http://localhost:5000/callback')
 
 
 @app.route("/")
@@ -42,6 +30,34 @@ def show_login():
         user_id = session['user_id']
         flash(f'User {user_id} logged in!')
         return redirect('/menu')
+
+    return render_template('login.html')
+
+
+@app.route('/authorize')
+def authorize():
+    """OAuth"""
+    authorization_url, state = flow.authorization_url(
+                                access_type='offline',
+                                include_granted_scopes='true')
+
+    session['state'] = state
+
+    return redirect(authorization_url)
+
+
+@app.route('/callback')
+def callback():
+    """Processes response for google calendar authorization"""
+    # might need flow here
+    authorization_response = request.url
+
+    flow.fetch_token(authorization_response=authorization_response)
+
+    credentials = flow.credentials
+    session['credentials'] = cred_dict(credentials)
+
+    flash('Succesfully logged in to Google Calendar!')
 
     return render_template('login.html')
 
@@ -83,7 +99,7 @@ def create_user():
 
 
 @app.route("/menu")
-def homepage():
+def menu():
     """Show options to view all recipes, all mealplans, or create new mealplan"""
 
     return render_template('menu.html')
@@ -124,43 +140,6 @@ def create_mealplan():
 
     if 'credentials' not in session:
         return redirect('/authorize')
-
-    return render_template('search.html')
-
-
-
-@app.route('/authorize')
-def authorize():
-    """OAuth"""
-    var = session['user_id']
-    flow = newflow(var)
-
-    authorization_url, state = flow.authorization_url(
-                                access_type='offline',
-                                include_granted_scopes='true')
-    print(session)
-    session['state'] = state
-    print(session)
-
-    return redirect(authorization_url)
-
-
-@app.route('/callback')
-def callback():
-    """Processes response for google calendar authorization"""
-    # might need flow here
-    authorization_response = request.url
-
-    var = request.args.get('var')
-    session['user_id'] = var
-    print(f"\nthis is var {var}\n")
-
-    flow.fetch_token(authorization_response=authorization_response)
-
-    credentials = flow.credentials
-    session['credentials'] = cred_dict(credentials)
-
-    flash('Succesfully logged in to Google Calendar!')
 
     return render_template('search.html')
 
