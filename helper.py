@@ -61,7 +61,7 @@ def create_recipe_list(ingredients, num, db_recipes):
        outputs recipe list that is num long (either from db only or db + api)
     """
     if len(db_recipes) < num:
-        api_recipes = create_api_recipes(ingredients, num)
+        api_recipes = create_api_recipes(ingredients, num+5)
         master_recipes_list = make_recipe_list(num, db_recipes, api_recipes)
     else:
         master_recipes_list = make_recipe_list(num, db_recipes)
