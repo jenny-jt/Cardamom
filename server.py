@@ -29,35 +29,6 @@ def homepage():
     return render_template('homepage.html')
 
 
-@app.route("/recipes")
-def show_recipes():
-    """Show all recipes"""
-    recipes = all_recipes()
-
-    return render_template('recipes.html', recipes=recipes)
-
-
-@app.route("/mealplans")
-def show_mealplans():
-    """Show all mealplans"""
-    mealplans = all_mealplans()
-
-    return render_template('mealplans.html', mealplans=mealplans)
-
-
-@app.route("/create")
-def create_mealplan():
-    """check if authorized
-    if yes: display form to gather info to create mealplan
-    if no: redirect to authorize
-    """
-
-    if 'credentials' not in session:
-        return redirect('/authorize')
-
-    return render_template('search.html')
-
-
 @app.route('/authorize')
 def authorize():
     """OAuth"""
@@ -87,6 +58,34 @@ def callback():
     return render_template('search.html')
 
 
+@app.route("/recipes")
+def show_recipes():
+    """Show all recipes"""
+    recipes = all_recipes()
+
+    return render_template('recipes.html', recipes=recipes)
+
+
+@app.route("/mealplans")
+def show_mealplans():
+    """Show all mealplans"""
+    mealplans = all_mealplans()
+
+    return render_template('mealplans.html', mealplans=mealplans)
+
+
+@app.route("/create")
+def create_mealplan():
+    """check if authorized
+    if yes: display form to gather info to create mealplan
+    if no: redirect to authorize
+    """
+    if 'credentials' not in session:
+        return redirect('/authorize')
+
+    return render_template('search.html')
+
+
 @app.route("/search")
 def search_results():
     """take in date for mealplan, ingredients, and number of recipes
@@ -102,19 +101,21 @@ def search_results():
     mealplan = check_mealplan(date)
     db_recipes = create_db_recipes(ingredients)
 
-    lists = create_recipe_list(ingredients, num, db_recipes)
-    print(f"\nthis is the lists**: {lists}\n")
-    recipes = mealplan_add_recipe(mealplan, lists[0])
+    master_list = create_recipe_list(ingredients, num, db_recipes)
+    print(f"\nthis is the lists**: {master_list}\n")
+    recipes = mealplan_add_recipe(mealplan, master_list[0])
 
-    if len(lists) > 2:
-        alt_recipes = lists[1] + lists[2]
+    if len(master_list) > 2:
+        alt_recipes = master_list[1] + master_list[2]
     else:
-        alt_recipes = lists[1]
+        alt_recipes = master_list[1]
 
-    if not alt_recipes:
-        new_api_recipes = create_api_recipes(ingredients, (num+5))
+    if len(alt_recipes) < 3:
+        number = (num-len(db_recipes))+3
+        print(number)
+        new_api_recipes = create_api_recipes(ingredients, number)
         for recipe in new_api_recipes:
-            if recipe not in mealplan.recipes_r:
+            if recipe not in mealplan.recipes_r or alt_recipes:
                 alt_recipes.append(recipe)
 
     return render_template('modify.html',

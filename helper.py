@@ -62,11 +62,11 @@ def create_recipe_list(ingredients, num, db_recipes):
     """
     if len(db_recipes) < num:
         api_recipes = create_api_recipes(ingredients, num)
-        lists = make_recipe_list(num, db_recipes, api_recipes)
+        master_recipes_list = make_recipe_list(num, db_recipes, api_recipes)
     else:
-        lists = make_recipe_list(num, db_recipes)
+        master_recipes_list = make_recipe_list(num, db_recipes)
 
-    return lists
+    return master_recipes_list
 
 
 def make_recipe_list(number, db_recipes, api_recipes=[]):
@@ -87,7 +87,7 @@ def make_recipe_list(number, db_recipes, api_recipes=[]):
         recipe_list.append(item)
         count += 1
 
-    return recipe_list, api_recipes, db_recipes
+    return recipe_list, db_recipes, api_recipes
 
 
 def pick_recipes(recipes):

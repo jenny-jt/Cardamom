@@ -17,8 +17,8 @@ Please select the recipes you would like to remove:<br>
         <img src="{{ recipe.image }}" width="150" height="150" alt="{{ recipe.name }}"
             style="float:left; margin-right:10px; margin:5px"><br>
         Coook time: {{ recipe.cook_time }} minutes <br>
-        Link: <a href="recipe.url"> Go to Recipe</a><br>
-        <input type="checkbox" name="remove" value="{{ recipe.id }}">
+        Link: <a href="recipe.url"> Go to Recipe</a><br><br><br><br><br><br><br>
+        <input type="checkbox" name="remove" value="{{ recipe.id }}"><br>
     </div>
     {% endfor %}
 
@@ -29,8 +29,8 @@ Please select the recipes you would like to add:<br>
         <img src="{{ recipe.image }}" width="150" height="150" alt="{{ recipe.name }}"
             style="float:left; margin-right:10px; margin:5px"><br>
         Coook time: {{ recipe.cook_time }} minutes <br>
-        Link: <a href="recipe.url"> Go to Recipe</a><br>
-        <input type="checkbox" name="add" value="{{ recipe.id }}">
+        Link: <a href="recipe.url"> Go to Recipe</a><br><br><br><br><br><br><br>
+        <input type="checkbox" name="add" value="{{ recipe.id }}"><br>
     </div>
     {% endfor %}
 
