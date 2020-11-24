@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, session, flash
+from flask import Flask, request, render_template, redirect, session, flash, jsonify
 import os
 
 from model import db, connect_to_db, MealPlan, Recipe
@@ -21,17 +21,12 @@ flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE,
                                      scopes=SCOPES,
                                      redirect_uri='http://localhost:5000/callback')
 
-
+@app.route("/search")
 @app.route("/")
 def show_login():
     """show log in form"""
 
-    if 'user_id' in session:
-        user_id = session['user_id']
-        flash(f'User {user_id} logged in!')
-        return redirect('/menu')
-
-    return render_template('login.html')
+    return render_template('root.html')
 
 
 @app.route('/authorize')
@@ -152,7 +147,6 @@ def search_results():
     ingredients = request.args.get("ingredients").split(",")
     num_recipes = int(request.args.get("recipes_per_day"))
 
-    # user_id = 1
     print(f"\nthis is the session at beginning: {session}")
     user_id = session['user_id']
     print(f"\nthis is the user id from session: {session}\n")
@@ -261,6 +255,41 @@ def make_calendar_event():
     flash('Recipes added to MealPlan calendar!')
 
     return render_template('homepage.html')
+
+
+@app.route("/api/login", methods=['POST'])
+def login_user():
+    """log in user"""
+    data = request.get_json()
+
+    email = data['email']
+    password = data['password']
+
+    user = user_by_email(email)
+
+    if user:
+        if user.password == password:
+            session['user_id'] = user.id
+            return jsonify("User logged in successfully")
+        else: 
+            return jsonify("wrong password")
+
+    return("no user with this email")
+
+@app.route("/api/mealplans")
+def user_mealplans():
+    """show user's mealplans"""
+    user_id = session['user_id']
+    user = user_by_id(user_id)
+    mealplans = user.mealplans
+    mealplans_info = []
+    for mealplan in mealplans:
+        mealplan = {}
+        mealplan['id'] = mealplan.id
+        mealplan['date'] = mealplan.date
+        mealplans_info.append(mealplan)
+
+    return jsonify(mealplans_info)
 
 
 # @app.route("/inventory")
