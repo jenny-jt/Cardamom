@@ -1,7 +1,7 @@
 """All helper functions"""
 from model import MealPlan
 from random import choice
-from crud import add_mealplan, create_api_recipes
+from crud import create_api_recipes, check_mealplan
 from datetime import datetime, timedelta
 
 
@@ -88,7 +88,7 @@ def create_alt_recipes(master_list, ingredients, num_recipes, mealplan):
     else:
         alt_recipes = master_list[1]
 
-    if len(alt_recipes) < 3:
+    if len(alt_recipes) < 2:
         new_api_recipes = create_api_recipes(ingredients, 3)
         for recipe in new_api_recipes:
             if recipe not in mealplan.recipes_r:
@@ -116,16 +116,6 @@ def num_days(start_date, end_date):
     num_days = date_range.days
 
     return num_days
-
-
-def check_mealplan(date, user):
-    """checks if mealplan exists, otherwise makes a new mealplan object"""
-    mealplan = MealPlan.query.filter(MealPlan.date == date).first()
-
-    if not mealplan:
-        mealplan = add_mealplan(date, user)  # also adds mp to user
-
-    return mealplan
 
 
 def mealplan_dates(start_date, end_date, user):

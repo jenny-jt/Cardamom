@@ -38,7 +38,7 @@ def add_recipe(name, ingredients, url, cook_time="n/a", image="none"):
 def add_mealplan(date, user):
     """add meal plan with date"""
     mealplan = MealPlan(date=date)
-    user_add_mealplan(mealplan, user)
+    user.add_mealplan_to_user(mealplan)
     db.session.add(mealplan)
     db.session.commit()
 
@@ -180,9 +180,21 @@ def add_ingr(ingr_data):
     return recipe_ingredients
 
 
-def user_add_mealplan(mealplan, user):
-    """called when mealplan added to db, adds mealplan to user"""
-    user.add_mealplan_to_user(mealplan)
+def check_mealplan(date, user):
+    """checks if mealplan exists, otherwise makes a new mealplan object
+        also add mealplan to user object
+    """
+    mealplan = MealPlan.query.filter(MealPlan.date == date).first()
+
+    if not mealplan:
+        mealplan = add_mealplan(date, user)
+
+    print(f" this is user in check_mealplan: {user}")
+    print(f" this is user's mealplans in check_mealplan: {user.mealplans}") #=None
+    db.session.commit()
+    print(f"this is the user's meaplans: {user.mealplans}")
+
+    return mealplan
 
 
 def mealplan_add_recipe(mealplan, recipes_list, num_recipes):

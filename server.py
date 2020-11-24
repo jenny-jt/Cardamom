@@ -18,8 +18,8 @@ API_VERSION = 'v3'
 SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events']
 
 flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE,
-                                         scopes=SCOPES,
-                                         redirect_uri='http://localhost:5000/callback')
+                                     scopes=SCOPES,
+                                     redirect_uri='http://localhost:5000/callback')
 
 
 
@@ -91,12 +91,9 @@ def show_recipes():
 @app.route("/mealplans")
 def show_mealplans():
     """Show all mealplans for user"""
-    # mealplans = all_mealplans()
-
     user_id = session['user_id']
     user = user_by_id(user_id)
     mealplans = user.mealplans
-    print(f"these are users mealplans: {mealplans}")
 
     if mealplans:
         return render_template('mealplans.html', mealplans=mealplans)
@@ -111,7 +108,6 @@ def create_mealplan():
     if yes: display form to gather info to create mealplan
     if no: redirect to authorize
     """
-    print(f"session in create_mealplan route: {session}")
 
     return render_template('search.html')
 
@@ -122,9 +118,8 @@ def authorize():
     authorization_url, state = flow.authorization_url(
                                 access_type='offline',
                                 include_granted_scopes='true')
-    print(session)
+
     session['state'] = state
-    print(session)
 
     return redirect(authorization_url)
 
@@ -139,7 +134,7 @@ def callback():
     credentials = flow.credentials
     session['credentials'] = cred_dict(credentials)
 
-    flash('Succesfully logged in to Google Calendar!')
+    flash('Succesfully logged into Google Calendar!')
 
     return redirect("/")
 
@@ -152,18 +147,13 @@ def search_results():
     ingredients = request.args.get("ingredients").split(",")
     num_recipes = int(request.args.get("recipes_per_day"))
 
-    # user_id = 1
-    print(f"\nthis is the session at beginning: {session}")
     user_id = session['user_id']
-    print(f"\nthis is the user id from session: {session}\n")
     user = user_by_id(user_id)
-    print(user)
 
     start = request.args.get("start_date")
     session['start'] = start
     end = request.args.get("end_date")
     session['end'] = end
-    print(f"session after adding end: {session}")
 
     start_date, end_date = convert_dates(start, end)
     days = num_days(start_date, end_date)
@@ -176,10 +166,8 @@ def search_results():
 
     for mealplan in mealplans:
         alt_recipe = create_alt_recipes(master_list, ingredients, num, mealplan)
-        mealplan_add_recipe(mealplan, recipe_list)
-        altrecipes = mealplan_add_altrecipe(mealplan, alt_recipe)
-
-        print(f"\n alternative recipes for mp {altrecipes}\n")
+        mealplan_add_recipe(mealplan, recipe_list, num_recipes)
+        mealplan_add_altrecipe(mealplan, alt_recipe)
 
     return render_template("display.html", mealplans=mealplans)
 
@@ -190,8 +178,9 @@ def modify_mealplan(mealplan_id):
 
     mealplan_id = int(mealplan_id)
     mealplan = MealPlan.query.get(mealplan_id)
+    alt_recipes = mealplan.altrecipes_r  # this line should not be needed, jinja should be able to parse mealplan.altrecipes_r
 
-    return render_template('modify.html', mealplan=mealplan)
+    return render_template('modify.html', mealplan=mealplan, alt_recipes=alt_recipes)
 
 
 @app.route('/modify', methods=['POST'])
@@ -243,14 +232,17 @@ def make_calendar_event():
     cal = build('calendar', API_VERSION, credentials=credentials)
     cal_id = 'tl9a33nl5al9k337lh45f40av8@group.calendar.google.com'
 
+    user_id = session["user_id"]
+    user = user_by_id(user_id)
+
     start = session['start']
     end = session['end']
     start_date, end_date = convert_dates(start, end)
-    mealplans = mealplan_dates(start_date, end_date)
+    mealplans = mealplan_dates(start_date, end_date, user)
 
     for mealplan in mealplans:
         recipes = mealplan.recipes_r
-        date = str(mealplan.date)
+        date = str(mealplan.date)[:10]  # might be able to take out string
 
         for recipe in recipes:
             event = make_cal_event(recipe, date)
@@ -258,7 +250,7 @@ def make_calendar_event():
 
     flash('Recipes added to MealPlan calendar!')
 
-    return render_template('homepage.html')
+    return render_template('menu.html')
 
 
 # @app.route("/inventory")
