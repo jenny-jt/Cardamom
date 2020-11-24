@@ -58,10 +58,10 @@ class MealPlan(db.Model):
     updated = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     deleted = db.Column(db.TIMESTAMP(timezone=True), nullable=True)
     date = db.Column(db.DateTime(timezone=True), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
 
     recipes_r = db.relationship('Recipe', secondary='recipes_mealplans', backref="mealplans_r")
     altrecipes_r = db.relationship('Recipe', secondary='altrecipes_mealplans')
-    user = db.relationship('User')
 
     def __repr__(self):
         """Provide helpful representation when printed."""
@@ -84,7 +84,6 @@ class User(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     email = db.Column(db.String(), unique=True)
     password = db.Column(db.String())
-    mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
 
     mealplans = db.relationship('MealPlan')
 

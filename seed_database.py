@@ -152,8 +152,3 @@ for user in users:
     user = add_user(email=user['email'], password=user['password'])
     db.session.add(user)
     db.session.commit()
-
-
-user2 = User.query.get(2)
-
-user2.add_mealplan_to_user(***)

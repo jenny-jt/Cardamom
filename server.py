@@ -24,7 +24,7 @@ flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE,
 @app.route("/search")
 @app.route("/")
 def show_login():
-    """show log in form"""
+    """show root template"""
 
     return render_template('root.html')
 
@@ -222,8 +222,6 @@ def modify_recipes():
         else:
             flash('recipe already in mealplan')
 
-    print(f"this is the recipes list after removal: {recipes}")
-
     flash('Recipes removed and added')
     return render_template('events.html', recipes=recipes, mealplan=mealplan)
 
@@ -246,7 +244,7 @@ def make_calendar_event():
 
     for mealplan in mealplans:
         recipes = mealplan.recipes_r
-        date = str(mealplan.date)
+        date = str(mealplan.date)[:10]
 
         for recipe in recipes:
             event = make_cal_event(recipe, date)
@@ -271,10 +269,11 @@ def login_user():
         if user.password == password:
             session['user_id'] = user.id
             return jsonify("User logged in successfully")
-        else: 
+        else:
             return jsonify("wrong password")
 
-    return("no user with this email")
+    return jsonify("no user with this email")
+
 
 @app.route("/api/mealplans")
 def user_mealplans():
@@ -282,15 +281,54 @@ def user_mealplans():
     user_id = session['user_id']
     user = user_by_id(user_id)
     mealplans = user.mealplans
+    print(mealplans)
     mealplans_info = []
-    for mealplan in mealplans:
-        mealplan = {}
-        mealplan['id'] = mealplan.id
-        mealplan['date'] = mealplan.date
-        mealplans_info.append(mealplan)
 
+    for mealplan in mealplans:
+        mp = {}
+        mp['id'] = mealplan.id
+        mp['date'] = mealplan.date.strftime("%Y-%m-%d")
+        mealplans_info.append(mp)
+
+    print(mealplans_info)
     return jsonify(mealplans_info)
 
+
+@app.route("/api/recipes")
+def recipes():
+    """show user's mealplans"""
+    recipes = all_recipes()
+
+    recipes_info = []
+    for recipe in recipes:
+        recipe = {}
+        recipe['name'] = recipe.name
+        recipe['image'] = recipe.image
+        recipe['cook_time'] = recipe.cook_time
+        recipe['url'] = recipe.url
+        recipes_info.append(mealplan)
+
+    return jsonify(recipes_info)
+
+
+@app.route("/api/create", methods=['POST'])
+def create():
+    """create mealplan(s) for user using dates, ingredients, num_recipes entered
+        return jsonified obj with mealplan ids of mealplans list
+    """
+    data = request.get_json()
+
+    ingredients = data['ingredients']
+    num_recipes = data['num_recipes_day']
+    start = data['start_date']
+    end = data['end_date']
+
+    user_id = session['user_id']
+    user = user_by_id(user_id)
+
+    mealplans = user.mealplans
+
+    return("Created mealplans")
 
 # @app.route("/inventory")
 # def update_inventory():
