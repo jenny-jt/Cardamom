@@ -5,6 +5,65 @@ from crud import add_mealplan, create_api_recipes
 from datetime import datetime, timedelta
 
 
+def create_alt_recipes(master_list, ingredients, mealplan):
+    """creates list of alternate recipes"""
+
+    if len(master_list) > 2:
+        alt_recipes = master_list[1] + master_list[2]
+        print("crud: alt recipes with api", alt_recipes)
+    else:
+        alt_recipes = master_list[1]
+        print("crud: alt recipes without api", alt_recipes)
+
+    if len(alt_recipes) < 3:
+        new_api_recipes = create_api_recipes(ingredients, 3)
+        for recipe in new_api_recipes:
+            if recipe not in mealplan.recipes_r:
+                alt_recipes.append(recipe)
+        print("crud: alt recipes after new api", alt_recipes)
+
+    return alt_recipes
+
+
+def create_recipe_list(ingredients, num, db_recipes):
+    """takes in num as well as list of recipes from db
+       will make api recipe list if needed
+       returns recipe list that is num long (picked randomly from db only or db + api)
+       also returns leftover db_recipes (lists[1]) and api_recipes (lists[2]) lists
+    """
+    db_num = len(db_recipes)
+    api_num = num - db_num + 4
+
+    if db_num < num:
+        api_recipes = create_api_recipes(ingredients, api_num)
+        master_list = make_recipe_lists(num, db_recipes, api_recipes)
+    else:
+        master_list = make_recipe_lists(num, db_recipes)
+
+    return master_list  # recipe_list, db_recipes, api_recipes
+
+
+def check_mealplan(date, user):
+    """checks if mealplan exists, otherwise makes a new mealplan object"""
+    mealplan = MealPlan.query.filter(MealPlan.date == date).first()
+
+    if not mealplan:
+        mealplan = add_mealplan(date, user)  # also adds mp to user
+
+    return mealplan
+
+
+def convert_dates(start, end):  
+    """take in start and end date strings from form, returns date time objects"""
+
+    dt_format = "%Y-%m-%d"
+
+    start_date = datetime.strptime(start, dt_format)
+    end_date = datetime.strptime(end, dt_format)
+
+    return start_date, end_date
+
+
 def cred_dict(credentials):
     """Takes in credentials from OAuth and returns in dictionary format"""
 
@@ -17,27 +76,26 @@ def cred_dict(credentials):
             'scopes': credentials.scopes}
 
 
-def create_recipe_list(ingredients, num, db_recipes):
-    """takes in num as well as list of recipes from db
-       will make api recipe list if needed
-       returns recipe list that is num long (picked randomly from db only or db + api)
-       also returns leftover db_recipes (lists[1]) and api_recipes (lists[2]) lists
-    """
-    db_num = len(db_recipes)
-    api_num = num - db_num + 3
+def make_cal_event(recipe, date):
+    """Takes in recipe object, turns it into gcal event body with"""
 
-    if len(db_recipes) < num:
-        api_recipes = create_api_recipes(ingredients, api_num)
-        master_list = make_recipe_lists(num, db_recipes, api_recipes)
-    else:
-        master_list = make_recipe_lists(num, db_recipes)
+    cook_time = str(recipe.cook_time)  # might be unnecessary, cooktime is probably a string
 
-    return master_list  # recipe_list, db_recipes, api_recipes
+    # dictionary for google event information
+    event = {
+            'summary': recipe.name,
+            'start': {"date": date},
+            'end': {"date": date},
+            'description': f"{cook_time} minutes",
+            'source': {"url": recipe.url}
+            }
+
+    return event
 
 
 def make_recipe_lists(num, db_recipes, api_recipes=[]):
     """takes in db and api recipe lists, selects number of them to generate recipe list
-       also contains the leftovers of the db and api lists
+       returns recipe list and leftovers of the db and api lists
     """
 
     count = 0
@@ -57,77 +115,6 @@ def make_recipe_lists(num, db_recipes, api_recipes=[]):
     return recipe_list, db_recipes, api_recipes
 
 
-def pick_recipes(recipes):
-    """takes in list of recipes, picks a random recipe from list"""
-    item = choice(recipes)
-
-    return item
-
-
-def make_cal_event(recipe, date):
-    """Takes in recipe object, turns it into gcal event body with"""
-    cook_time = str(recipe.cook_time)
-
-    # dictionary for google event information
-    event = {
-            'summary': recipe.name,
-            'start': {"date": date},
-            'end': {"date": date},
-            'description': f"{cook_time} minutes",
-            'source': {"url": recipe.url}
-            }
-
-    return event
-
-
-def create_alt_recipes(master_list, ingredients, num_recipes, mealplan):
-    """creates list of alternate recipes"""
-
-    if len(master_list) > 2:
-        alt_recipes = master_list[1] + master_list[2]
-    else:
-        alt_recipes = master_list[1]
-
-    if len(alt_recipes) < 3:
-        new_api_recipes = create_api_recipes(ingredients, 3)
-        for recipe in new_api_recipes:
-            if recipe not in mealplan.recipes_r:
-                alt_recipes.append(recipe)
-
-    return alt_recipes
-
-
-def convert_dates(start, end):  
-    """take in start and end date strings from form, returns date time objects"""
-
-    dt_format = "%Y-%m-%d"
-
-    start_date = datetime.strptime(start, dt_format)
-    end_date = datetime.strptime(end, dt_format)
-
-    return start_date, end_date
-
-
-def num_days(start_date, end_date):
-    """take in start and end dates, returns number of days in date range"""
-
-    date_range = end_date - start_date
-
-    num_days = date_range.days
-
-    return num_days
-
-
-def check_mealplan(date, user):
-    """checks if mealplan exists, otherwise makes a new mealplan object"""
-    mealplan = MealPlan.query.filter(MealPlan.date == date).first()
-
-    if not mealplan:
-        mealplan = add_mealplan(date, user)  # also adds mp to user
-
-    return mealplan
-
-
 def mealplan_dates(start_date, end_date, user):
     """take in start and end dates from form,
        check if mealplan exists for each date in range
@@ -144,3 +131,20 @@ def mealplan_dates(start_date, end_date, user):
         start_date += delta
 
     return mealplans
+
+
+def num_days(start_date, end_date):
+    """take in start and end dates, returns number of days in date range"""
+
+    date_range = end_date - start_date
+
+    num_days = date_range.days
+
+    return num_days
+
+
+def pick_recipes(recipes):
+    """takes in list of recipes, picks a random recipe from list"""
+    item = choice(recipes)
+
+    return item

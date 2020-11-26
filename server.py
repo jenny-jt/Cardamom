@@ -351,13 +351,9 @@ def create():
     data = request.get_json()
 
     ingredients = data['ingredients']
-    print(ingredients)
     num_recipes = int(data['num_recipes_day'])
-    (num_recipes)
     start = data['start_date']
-    print(start)
     end = data['end_date']
-    print(end)
 
     start_date, end_date = convert_dates(start, end)
     days = num_days(start_date, end_date)
@@ -367,16 +363,17 @@ def create():
     user = user_by_id(user_id)
 
     db_recipes = create_db_recipes(ingredients)
-    master_list = create_recipe_list(ingredients, num_recipes, db_recipes)
+    master_list = create_recipe_list(ingredients, num, db_recipes)
     recipe_list = master_list[0]
 
     mealplans = mealplan_dates(start_date, end_date, user)
     mealplans_list = []
 
     for mealplan in mealplans:
-        alt_recipe = create_alt_recipes(master_list, ingredients, num, mealplan)
-        recipes = mealplan_add_recipe(mealplan, recipe_list, num_recipes)  
-        # need to convert list of recipe obj to list of recipe name, img, url, cooktime
+        alt_recipes = create_alt_recipes(master_list, ingredients, mealplan)
+        altrecipes = mealplan_add_altrecipe(mealplan, alt_recipes)
+        recipes = mealplan_add_recipe(mealplan, recipe_list, num_recipes)
+
         recipes_info = []
         for recipe in recipes:
             r = {}
@@ -387,9 +384,8 @@ def create():
             r['url'] = recipe.url
             recipes_info.append(r)
 
-        # need to convert list of recipe obj to list of recipe name, img, url, cooktime
         alt_recipes_info = []
-        for recipe in alt_recipe:
+        for recipe in altrecipes:
             alt_r = {}
             alt_r['id'] = recipe.id
             alt_r['name'] = recipe.name
@@ -398,9 +394,8 @@ def create():
             alt_r['url'] = recipe.url
             alt_recipes_info.append(alt_r)
 
-        mp = {'id': mealplan.id, 'date': mealplan.date.strftime("%Y-%m-%d"), 'recipes': recipes_info, 'alt_recipes': alt_recipes_info}
+        mp = {'id': mealplan.id, 'date': mealplan.date.strftime("%Y-%m-%d"), 'recipes': recipes_info, 'altrecipes': alt_recipes_info}
         mealplans_list.append(mp)
-
 
     return jsonify(mealplans_list)
 
@@ -420,21 +415,34 @@ def calendar_event():
 
     mealplan_id = data['mealplan_id']
     recipe_ids = data['recipe_ids']
-    
+    altrecipe_ids = data['recipe_ids']
+
+    # need to update mealplan recipes to this recipes list, maybe also update alt_recipes list
+    # updated alt_recipes = original alt_recipes 
     mealplan = MealPlan.query.get(mealplan_id)
     date = str(mealplan.date)[:10]
 
-    cal_recipes = []
+    cal_recipes = []  # front end recipe list used to make cal events
 
     for id in recipe_ids:
         cal_recipe = Recipe.query.get(id)
         cal_recipes.append(cal_recipe)
-    print(f"\n this is cal_recipes {cal_recipes}\n")
+
+    mealplan.recipes_r = cal_recipes
+    print(f"\n this is updated mealplan recipes {mealplan.recipes_r}\n")
+
+    alt_recipes = []
+
+    for id in altrecipe_ids:
+        alt_recipe = Recipe.query.get(id)
+        alt_recipes.append(alt_recipe)
+
+    mealplan.altrecipes_r = alt_recipes  # can i do this or do i have to .clear() and then add recipes?
+    print(f"\n this is updated alternate recipes {mealplan.altrecipes_r}\n")
 
     for recipe in cal_recipes:
         event = make_cal_event(recipe, date)
-        print(event)
-        add_event = cal.events().insert(calendarId=cal_id, sendNotifications=True, body=event).execute()
+        cal.events().insert(calendarId=cal_id, sendNotifications=True, body=event).execute()
 
     return ('Recipes added to MealPlan calendar!')
 
