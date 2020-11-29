@@ -2,8 +2,8 @@ from flask import Flask, request, render_template, redirect, session, flash, jso
 import os
 
 from model import db, connect_to_db, MealPlan, Recipe
-from helper import make_cal_event, cred_dict, create_recipe_list, create_alt_recipes, convert_dates, mealplan_dates, num_days
-from crud import all_recipes, create_db_recipes, add_user, user_by_id, user_by_email, mealplan_add_recipe, mealplan_add_altrecipe
+from helper import make_cal_event, cred_dict, create_recipe_list, create_alt_recipes, data_mealplans, data_recipes, data_user, convert_dates, mealplan_dates, num_days, verify_user
+from crud import all_recipes, create_db_recipes, add_user, user_by_id, user_by_email, mealplan_add_recipe, mealplan_add_altrecipe, updated_recipes
 
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
@@ -20,6 +20,7 @@ SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.co
 flow = Flow.from_client_secrets_file(CLIENT_SECRETS_FILE,
                                      scopes=SCOPES,
                                      redirect_uri='http://localhost:5000/callback')
+
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -57,88 +58,6 @@ def callback():
     return render_template('root.html')
 
 
-# @app.route("/login", methods=['POST'])
-# def login():
-#     """ask user to login, if new user, create user and add to db"""
-
-#     email = request.form.get('email')
-#     password = request.form.get('password')
-
-#     user = user_by_email(email)
-
-#     if user:
-#         if user.password == password:
-#             session['user_id'] = user.id
-#             flash("Logged in successfully")
-#             return redirect('/menu')
-#         else:
-#             flash('Wrong password! Please try again')
-#             return redirect('/')
-#     else:
-#         flash('Email not in system. Would you like to create a new user?')
-#         return redirect('/')
-
-
-# @app.route("/create_user", methods=['POST'])
-# def create_user():
-#     """creates user with entered email and pw"""
-
-#     email = request.form.get('email')
-#     password = request.form.get('password')
-
-#     user = add_user(email, password)
-#     session['user_id'] = user.id
-
-#     flash('Account created!')
-#     return redirect('/menu')
-
-
-# @app.route("/menu")
-# def menu():
-#     """Show options to view all recipes, all mealplans, or create new mealplan"""
-
-#     return render_template('menu.html')
-
-
-# @app.route("/recipes")
-# def show_recipes():
-#     """Show all recipes"""
-#     recipes = all_recipes()
-
-#     return render_template('recipes.html', recipes=recipes)
-
-
-# @app.route("/mealplans")
-# def show_mealplans():
-#     """Show all mealplans for user"""
-#     # mealplans = all_mealplans()
-
-#     user_id = session['user_id']
-#     user = user_by_id(user_id)
-#     mealplans = user.mealplans
-#     print(f"these are users mealplans: {mealplans}")
-
-#     if mealplans:
-#         return render_template('mealplans.html', mealplans=mealplans)
-#     else:
-#         flash('No Meal Plans for you yet. Please create one!')
-#         return redirect("/create_mealplan")
-
-
-# @app.route("/create_mealplan")
-# def create_mealplan():
-#     """check if authorized for gcal
-#     if yes: display form to gather info to create mealplan
-#     if no: redirect to authorize
-#     """
-#     print(f"session in create_mealplan route: {session}")
-
-#     if 'credentials' not in session:
-#         return redirect('/authorize')
-
-#     return render_template('search.html')
-
-
 # @app.route("/search")
 # def search_results():
 #     """take in date for mealplan, ingredients, and number of recipes
@@ -170,16 +89,6 @@ def callback():
 #         mealplan_add_altrecipe(mealplan, alt_recipe)
 
 #     return render_template("display.html", mealplans=mealplans)
-
-
-# @app.route("/mealplans/<int:mealplan_id>")
-# def modify_mealplan(mealplan_id):
-#     """retrieve mealplan obj for each id, render modification form"""
-
-#     mealplan_id = int(mealplan_id)
-#     mealplan = MealPlan.query.get(mealplan_id)
-
-#     return render_template('modify.html', mealplan=mealplan)
 
 
 # @app.route('/modify', methods=['POST'])
@@ -218,73 +127,48 @@ def callback():
 #     return render_template('events.html', recipes=recipes, mealplan=mealplan)
 
 
-# @app.route('/cal', methods=['POST'])
-# def make_calendar_event():
-#     """Add all-day recipe event to user's google calendar for each recipe in mealplan"""
-
-#     # grabs stored OAuth credentials
-#     credentials = Credentials(**session['credentials'])
-
-#     # google api client to make google calendar event
-#     cal = build('calendar', API_VERSION, credentials=credentials)
-#     cal_id = 'tl9a33nl5al9k337lh45f40av8@group.calendar.google.com'
-
-#     start = session['start']
-#     end = session['end']
-#     start_date, end_date = convert_dates(start, end)
-#     mealplans = mealplan_dates(start_date, end_date)
-
-#     for mealplan in mealplans:
-#         recipes = mealplan.recipes_r
-#         date = str(mealplan.date)[:10]
-
-#         for recipe in recipes:
-#             event = make_cal_event(recipe, date)
-#             add_event = cal.events().insert(calendarId=cal_id, sendNotifications=True, body=event).execute()
-
-#     flash('Recipes added to MealPlan calendar!')
-
-#     return render_template('homepage.html')
-
-
 @app.route("/api/login", methods=['POST'])
 def login_user():
-    """log in user"""
-
-    if 'credentials' not in session:
-        return redirect('/api/authorize')
-
+    """log in user, return either jsonify(user name and id), or "no user with this email"
+        if no user, creates user with entered email and password
+    """
     data = request.get_json()
-
     email = data['email']
     password = data['password']
 
     user = user_by_email(email)
+    print("****user", user)
 
-    if user:
-        if user.password == password:
-            session['user_id'] = user.id
-            return jsonify("User logged in successfully")
-        else:
-            return jsonify("wrong password")
-
-    return jsonify("no user with this email")
+    user_verified = verify_user(password, user)
+    print("******verified", user_verified)
+    return jsonify(user_verified)
 
 
-@app.route("/api/mealplans")
+@app.route("/api/new_user", methods=['POST'])
+def new_user():
+    """ creates user with entered email and password"""
+
+    data = request.get_json()
+    email = data['email']
+    password = data['password']
+
+    user = add_user(name, email, password)
+    user_info = data_user(user)
+
+    return jsonify(user_info)
+
+
+@app.route("/api/mealplans", methods=['POST'])
 def user_mealplans():
     """show user's mealplans"""
-    user_id = session['user_id']
+    data = request.get_json()
+    user_id = data['user_id']
+    print(user_id)
     user = user_by_id(user_id)
+    print(user)
 
     mealplans = user.mealplans
-    mealplans_info = []
-
-    for mealplan in mealplans:
-        mp = {}
-        mp['id'] = mealplan.id
-        mp['date'] = mealplan.date.strftime("%Y-%m-%d")
-        mealplans_info.append(mp)
+    mealplans_info = data_mealplans(mealplans)
 
     return jsonify(mealplans_info)
 
@@ -294,15 +178,7 @@ def recipes():
     """show user's mealplans"""
     recipes = all_recipes()
 
-    recipes_info = []
-    for recipe in recipes:
-        r = {}
-        r['id'] = recipe.id
-        r['name'] = recipe.name
-        r['image'] = recipe.image
-        r['cook_time'] = recipe.cook_time
-        r['url'] = recipe.url
-        recipes_info.append(r)
+    recipes_info = data_recipes(recipes)
 
     return jsonify(recipes_info)
 
@@ -315,30 +191,12 @@ def modify_mp(mealplan_id):
     mealplan = MealPlan.query.get(mealplan_id)
 
     recipes = mealplan.recipes_r
-    recipes_info = []
+    recipes_info = data_recipes(recipes)
 
-    for recipe in recipes:
-        r = {}
-        r['id'] = recipe.id
-        r['name'] = recipe.name
-        r['image'] = recipe.image
-        r['cook_time'] = recipe.cook_time
-        r['url'] = recipe.url
-        recipes_info.append(r)
+    altrecipes = mealplan.altrecipes_r
+    altrecipes_info = data_recipes(altrecipes)
 
-    alt_recipes = mealplan.altrecipes_r
-    alt_recipes_info = []
-
-    for recipe in alt_recipes:
-        alt_r = {}
-        alt_r['id'] = recipe.id
-        alt_r['name'] = recipe.name
-        alt_r['image'] = recipe.image
-        alt_r['cook_time'] = recipe.cook_time
-        alt_r['url'] = recipe.url
-        alt_recipes_info.append(alt_r)
-
-    mealplan_recipes = {'recipes': recipes_info, 'alts': alt_recipes_info}
+    mealplan_recipes = {'recipes': recipes_info, 'altrecipes': altrecipes_info}
 
     return jsonify(mealplan_recipes)
 
@@ -374,27 +232,12 @@ def create():
         altrecipes = mealplan_add_altrecipe(mealplan, alt_recipes)
         recipes = mealplan_add_recipe(mealplan, recipe_list, num_recipes)
 
-        recipes_info = []
-        for recipe in recipes:
-            r = {}
-            r['id'] = recipe.id
-            r['name'] = recipe.name
-            r['image'] = recipe.image
-            r['cook_time'] = recipe.cook_time
-            r['url'] = recipe.url
-            recipes_info.append(r)
+        recipes_info = data_recipes(recipes)
+        alt_recipes_info = data_recipes(altrecipes)
 
-        alt_recipes_info = []
-        for recipe in altrecipes:
-            alt_r = {}
-            alt_r['id'] = recipe.id
-            alt_r['name'] = recipe.name
-            alt_r['image'] = recipe.image
-            alt_r['cook_time'] = recipe.cook_time
-            alt_r['url'] = recipe.url
-            alt_recipes_info.append(alt_r)
+        mp = {'id': mealplan.id, 'date': mealplan.date.strftime("%Y-%m-%d"),
+              'recipes': recipes_info, 'altrecipes': alt_recipes_info}
 
-        mp = {'id': mealplan.id, 'date': mealplan.date.strftime("%Y-%m-%d"), 'recipes': recipes_info, 'altrecipes': alt_recipes_info}
         mealplans_list.append(mp)
 
     return jsonify(mealplans_list)
@@ -417,41 +260,25 @@ def calendar_event():
     recipe_ids = data['recipe_ids']
     altrecipe_ids = data['recipe_ids']
 
-    # need to update mealplan recipes to this recipes list, maybe also update alt_recipes list
-    # updated alt_recipes = original alt_recipes 
     mealplan = MealPlan.query.get(mealplan_id)
     date = str(mealplan.date)[:10]
 
-    cal_recipes = []  # front end recipe list used to make cal events
-
-    for id in recipe_ids:
-        cal_recipe = Recipe.query.get(id)
-        cal_recipes.append(cal_recipe)
-
+    # front end recipe list used to make cal events
+    cal_recipes = updated_recipes(recipe_ids)
     mealplan.recipes_r = cal_recipes
-    print(f"\n this is updated mealplan recipes {mealplan.recipes_r}\n")
+    db.session.commit()
+    print(f"\n updated mealplan recipes {mealplan.recipes_r}\n")
 
-    alt_recipes = []
-
-    for id in altrecipe_ids:
-        alt_recipe = Recipe.query.get(id)
-        alt_recipes.append(alt_recipe)
-
+    alt_recipes = updated_recipes(altrecipe_ids)
     mealplan.altrecipes_r = alt_recipes  # can i do this or do i have to .clear() and then add recipes?
-    print(f"\n this is updated alternate recipes {mealplan.altrecipes_r}\n")
+    db.session.commit()
+    print(f"\n updated alternate recipes {mealplan.altrecipes_r}\n")
 
     for recipe in cal_recipes:
         event = make_cal_event(recipe, date)
         cal.events().insert(calendarId=cal_id, sendNotifications=True, body=event).execute()
 
-    return ('Recipes added to MealPlan calendar!')
-
-
-# @app.route("/inventory")
-# def update_inventory():
-#     """ form with default values for location, able to save timestamp, quantity """
-
-#     return render_template('inventory.html')
+    return jsonify('Recipes added to MealPlan calendar!')
 
 
 if __name__ == "__main__":

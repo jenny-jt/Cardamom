@@ -118,10 +118,10 @@ recipes = [{"name": "Taiwanese Ground Pork", "ingredients": ["ground pork"],
 # {"name": "", "ingredients": [], "url": ""},       
 # kabob url https://persianmama.com/kabob-koobideh-grilled-minced-meat-kabobs/
 
-users = [{"email": "email", "password": "pw"},
-         {"email": "1", "password": "1"},
-         {"email": "2", "password": "2"},
-         {"email": "3", "password": "3"}]
+users = [{"name": "user", "email": "email@test.com", "password": "pw"},
+         {"name": "Bob", "email": "1@test.com", "password": "1"},
+         {"name": "Richard", "email": "2@test.com", "password": "2"},
+         {"name": "Turtle", "email": "3@test.com", "password": "3"}]
 
 for ingredient in ingredients:
     ingr = add_ingredient(name=ingredient['name'], location=ingredient['location'])
@@ -148,7 +148,8 @@ for recipe in recipes:
     db.session.add(db_recipe)
     db.session.commit()
 
+
 for user in users:
-    user = add_user(email=user['email'], password=user['password'])
+    user = add_user(name=user['name'], email=user['email'], password=user['password'])
     db.session.add(user)
     db.session.commit()

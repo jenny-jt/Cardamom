@@ -8,9 +8,9 @@ from flask import session
 api = sp.API(os.environ['apiKey'])
 
 
-def add_user(email, password):
+def add_user(name, email, password):
     """add and return user"""
-    user = User(email=email, password=password)
+    user = User(name=name, email=email, password=password)
     db.session.add(user)
     db.session.commit()
 
@@ -220,15 +220,15 @@ def user_by_email(email):
     return user
 
 
-def update_inventory(ingredient, bought, use_this_week, in_stock, quantity):
-    """update inventory when ingredient bought or used"""
+def updated_recipes(recipe_ids):
+    """generate updated list of recipes from ids to update mealplan"""
+    recipes = []
 
-    inventory = Inventory(ingredient_r=ingredient, bought=bought, use_this_week=use_this_week, in_stock=in_stock, quantity=quantity)
-
-    db.session.add(inventory)
-    db.session.commit()
-
-    return inventory
+    for id in recipe_ids:
+        recipe = Recipe.query.get(id)
+        recipes.append(recipe)
+    
+    return recipes
 
 
 if __name__ == '__main__':

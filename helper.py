@@ -1,4 +1,5 @@
 """All helper functions"""
+from flask import session, jsonify
 from model import MealPlan
 from random import choice
 from crud import add_mealplan, create_api_recipes
@@ -48,7 +49,7 @@ def check_mealplan(date, user):
     mealplan = MealPlan.query.filter(MealPlan.date == date).first()
 
     if not mealplan:
-        mealplan = add_mealplan(date, user)  # also adds mp to user
+        mealplan = add_mealplan(date, user)
 
     return mealplan
 
@@ -74,6 +75,44 @@ def cred_dict(credentials):
             'client_id': credentials.client_id,
             'client_secret': credentials.client_secret,
             'scopes': credentials.scopes}
+
+
+def data_mealplans(mealplans):
+    """takes in mealplan list and generates list of mealplan info to jsonify"""
+    mealplans_info = []
+
+    for mealplan in mealplans:
+        mp = {}
+        mp['id'] = mealplan.id
+        mp['date'] = mealplan.date.strftime("%Y-%m-%d")
+        mealplans_info.append(mp)
+    
+    return mealplans_info
+
+
+def data_recipes(recipes):
+    """Takes in recipe list and generates list of recipe info to jsonify"""
+    recipes_info = []
+
+    for recipe in recipes:
+        r = {}
+        r['id'] = recipe.id
+        r['name'] = recipe.name
+        r['image'] = recipe.image
+        r['cook_time'] = recipe.cook_time
+        r['url'] = recipe.url
+        recipes_info.append(r)
+
+    return recipes_info
+
+
+def data_user(user):
+    """takes in user obj, sets session with user id and return jsonified user info"""
+    
+    session['user_id'] = user.id
+    user_info = {'name': user.name, 'id': user.id}
+
+    return user_info
 
 
 def make_cal_event(recipe, date):
@@ -118,7 +157,7 @@ def make_recipe_lists(num, db_recipes, api_recipes=[]):
 def mealplan_dates(start_date, end_date, user):
     """take in start and end dates from form,
        check if mealplan exists for each date in range
-       if not exist, then create new mealplan for each date
+       if not exist, then create new mealplan for each date attached to user
        returns list of mealplans for date range
     """
     mealplans = []
@@ -148,3 +187,15 @@ def pick_recipes(recipes):
     item = choice(recipes)
 
     return item
+
+
+def verify_user(password, user):
+    """take in user email and password, and checks if user in db
+    returns user id and name if yes, string "no user" if no
+    """
+
+    if user.password == password:
+        user_info = data_user(user)
+        return user_info
+    else:
+        return ("no user with this email")

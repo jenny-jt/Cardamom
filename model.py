@@ -82,20 +82,18 @@ class User(db.Model):
     __tablename__ = "users"
 
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
-    email = db.Column(db.String(), unique=True)
-    password = db.Column(db.String())
+    name = db.Column(db.String(), nullable=False, unique=False)
+    email = db.Column(db.String(), nullable=False, unique=True)
+    password = db.Column(db.String(), nullable=False)
 
     mealplans = db.relationship('MealPlan')
 
     def __repr__(self):
-        return f'<User user_id={self.id} email={self.email}>'
+        return f'<User user_id={self.id} name={self.name}>'
 
     def add_mealplan_to_user(self, mealplan):
         """Add mealplan object to user"""
         self.mealplans.append(mealplan)
-
-
-##########################relationships###############################
 
 
 class Ingredient_Recipe(db.Model):
@@ -128,9 +126,6 @@ class AltRecipe_MealPlan(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)
     recipe_id = db.Column(db.Integer, db.ForeignKey("recipes.id"))
     mealplan_id = db.Column(db.Integer, db.ForeignKey("mealplans.id"))
-
-
-##########################relationships###############################
 
 
 class Inventory(db.Model):
@@ -168,6 +163,22 @@ def connect_to_db(app):
     db.init_app(app)
 
     print('Connected to the db!')
+
+
+# def test_data():
+#     """Create some sample data."""
+
+#     # In case this is run more than once, empty out existing data
+#     User.query.delete()
+#     Recipe.query.delete()
+#     Ingredient.query.delete()
+#     Mealplan.query.delete()
+
+#     # Add sample ingredients, recipes, mealplans, users
+  
+
+#     db.session.add_all([****])
+#     db.session.commit()
 
 
 if __name__ == "__main__":
