@@ -3,7 +3,7 @@ import os
 
 from model import db, connect_to_db, MealPlan, Recipe
 from helper import make_cal_event, cred_dict, create_recipe_list, create_alt_recipes, convert_dates, mealplan_dates, num_days
-from crud import all_recipes, create_db_recipes, add_user, user_by_id, user_by_email, mealplan_add_recipe, mealplan_add_altrecipe
+from crud import all_recipes, create_db_recipes, add_user, user_by_id, user_by_email, mealplan_add_recipe, mealplan_add_altrecipe, mealplan_by_id
 
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
@@ -161,13 +161,21 @@ def search_results():
 
     mealplans = mealplan_dates(start_date, end_date, user)
     db_recipes = create_db_recipes(ingredients)
-    master_list = create_recipe_list(ingredients, num_recipes, db_recipes)
+    print("*****db recipes", db_recipes)
+    master_list = create_recipe_list(ingredients, num, db_recipes)
     recipe_list = master_list[0]
+    print("**** recipe_list", recipe_list)
 
     for mealplan in mealplans:
         alt_recipe = create_alt_recipes(master_list, ingredients, num, mealplan)
-        mealplan_add_recipe(mealplan, recipe_list, num_recipes)
-        mealplan_add_altrecipe(mealplan, alt_recipe)
+        recipes = mealplan_add_recipe(mealplan, recipe_list, num_recipes)
+        altrecipes = mealplan_add_altrecipe(mealplan, alt_recipe)
+        print("**** date", mealplan.date)
+        print("**** id", mealplan.id)
+        print("****recipes in mp", recipes)
+        print("****alternative recipes in mp", altrecipes)
+
+    print("********mealplans list", mealplans)
 
     return render_template("display.html", mealplans=mealplans)
 
@@ -191,6 +199,7 @@ def modify_recipes():
     mealplan = MealPlan.query.get(mealplan_id)
 
     recipes = mealplan.recipes_r
+    altrecipes = mealplan.altrecipes_r
     id_remove_recipes = request.form.getlist('remove')
     id_add_recipes = request.form.getlist('add')
 
@@ -206,11 +215,13 @@ def modify_recipes():
 
     for recipe in remove:
         recipes.remove(recipe)
+        altrecipes.append(recipe)
         db.session.commit()
 
     for recipe in add:
         if recipe not in recipes:
             recipes.append(recipe)
+            altrecipes.remove(recipe)
             db.session.commit()
         else:
             flash('recipe already in mealplan')
@@ -223,6 +234,38 @@ def modify_recipes():
 
 @app.route('/cal', methods=['POST'])
 def make_calendar_event():
+    """Add all-day recipe event to user's google calendar for each recipe in mealplan"""
+
+    # grabs stored OAuth credentials
+    credentials = Credentials(**session['credentials'])
+
+    # google api client to make google calendar event
+    cal = build('calendar', API_VERSION, credentials=credentials)
+    cal_id = 'tl9a33nl5al9k337lh45f40av8@group.calendar.google.com'
+
+    # user_id = session["user_id"]
+    # user = user_by_id(user_id)
+
+    date = request.form.get("mealplan date")[:10]
+    print(date)
+    mp_id = int(request.form.get("mealplan id"))
+    print("mealplan id", mp_id)
+
+    mealplan = mealplan_by_id(mp_id)
+    print("mealplan for cal", mealplan)
+    recipes = mealplan.recipes_r
+
+    for recipe in recipes:
+        event = make_cal_event(recipe, date)
+        cal.events().insert(calendarId=cal_id, sendNotifications=True, body=event).execute()
+
+    flash('Recipes added to MealPlan calendar!')
+
+    return render_template('menu.html')
+
+
+@app.route('/cal_all', methods=['POST'])
+def all_to_cal():
     """Add all-day recipe event to user's google calendar for each recipe in mealplan"""
 
     # grabs stored OAuth credentials
@@ -251,7 +294,6 @@ def make_calendar_event():
     flash('Recipes added to MealPlan calendar!')
 
     return render_template('menu.html')
-
 
 # @app.route("/inventory")
 # def update_inventory():

@@ -1,5 +1,4 @@
 """All helper functions"""
-from model import MealPlan
 from random import choice
 from crud import create_api_recipes, check_mealplan
 from datetime import datetime, timedelta

@@ -22,10 +22,15 @@
 
 {% endfor %}
 
-Everything looks good!<br>
-<form action="/cal" method='POST'>
+Everything looks good!<br> 
+<form action="/cal_all" method='POST'>
     I would like to add everything to Calendar
     <button type="submit"> Add to Calendar </button>
+</form><br>
+
+<form action="/mealplans">
+    Finalize Mealplans before adding to Google Calendar
+    <button type="submit"> Finalize </button>
 </form>
 
 {% endblock %}

@@ -85,6 +85,7 @@ def create_db_recipes(ingredients):
         if not ingr:
             ingr = add_ingredient(name=ingredient, location=choice(location))
         ingr_recipes = ingr.recipes_r
+        print("******ingr recipes", ingr_recipes)
         db_recipes.extend(ingr_recipes)
 
     db_recipes = set(db_recipes)
@@ -230,6 +231,14 @@ def mealplan_add_altrecipe(mealplan, alt_recipes):
 
     print(f"\n crud version: alternate recipe objects associated with mealplan: {altrecipes}\n")
     return altrecipes
+
+
+def mealplan_by_id(mp_id):
+    """get mealplan by id"""
+
+    mealplan = MealPlan.query.get(mp_id)
+
+    return mealplan
 
 
 def update_inventory(ingredient, bought, use_this_week, in_stock, quantity):

@@ -20,6 +20,8 @@ Final Meal Plan Recipes<br>
 
 <br><br>Add to Calendar<br>
 <form action="/cal" method='POST'>
+    <input type="hidden" name="mealplan date" value="{{ mealplan.date }}"/>
+    <input type="hidden" name="mealplan id" value="{{ mealplan.id }}"/>
     Would you like to add this mealplan to your Google Calendar?
     Looks Good <button type="submit"> Add to Calendar </button>
 </form>
