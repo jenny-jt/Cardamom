@@ -157,9 +157,7 @@ def new_user():
         return jsonify('user with this email already exists')
     else:
         user = add_user(name, email, password)
-        print("****user", user)
         user_info = data_user(user)
-        print("****user info", user_info)
         return jsonify(user_info)
 
 
@@ -167,13 +165,15 @@ def new_user():
 def user_mealplans():
     """show user's mealplans"""
     data = request.get_json()
-    print("****data from front end, should contain user", data)
+    print("data coming into mealplans", data)
+    
     user_id = data['user_id']
-    print(user_id)
+    print("****mealplans user id", user_id)
     user = user_by_id(user_id)
-    print(user)
+    print("***user retrieved in mealplans", user)
 
     mealplans = user.mealplans
+    print("****user mealplans", mealplans)
     mealplans_info = data_mealplans(mealplans)
 
     return jsonify(mealplans_info)
@@ -212,31 +212,37 @@ def create():
         return jsonified obj with mealplan ids of mealplans list
     """
     data = request.get_json()
+    print("****data", data)
 
     ingredients = data['ingredients']
     num_recipes = int(data['num_recipes_day'])
-    print("****num recipes", num_recipes)
     start = data['start_date']
     end = data['end_date']
+    user_id = data['user_id']
 
     start_date, end_date = convert_dates(start, end)
     days = num_days(start_date, end_date)
     num = num_recipes * days
 
-    user_id = session['user_id']
     user = user_by_id(user_id)
+    print("***user in create", user)
 
     db_recipes = create_db_recipes(ingredients)
+    print("***db recipes based on ingredients", db_recipes)
     master_list = create_recipe_list(ingredients, num, db_recipes)
     recipe_list = master_list[0]
+    print("***final recipe list", recipe_list)
 
     mealplans = mealplan_dates(start_date, end_date, user)
+    print("****mp generated", mealplans)
     mealplans_list = []
 
     for mealplan in mealplans:
         alt_recipes = create_alt_recipes(master_list, ingredients, mealplan)
         altrecipes = mealplan_add_altrecipe(mealplan, alt_recipes)
+        print("****alternate recipes in mealplan", altrecipes)
         recipes = mealplan_add_recipe(mealplan, recipe_list, num_recipes)
+        print("****recipes in mealplan", recipes)
 
         recipes_info = data_recipes(recipes)
         alt_recipes_info = data_recipes(altrecipes)
@@ -245,6 +251,7 @@ def create():
               'recipes': recipes_info, 'altrecipes': alt_recipes_info}
 
         mealplans_list.append(mp)
+        print("****list of mealplans after create", mealplans_list)
 
     return jsonify(mealplans_list)
 

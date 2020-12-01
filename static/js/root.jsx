@@ -8,6 +8,8 @@ const useParams = ReactRouterDOM.useParams;
 const useHistory = ReactRouterDOM.useHistory;
 const Navbar = ReactBootstrap.Navbar;
 const Nav = ReactBootstrap.Nav;
+const Row = ReactBootstrap.Row;
+const ListGroup = ReactBootstrap.ListGroup;
 const Form = ReactBootstrap.Form;
 const Button = ReactBootstrap.Button;
 const Col = ReactBootstrap.Col;
@@ -93,7 +95,7 @@ function LogIn(props) {
 }
 
 
-function CreateUser() {
+function CreateUser(props) {
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -182,8 +184,8 @@ function CreateMealPlan(props) {
       ingredients: ingredients,
       num_recipes_day: num_recipes_day,
       start_date: start_date, 
-      end_date: end_date
-
+      end_date: end_date,
+      user_id: props.user.id
     }
 
     const options = {
@@ -229,7 +231,7 @@ function CreateMealPlan(props) {
         <Form.Group controlId="exampleForm.ControlSelect1">
         <Form.Label>Number of Recipes:</Form.Label>
         <Form.Control onChange={handleChange} value={num_recipes_day} as="select">
-            <option name="recipes_per_day" value="1" defaultValue>1</option>
+            <option name="recipes_per_day" value="1">1</option>
             <option name="recipes_per_day" value="2">2</option>
             <option name="recipes_per_day" value="3">3</option>
             <option name="recipes_per_day" value="4">4</option>
@@ -263,10 +265,10 @@ function CreateMealPlan(props) {
 
 function Mealplans(props) {
   const[mealplans, setMealplans] = React.useState([])
+  const data = {user_id: props.user.id}
+  console.log("data in Mealplans which contains user id", data)
 
   React.useEffect(() => {
-    const data = {'user_id': props.user.id}
-    console.log("data in Mealplans", data)
 
     const options = {
       method: 'POST',
@@ -293,7 +295,6 @@ function Mealplans(props) {
       })}
     </ul>
   )
-  
 }
 
 
@@ -445,7 +446,7 @@ function Recipes() {
   ), [])  
 
   function generateRecipes() {
-    const recipe_column = recipes.map((recipe) => {
+    const recipeColumn = recipes.map((recipe) => {
       return (
         <Col xs={6} md={4}>
           <Recipe name={recipe['name']} image={recipe['image']} cook_time={recipe['cook_time']} url={recipe['url']} />
@@ -455,13 +456,13 @@ function Recipes() {
 
     let rows = []
 
-    for (let i =0; i < recipe_column.length; i+=3) {
-      let row_recipes = <row> {recipe_column[i]} {recipe_column[i+1]} {recipe_column[i+2]} </row>
-      console.log(row_recipes)
-      rows.push(row_recipes);
-         
+    for (let i =0; i < recipeColumn.length; i+=3) {
+      rows.push(
+        <Row> {recipeColumn[i]} {recipeColumn[i+1]} {recipeColumn[i+2]} </Row>
+      )
+    }
     return rows
-    }}
+    }
 
   return (
     <React.Fragment>
@@ -477,31 +478,32 @@ function App() {
   React.useEffect(() => {
     const user_in_storage = localStorage.getItem('user')
     if (user_in_storage) {
-      setUser(JSON.parse(user_in_storage))
+      setUser(JSON.parse(user_in_storage));
     }
   },[]);
 
-  console.log(user);
+  console.log("user in storage", user);
+  console.log("user id", user.id)
 
     return (
       <Router>
         <Navbar bg="light" expand="lg">
           <Navbar.Brand href="#home">Meal Planner</Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav"/>
-          {/* <Navbar.Collapse id="basic-navbar-nav"> */}
+          <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">
               <Nav.Link href="/"> Home </Nav.Link>
-              <Nav.Link href="/login"> Login </Nav.Link>
-              <Nav.Link href="/new_user"> Create Account</Nav.Link>
+              {user? '' : <Nav.Link href="/login"> Login </Nav.Link>}
+              {user? '' : <Nav.Link href="/new_user"> Create Account</Nav.Link>}
               <Nav.Link href="/recipes"> Recipes </Nav.Link>
-              <Nav.Link href="/create_mealplan"> Create a Mealplan </Nav.Link>
-              <Nav.Link href="/mealplans"> View My Mealplans </Nav.Link>
+              {user? <Nav.Link href="/create_mealplan"> Create a Mealplan </Nav.Link> : ''}
+              {user? <Nav.Link href="/mealplans"> View My Mealplans </Nav.Link> : ''}
             </Nav>
             {/* <Form inline>
               <FormControl type="text" placeholder="Email" className="mr-sm-2" />
               <Button variant="outline-success">Log In</Button>
             </Form> */}
-          {/* </Navbar.Collapse> */}
+          </Navbar.Collapse>
         </Navbar>
 
         <Switch>
