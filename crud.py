@@ -26,7 +26,7 @@ def add_ingredient(name, location):
     return ingredient
 
 
-def add_ingr(ingr_data):
+def recipe_ingr(ingr_data):
     """takes in ingredient data, outputs unique list of ingredients"""
     recipe_ingredients = set()
 
@@ -111,15 +111,21 @@ def create_api_recipes(ingredients, num):
 
 def create_db_recipes(ingredients):
     """takes list of ingredients from form and outputs unique list of recipes associated with those ingredients"""
-    db_recipes = []
+    ingredients = ingredients.split(", ")
+    print("*****ingredients in create db recipes", ingredients)
     location = ["freezer", "fridge", "pantry"]
-
+    
+    db_recipes = []
     for ingredient in ingredients:
-        ingr = Ingredient.query.filter(Ingredient.name == ingredient).first()
-        if not ingr:
-            ingr = add_ingredient(name=ingredient, location=choice(location))
-        ingr_recipes = ingr.recipes_r
-        db_recipes.extend(ingr_recipes)
+        ingr_list = Ingredient.query.filter(Ingredient.name.ilike(f'%{ingredient}%')).all()
+        print("********** ingr", ingr_list)
+        # if not ingr:
+        #     ingr = add_ingredient(name=ingredient, location=choice(location))
+        for ingr in ingr_list:
+            ingr_recipes = ingr.recipes_r
+            print("********** recipes assoc with ingredients", ingr_recipes)
+            db_recipes.extend(ingr_recipes)
+            print("******** db_recipes as updating", db_recipes)
 
     db_recipes = set(db_recipes)
     db_recipes = list(db_recipes)
@@ -167,6 +173,7 @@ def recipe_info(api_id):
        if recipe not in db, make new recipe obj, return recipe object"""
     response = api.get_recipe_information(id=api_id)
     data = response.json()
+    print("***************data", data)
 
     name = str(data['title'])
     cook_time = int(data['readyInMinutes'])
@@ -174,21 +181,21 @@ def recipe_info(api_id):
     image = data['image']
 
     ingr_data = data['extendedIngredients']
-    recipe_ingredients = add_ingr(ingr_data)
+    recipe_ingredients = recipe_ingr(ingr_data)
+    print("*******************recipe_ingredients", recipe_ingredients)
 
     check_db = Recipe.query.filter(Recipe.name == name).first()
 
-    if not check_db:
+    if not check_db:  # if recipe not in db
         ingredients = ", ".join(recipe_ingredients)
         recipe = add_recipe(name=name, ingredients=ingredients, url=url, cook_time=cook_time, image=image)
         location = ["freezer", "fridge", "pantry"]
 
-        for ingr in ingredients:
+        for ingr in recipe_ingredients:
             db_ingr = Ingredient.query.filter(Ingredient.name == ingr).first()
             # if ingredient is not in db, make a new one with a random location
             if not db_ingr:
                 db_ingr = add_ingredient(name=ingr, location=choice(location))
-
             recipe.ingredients_r.append(db_ingr)
 
         db.session.add(recipe)

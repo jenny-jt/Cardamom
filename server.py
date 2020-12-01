@@ -214,7 +214,7 @@ def create():
     data = request.get_json()
     print("****data", data)
 
-    ingredients = data['ingredients']
+    ingredients = data['ingredients']  # string: carrot, egg
     num_recipes = int(data['num_recipes_day'])
     start = data['start_date']
     end = data['end_date']
@@ -223,26 +223,23 @@ def create():
     start_date, end_date = convert_dates(start, end)
     days = num_days(start_date, end_date)
     num = num_recipes * days
+    print("****num", num)
 
     user = user_by_id(user_id)
-    print("***user in create", user)
 
     db_recipes = create_db_recipes(ingredients)
     print("***db recipes based on ingredients", db_recipes)
     master_list = create_recipe_list(ingredients, num, db_recipes)
     recipe_list = master_list[0]
-    print("***final recipe list", recipe_list)
+    print("*****************************final recipe list should have num recipes", recipe_list)
 
     mealplans = mealplan_dates(start_date, end_date, user)
-    print("****mp generated", mealplans)
     mealplans_list = []
 
     for mealplan in mealplans:
         alt_recipes = create_alt_recipes(master_list, ingredients, mealplan)
         altrecipes = mealplan_add_altrecipe(mealplan, alt_recipes)
-        print("****alternate recipes in mealplan", altrecipes)
         recipes = mealplan_add_recipe(mealplan, recipe_list, num_recipes)
-        print("****recipes in mealplan", recipes)
 
         recipes_info = data_recipes(recipes)
         alt_recipes_info = data_recipes(altrecipes)
@@ -251,7 +248,8 @@ def create():
               'recipes': recipes_info, 'altrecipes': alt_recipes_info}
 
         mealplans_list.append(mp)
-        print("****list of mealplans after create", mealplans_list)
+    
+    print("****list of mealplans after create", mealplans_list)
 
     return jsonify(mealplans_list)
 

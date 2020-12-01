@@ -231,6 +231,7 @@ function CreateMealPlan(props) {
         <Form.Group controlId="exampleForm.ControlSelect1">
         <Form.Label>Number of Recipes:</Form.Label>
         <Form.Control onChange={handleChange} value={num_recipes_day} as="select">
+            <option selected>Select something</option>
             <option name="recipes_per_day" value="1">1</option>
             <option name="recipes_per_day" value="2">2</option>
             <option name="recipes_per_day" value="3">3</option>
@@ -264,8 +265,9 @@ function CreateMealPlan(props) {
 
 
 function Mealplans(props) {
+  console.log("mealplans being rendered", props.user)
   const[mealplans, setMealplans] = React.useState([])
-  const data = {user_id: props.user.id}
+  const data = {"user_id": props.user.id, "hi": "there"}
   console.log("data in Mealplans which contains user id", data)
 
   React.useEffect(() => {
@@ -284,16 +286,16 @@ function Mealplans(props) {
   }, []);
 
   return (
-    <ul>
+    <React.Fragment>
       {mealplans.map((mp) => {
         return (
           <ListGroup>
-          <ListGroup.label> Mealplan for {mp.date} </ListGroup.label>
-          <ListGroup.Item action href={`/mealplan/${mp.id}`}> </ListGroup.Item>
+            <ListGroup.label> Mealplan for {mp.date} </ListGroup.label>
+            <ListGroup.Item action href={`/mealplan/${mp.id}`}> </ListGroup.Item>
           </ListGroup>
         )
       })}
-    </ul>
+    </React.Fragment>
   )
 }
 
@@ -418,6 +420,17 @@ function Mealplan() {
 
 
 function Recipe(props) {
+  const styles = {
+    card: {
+      backgroundColor: '#B7E0F2',
+      borderRadius: 55,
+      padding: '3rem'
+    },
+    cardImage: {
+      objectFit: 'cover',
+      borderRadius: 55
+    }
+  }
   return (
     <Card border="secondary" style={{ width: '18rem' }}>
       <Card.Img top width="100%" variant="top" src={props.image} alt="Card image cap" />
@@ -471,6 +484,12 @@ function Recipes() {
   )
 }
 
+function LogOut(props) {
+  props.user = null;
+  localStorage.clear();
+  return(alert('logged out'))
+}
+
 
 function App() {
   const [user, setUser] = React.useState({}) //USER LOCALLY DEFINED
@@ -493,6 +512,7 @@ function App() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="mr-auto">
               <Nav.Link href="/"> Home </Nav.Link>
+              <Nav.Link href="/logout"> Log Out </Nav.Link>
               {user? '' : <Nav.Link href="/login"> Login </Nav.Link>}
               {user? '' : <Nav.Link href="/new_user"> Create Account</Nav.Link>}
               <Nav.Link href="/recipes"> Recipes </Nav.Link>
@@ -509,6 +529,9 @@ function App() {
         <Switch>
           <Route path="/login">
             <LogIn user={user} setUser={setUser} />
+          </Route>
+          <Route path="/logout">
+            <LogOut user={user} setUser={setUser} />
           </Route>
           <Route path="/recipes">
             <Recipes />

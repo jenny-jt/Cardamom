@@ -37,6 +37,7 @@ def create_recipe_list(ingredients, num, db_recipes):
 
     if db_num < num:
         api_recipes = create_api_recipes(ingredients, api_num)
+        print("*********api recipes", api_num)
         master_list = make_recipe_lists(num, db_recipes, api_recipes)
     else:
         master_list = make_recipe_lists(num, db_recipes)
@@ -176,8 +177,11 @@ def num_days(start_date, end_date):
     """take in start and end dates, returns number of days in date range"""
 
     date_range = end_date - start_date
-
-    num_days = date_range.days
+    print("****date range", date_range)
+    x = date_range.days
+    print("date range days", x)
+    num_days = date_range.days + 1
+    print("*****num_days", num_days)
 
     return num_days
 
