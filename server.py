@@ -129,18 +129,16 @@ def callback():
 
 @app.route("/api/login", methods=['POST'])
 def login_user():
-    """log in user, return either jsonify(user name and id), or "no user with this email"
-        if no user, creates user with entered email and password
-    """
+    """log in user, return either jsonify(user name and id), or no user with this email"""
     data = request.get_json()
     email = data['email']
     password = data['password']
 
     user = user_by_email(email)
-    print("****user", user)
+
 
     user_verified = verify_user(password, user)
-    print("******verified", user_verified)
+
     return jsonify(user_verified)
 
 
@@ -149,19 +147,27 @@ def new_user():
     """ creates user with entered email and password"""
 
     data = request.get_json()
+    name = data['name']
     email = data['email']
     password = data['password']
 
-    user = add_user(name, email, password)
-    user_info = data_user(user)
+    user = user_by_email(email)
 
-    return jsonify(user_info)
+    if user:
+        return jsonify('user with this email already exists')
+    else:
+        user = add_user(name, email, password)
+        print("****user", user)
+        user_info = data_user(user)
+        print("****user info", user_info)
+        return jsonify(user_info)
 
 
 @app.route("/api/mealplans", methods=['POST'])
 def user_mealplans():
     """show user's mealplans"""
     data = request.get_json()
+    print("****data from front end, should contain user", data)
     user_id = data['user_id']
     print(user_id)
     user = user_by_id(user_id)
@@ -177,7 +183,6 @@ def user_mealplans():
 def recipes():
     """show user's mealplans"""
     recipes = all_recipes()
-
     recipes_info = data_recipes(recipes)
 
     return jsonify(recipes_info)
@@ -210,6 +215,7 @@ def create():
 
     ingredients = data['ingredients']
     num_recipes = int(data['num_recipes_day'])
+    print("****num recipes", num_recipes)
     start = data['start_date']
     end = data['end_date']
 

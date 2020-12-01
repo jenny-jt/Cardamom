@@ -60,14 +60,14 @@ def add_mealplan(date, user):
 
 def all_recipes():
     """output all recipes in database"""
-    recipes = Recipe.query.all()
+    recipes = Recipe.query.order_by(Recipe.name).all()
 
     return recipes
 
 
 def all_mealplans():
     """output all mealplans in database"""
-    mealplans = MealPlan.query.all()
+    mealplans = MealPlan.query.order_by(Mealplan.date).all()
 
     return mealplans
 

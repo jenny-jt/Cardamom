@@ -10,13 +10,22 @@ const Navbar = ReactBootstrap.Navbar;
 const Nav = ReactBootstrap.Nav;
 const Form = ReactBootstrap.Form;
 const Button = ReactBootstrap.Button;
+const Col = ReactBootstrap.Col;
+const Card = ReactBootstrap.Card;
+const CardDeck = ReactBootstrap.CardDeck;
+const CardColumns = ReactBootstrap.CardColumns;
+const CardBody = ReactBootstrap.CardBody;
+const CardImage = ReactBootstrap.CardImage;
+const CardTitle = ReactBootstrap.CardTitle;
+const CardText = ReactBootstrap.CardText;
 // same as the above but using destructing syntax 
 // const { useHistory, useParams, Redirect, Switch, Prompt, Link, Route } = ReactRouterDOM;
 
 
-function Homepage() {
-  return <div> Welcome to my site </div>
+function Homepage(props) {
+  return <div> Welcome {props.user.name} </div>
 }
+
 
 function LogIn(props) { 
 
@@ -38,20 +47,20 @@ function LogIn(props) {
       headers: {'Content-Type': 'application/json'}
     }
 
-    fetch('/api/login', options) // THIS ROUTE IS RETURNING YOUR USER INFO BEING SET TO STORAGE
+    fetch('/api/login', options) 
     .then(response => response.json())
     .then(data => {
       console.log("fetch is running", data);
       if (data !== 'no user with this email') {
         props.setUser(data);
-        localStorage.setItem('user', JSON.stringify(data)); // THIS SETS USER TO STORAGE WITH INFO YOU GET FROM FETCH
+        localStorage.setItem('user', JSON.stringify(data));
+        console.log("user after setItem", props.user)
         history.push('/');
       } else {
         alert("incorrect email/password")
       }
     });
   }
-
 
   function handleEmailChange(evt) {
     setEmail(evt.target.value)
@@ -83,7 +92,79 @@ function LogIn(props) {
   ) 
 }
 
-function CreateMealPlan() { 
+
+function CreateUser() {
+  const [name, setName] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const history = useHistory()
+
+  function handleNewUser(evt) {
+    evt.preventDefault();
+
+    const data = { 
+      name: name,
+      email: email,
+      password: password
+    }
+
+    const options = {
+      method: 'POST',
+      body: JSON.stringify(data),
+      headers: {'Content-Type': 'application/json'}
+    }
+
+    fetch('/api/new_user', options) 
+    .then(response => response.json())
+    .then(data => {
+      console.log("new user data", data);
+      if (data !== 'user with this email already exists') {
+        props.setUser(data);
+        localStorage.setItem('user', JSON.stringify(data));
+        history.push('/');
+      } else {
+        alert("user with this email already exists")
+      }
+      });
+  }
+
+  function handleNameChange(evt) {
+    setName(evt.target.value)
+  }
+  function handleEmailChange(evt) {
+    setEmail(evt.target.value)
+  }
+
+  function handlePasswordChange(evt) {
+    setPassword(evt.target.value)
+  }
+
+  return (
+    <React.Fragment>
+      <Form onSubmit={handleNewUser}>
+      <Form.Group>
+        <Form.Label>Name</Form.Label>
+        <Form.Control type="text" value={name} onChange={handleNameChange} placeholder="Name" />
+      </Form.Group>
+        <Form.Group controlId="formBasicEmail">
+        <Form.Label>Email address</Form.Label>
+        <Form.Control type="text" value={email} onChange={handleEmailChange} placeholder="Enter email" />
+        <Form.Text className="text-muted" >
+          We'll never share your email with anyone else.
+        </Form.Text>
+      </Form.Group>
+      <Form.Group controlId="formBasicPassword">
+        <Form.Label>Password</Form.Label>
+        <Form.Control type="password" value={password} onChange={handlePasswordChange} placeholder="Password" />
+      </Form.Group>
+      <Button variant="primary" type="submit"> Log In </Button>
+      </Form>
+    </React.Fragment>
+  ) 
+}
+
+
+function CreateMealPlan(props) { 
   //take in search form data, send to server to create mealplans,
   // receive back mealplan ids, history.push to /mealplans *indicate new ones
 
@@ -101,7 +182,8 @@ function CreateMealPlan() {
       ingredients: ingredients,
       num_recipes_day: num_recipes_day,
       start_date: start_date, 
-      end_date: end_date  
+      end_date: end_date
+
     }
 
     const options = {
@@ -115,15 +197,16 @@ function CreateMealPlan() {
       fetch('/api/create', options)
       .then(response => response.json())
       .then(data => {
-        history.push('/mealplans')
-        setMealPlanList(data)});
+        setMealPlanList(data);
+        history.push('/mealplans');
+        });
   }
 
   function handleIngredients(evt) {
     setIngredients(evt.target.value)
   }
 
-  function handleClick(evt) {  
+  function handleChange(evt) {  
     setNumRecipes(evt.target.value)
   }
 
@@ -140,24 +223,38 @@ function CreateMealPlan() {
       <Form onSubmit={handleCreate}>
         <Form.Group>
           <Form.Label>Ingredients:</Form.Label>
-          <input type="text" value={ingredients} placeholder={ingredients} onChange={handleIngredients}></input>
+          <Form.Control type="text" value={ingredients} placeholder="enter ingredients here" onChange={handleIngredients}></Form.Control>
         </Form.Group>
+
         <Form.Group controlId="exampleForm.ControlSelect1">
-          <Form.Label>Number of Recipes:</Form.Label>
-          <Form.Control as="select">
-            <option name="recipes_per_day" value="1" onClick={handleClick}>1</option>
-            <option name="recipes_per_day" value="2" onClick={handleClick}>2</option>
-            <option name="recipes_per_day" value="3" onClick={handleClick}>3</option>
-            <option name="recipes_per_day" value="4" onClick={handleClick}>4</option>
-            <option name="recipes_per_day" value="5" onClick={handleClick}>5</option>
-          </Form.Control>
+        <Form.Label>Number of Recipes:</Form.Label>
+        <Form.Control onChange={handleChange} value={num_recipes_day} as="select">
+            <option name="recipes_per_day" value="1" defaultValue>1</option>
+            <option name="recipes_per_day" value="2">2</option>
+            <option name="recipes_per_day" value="3">3</option>
+            <option name="recipes_per_day" value="4">4</option>
+            <option name="recipes_per_day" value="5">5</option>
+        </Form.Control>
         </Form.Group>
-        <Form.Group>
-          <Form.Label>Start Date:</Form.Label>
-          <input value={start_date} onChange={handleStartDate} type="date"></input>
-          <Form.Label>End Date:</Form.Label>
-          <input value={end_date} onChange={handleEndDate} type="date"></input>
-        </Form.Group>
+{/* 
+      <Form>
+        {['checkbox'].map((type) => (
+          <div key={`inline-${type}`} className="mb-3">
+            <Form.Check inline label="1" type={type} checked={num_recipes_day} onClick={handleChange} id={`inline-${type}-1`} />
+            <Form.Check inline label="2" type={type} checked={num_recipes_day} onClick={handleChange} id={`inline-${type}-2`} />
+            <Form.Check inline label="3" type={type} checked={num_recipes_day} onClick={handleChange} id={`inline-${type}-3`} />
+            <Form.Check inline label="4" type={type} checked={num_recipes_day} onClick={handleChange} id={`inline-${type}-4`} />
+            <Form.Check inline label="5" type={type} checked={num_recipes_day} onClick={handleChange} id={`inline-${type}-5`} />
+          </div>
+        ))}
+      </Form> */}
+
+      <Form.Group>
+        <Form.Label>Start Date:</Form.Label>
+        <Form.Control type="date" value={start_date} onChange={handleStartDate} type="date"/>
+        <Form.Label>End Date:</Form.Label>
+        <Form.Control type="date" value={end_date} onChange={handleEndDate} type="date"/>
+      </Form.Group>
         <Button type="submit">Create</Button>
       </Form>
     </React.Fragment>
@@ -168,7 +265,8 @@ function Mealplans(props) {
   const[mealplans, setMealplans] = React.useState([])
 
   React.useEffect(() => {
-    const data = {'user_id': props.id}
+    const data = {'user_id': props.user.id}
+    console.log("data in Mealplans", data)
 
     const options = {
       method: 'POST',
@@ -187,15 +285,17 @@ function Mealplans(props) {
     <ul>
       {mealplans.map((mp) => {
         return (
-          <li> 
-            <Link to={`/mealplan/${mp.id}`}> Mealplan for {mp.date} </Link>
-          </li>
+          <ListGroup>
+          <ListGroup.label> Mealplan for {mp.date} </ListGroup.label>
+          <ListGroup.Item action href={`/mealplan/${mp.id}`}> </ListGroup.Item>
+          </ListGroup>
         )
       })}
     </ul>
   )
   
 }
+
 
 function Mealplan() {
   let {mealplan_id} = useParams()
@@ -301,6 +401,9 @@ function Mealplan() {
           return (
             <React.Fragment>
               <Recipe name={alt_recipe['name']} image={alt_recipe['image']} cook_time={alt_recipe['cook_time']} url={alt_recipe['url']} />
+              <Card.Footer>
+                <small className="text-muted">Last updated 3 mins ago</small>
+              </Card.Footer>
               <button onClick={() => moveToRec(alt_recipe['id'])} name="add" value="{alt_recipe['id']}" type="button" className="btn btn-outline-warning btn-sm active" role="button" aria-pressed="true"> Add </button>
           </React.Fragment>
             )
@@ -315,12 +418,16 @@ function Mealplan() {
 
 function Recipe(props) {
   return (
-    <tr>
-      {props.name}<br></br>
-      Cook time: {props.cook_time}<br></br>
-      <a href={props.url} > Click to go to recipe </a><br></br>
-      <img src={props.image} variant="left" width="150" height="150"></img><br></br>
-    </tr>
+    <Card border="secondary" style={{ width: '18rem' }}>
+      <Card.Img top width="100%" variant="top" src={props.image} alt="Card image cap" />
+      <Card.Body>
+        <Card.Title>{props.name} </Card.Title>
+        <Card.Text>
+          Cook time: {props.cook_time} minutes
+        </Card.Text>
+        <Button variant="primary" href={props.url}>Go to Recipe</Button>
+      </Card.Body>
+    </Card>
   )
 }
 
@@ -337,17 +444,28 @@ function Recipes() {
     })
   ), [])  
 
+  function generateRecipes() {
+    const recipe_column = recipes.map((recipe) => {
+      return (
+        <Col xs={6} md={4}>
+          <Recipe name={recipe['name']} image={recipe['image']} cook_time={recipe['cook_time']} url={recipe['url']} />
+        </Col>
+      )
+    })
+
+    let rows = []
+
+    for (let i =0; i < recipe_column.length; i+=3) {
+      let row_recipes = <row> {recipe_column[i]} {recipe_column[i+1]} {recipe_column[i+2]} </row>
+      console.log(row_recipes)
+      rows.push(row_recipes);
+         
+    return rows
+    }}
+
   return (
     <React.Fragment>
-      <ul className="list-group">
-      {recipes.map((recipe) => {
-        return (
-          <li className="list-group-item">
-            <Recipe name={recipe['name']} image={recipe['image']} cook_time={recipe['cook_time']} url={recipe['url']} />
-          </li>
-        )
-      })}
-      </ul>
+      {generateRecipes()}
     </React.Fragment>
   )
 }
@@ -357,8 +475,10 @@ function App() {
   const [user, setUser] = React.useState({}) //USER LOCALLY DEFINED
 
   React.useEffect(() => {
-    const currentuser = JSON.parse(localStorage.getItem('user'));
-    setUser(currentuser)
+    const user_in_storage = localStorage.getItem('user')
+    if (user_in_storage) {
+      setUser(JSON.parse(user_in_storage))
+    }
   },[]);
 
   console.log(user);
@@ -392,7 +512,7 @@ function App() {
             <Recipes />
           </Route>
           <Route path="/create_mealplan">
-            <CreateMealPlan />
+            <CreateMealPlan user={user}/>
           </Route>
           <Route path="/mealplan/:mealplan_id">
             <Mealplan />
@@ -401,10 +521,10 @@ function App() {
             <Mealplans user={user}/>
           </Route>
           <Route path="/new_user">
-            <CreateMealPlan />
+            <CreateUser user={user} setUser={setUser}/>
           </Route>
           <Route path="/">
-            <Homepage />
+            <Homepage user={user}/>
           </Route>
         </Switch>
       </Router>
@@ -412,9 +532,3 @@ function App() {
   }
 
 ReactDOM.render(<App />, document.getElementById('root'))
-
-                  {/* {props.user?       ''        :   <Nav.Link><Link to="/app/signup">Login | Signup</Link></Nav.Link>}
-                        {props.user?
-                        <NavDropdown title= {props.user.fname} id="basic-nav-dropdown">
-                                <NavDropdown.Item><Link to="/app/user-profile">Profile</Link></NavDropdown.Item> */}
-                                {/* {if user?  'do this' : 'else do this'} */}
