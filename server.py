@@ -248,7 +248,7 @@ def create():
               'recipes': recipes_info, 'altrecipes': alt_recipes_info}
 
         mealplans_list.append(mp)
-    
+
     print("****list of mealplans after create", mealplans_list)
 
     return jsonify(mealplans_list)

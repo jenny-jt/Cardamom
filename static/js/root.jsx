@@ -12,7 +12,9 @@ const Row = ReactBootstrap.Row;
 const ListGroup = ReactBootstrap.ListGroup;
 const Form = ReactBootstrap.Form;
 const Button = ReactBootstrap.Button;
+const Image = ReactBootstrap.Image;
 const Col = ReactBootstrap.Col;
+const Container = ReactBootstrap.Container;
 const Card = ReactBootstrap.Card;
 const CardDeck = ReactBootstrap.CardDeck;
 const CardColumns = ReactBootstrap.CardColumns;
@@ -25,7 +27,17 @@ const CardText = ReactBootstrap.CardText;
 
 
 function Homepage(props) {
-  return <div> Welcome {props.user.name} </div>
+  return (
+    <React.Fragment>
+      <div className="bg"> Welcome {props.user.name} </div>
+      <BackgroundImage/>
+    </React.Fragment>
+  ) 
+}
+
+
+function BackgroundImage() {
+  return <Image className="bg" src='static/img/Salt spoon.jpeg'/>
 }
 
 
@@ -280,18 +292,20 @@ function Mealplans(props) {
       },
     }
 
-    fetch("api/mealplans", options)
-    .then(response => response.json())
-    .then(data => setMealplans(data));
-  }, []);
+    if (props.user.id) {
+      fetch("api/mealplans", options)
+      .then(response => response.json())
+      .then(data => setMealplans(data));
+    }
+  }, [props.user.id]);
 
   return (
     <React.Fragment>
       {mealplans.map((mp) => {
         return (
           <ListGroup>
-            <ListGroup.label> Mealplan for {mp.date} </ListGroup.label>
-            <ListGroup.Item action href={`/mealplan/${mp.id}`}> </ListGroup.Item>
+            
+            <ListGroup.Item action href={`/mealplan/${mp.id}`}> Mealplan for {mp.date} </ListGroup.Item>
           </ListGroup>
         )
       })}
@@ -420,26 +434,16 @@ function Mealplan() {
 
 
 function Recipe(props) {
-  const styles = {
-    card: {
-      backgroundColor: '#B7E0F2',
-      borderRadius: 55,
-      padding: '3rem'
-    },
-    cardImage: {
-      objectFit: 'cover',
-      borderRadius: 55
-    }
-  }
+
   return (
-    <Card border="secondary" style={{ width: '18rem' }}>
-      <Card.Img top width="100%" variant="top" src={props.image} alt="Card image cap" />
+    <Card border="secondary" className="card" style={{ width: '18rem' }}>
+      <Card.Img top width="100%" variant="top" src={props.image} className="card-img" alt="Card image cap" />
       <Card.Body>
         <Card.Title>{props.name} </Card.Title>
         <Card.Text>
           Cook time: {props.cook_time} minutes
         </Card.Text>
-        <Button variant="primary" href={props.url}>Go to Recipe</Button>
+        <Button variant="info" href={props.url}>Go to Recipe</Button>
       </Card.Body>
     </Card>
   )
@@ -475,19 +479,25 @@ function Recipes() {
       )
     }
     return rows
-    }
+  }
 
   return (
     <React.Fragment>
-      {generateRecipes()}
+      <Container className="page-container">
+        {generateRecipes()}
+      </Container>
     </React.Fragment>
   )
 }
 
-function LogOut(props) {
-  props.user = null;
-  localStorage.clear();
-  return(alert('logged out'))
+function Footer() {
+  return (
+    <footer className="footer">
+      <div className="container">
+        <span className="text-muted">Footer</span>
+      </div>
+  </footer>
+  )
 }
 
 
@@ -504,56 +514,59 @@ function App() {
   console.log("user in storage", user);
   console.log("user id", user.id)
 
-    return (
-      <Router>
-        <Navbar bg="light" expand="lg">
-          <Navbar.Brand href="#home">Meal Planner</Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav"/>
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="mr-auto">
-              <Nav.Link href="/"> Home </Nav.Link>
-              <Nav.Link href="/logout"> Log Out </Nav.Link>
-              {user? '' : <Nav.Link href="/login"> Login </Nav.Link>}
-              {user? '' : <Nav.Link href="/new_user"> Create Account</Nav.Link>}
-              <Nav.Link href="/recipes"> Recipes </Nav.Link>
-              {user? <Nav.Link href="/create_mealplan"> Create a Mealplan </Nav.Link> : ''}
-              {user? <Nav.Link href="/mealplans"> View My Mealplans </Nav.Link> : ''}
-            </Nav>
-            {/* <Form inline>
-              <FormControl type="text" placeholder="Email" className="mr-sm-2" />
-              <Button variant="outline-success">Log In</Button>
-            </Form> */}
-          </Navbar.Collapse>
-        </Navbar>
-
-        <Switch>
-          <Route path="/login">
-            <LogIn user={user} setUser={setUser} />
-          </Route>
-          <Route path="/logout">
-            <LogOut user={user} setUser={setUser} />
-          </Route>
-          <Route path="/recipes">
-            <Recipes />
-          </Route>
-          <Route path="/create_mealplan">
-            <CreateMealPlan user={user}/>
-          </Route>
-          <Route path="/mealplan/:mealplan_id">
-            <Mealplan />
-          </Route>
-          <Route path="/mealplans">
-            <Mealplans user={user}/>
-          </Route>
-          <Route path="/new_user">
-            <CreateUser user={user} setUser={setUser}/>
-          </Route>
-          <Route path="/">
-            <Homepage user={user}/>
-          </Route>
-        </Switch>
-      </Router>
-    );
+  function logOut() {
+    setUser({});
+    localStorage.clear();
+    return(alert('logged out'))
   }
+
+  return (
+    <Router>
+      <Navbar bg="light" expand="lg" className="navbar-color">
+        <Navbar.Brand href="#home">Meal Planner</Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav"/>
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="mr-auto">
+            <Nav.Link href="/"> Home </Nav.Link>
+            {user.id ? <Nav.Link href="/" onClick={logOut}> Log Out </Nav.Link> : ''}
+            {user.id ? '' : <Nav.Link href="/login"> Login </Nav.Link>}
+            {user.id ? '' : <Nav.Link href="/new_user"> Create Account</Nav.Link>}
+            <Nav.Link href="/recipes"> Recipes </Nav.Link>
+            {user.id ? <Nav.Link href="/create_mealplan"> Create a Mealplan </Nav.Link> : ''}
+            {user.id ? <Nav.Link href="/mealplans"> View My Mealplans </Nav.Link> : ''}
+          </Nav>
+          {/* <Form inline>
+            <FormControl type="text" placeholder="Email" className="mr-sm-2" />
+            <Button variant="outline-success">Log In</Button>
+          </Form> */}
+        </Navbar.Collapse>
+      </Navbar>
+
+      <Switch>
+        <Route path="/login">
+          <LogIn user={user} setUser={setUser} />
+        </Route>
+        <Route path="/recipes">
+          <Recipes />
+        </Route>
+        <Route path="/create_mealplan">
+          <CreateMealPlan user={user}/>
+        </Route>
+        <Route path="/mealplan/:mealplan_id">
+          <Mealplan />
+        </Route>
+        <Route path="/mealplans">
+          <Mealplans user={user}/>
+        </Route>
+        <Route path="/new_user">
+          <CreateUser user={user} setUser={setUser}/>
+        </Route>
+        <Route path="/">
+          <Homepage user={user}/>
+        </Route>
+      </Switch>
+    </Router>
+  );
+}
 
 ReactDOM.render(<App />, document.getElementById('root'))

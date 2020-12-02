@@ -1,0 +1,66 @@
+
+.bg {
+    background-color:#fff4c2; /* fallback if background image fails */
+    background-repeat: no-repeat;
+    background-image: url('static/img/Salt spoon.jpeg');
+    background-position: center;
+    height: 100%;
+    background-repeat: no-repeat;
+    background-size: cover;
+
+    /* filter: blur(2px); */
+    width: 100%;
+    height: 40rem;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
+
+.navbar-color {
+background: linear-gradient(to left, #D8E2F0, #b6cae5);
+}
+
+.navbar-color .navbar-brand:hover,
+.navbar-color .navbar-brand:focus {
+color: white;
+}
+
+.navbar-color .nav-link {
+    color: #13205c;
+  }
+  
+.card {
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    width: 18rem;
+    max-width: 16rem;
+    word-wrap: break-word;
+    background-color: #FEFEFE;
+    color:#000A14;
+    /* box-shadow:2rem, 2rem, 2rem rgba(0,0,0,0.2); */
+    border-radius:1rem;
+    background-clip: border-box;
+    /* border: 0.5rem solid rgba(0,0,0,.125); */
+    border-radius: .50rem;
+    margin-right: 1rem;
+    margin-bottom: 1rem;
+    margin-top: 5rem;
+  }
+
+.card-img {
+    width: 100%;
+    height: 20vh;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    line-height: 60px;
+    background-color: #929EAF;
+}
