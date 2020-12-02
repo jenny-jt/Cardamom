@@ -1,4 +1,4 @@
-Meal Planner
+# Meal Planner
 
 Meal Planner is a Single Page Web App that syncs up with your Google Calendar to manage meal planning. Simply input the ingredients you have on hand, or want to use, and Meal Planner will generate meals and organize them for you. Modification is easy with a click of a button, and recipe events will be added automatically to your calendar once you approve.
 
