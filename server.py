@@ -58,75 +58,6 @@ def callback():
     return render_template('root.html')
 
 
-# @app.route("/search")
-# def search_results():
-#     """take in date for mealplan, ingredients, and number of recipes
-#        outputs list of recipes that are associated with mealplan obj
-#     """
-#     ingredients = request.args.get("ingredients").split(",")
-#     num_recipes = int(request.args.get("recipes_per_day"))
-
-#     user_id = session['user_id']
-#     user = user_by_id(user_id)
-
-#     start = request.args.get("start_date")
-#     session['start'] = start
-#     end = request.args.get("end_date")
-#     session['end'] = end
-
-#     start_date, end_date = convert_dates(start, end)
-#     days = num_days(start_date, end_date)
-#     num = num_recipes * days
-
-#     mealplans = mealplan_dates(start_date, end_date, user)
-#     db_recipes = create_db_recipes(ingredients)
-#     master_list = create_recipe_list(ingredients, num_recipes, db_recipes)
-#     recipe_list = master_list[0]
-
-#     for mealplan in mealplans:
-#         alt_recipe = create_alt_recipes(master_list, ingredients, num, mealplan)
-#         mealplan_add_recipe(mealplan, recipe_list)
-#         mealplan_add_altrecipe(mealplan, alt_recipe)
-
-#     return render_template("display.html", mealplans=mealplans)
-
-
-# @app.route('/modify', methods=['POST'])
-# def modify_recipes():
-#     """remove select recipes and replace with additional db/api recipes"""
-
-#     mealplan_id = request.form.get("mealplan_id")
-#     mealplan = MealPlan.query.get(mealplan_id)
-
-#     recipes = mealplan.recipes_r
-#     id_remove_recipes = request.form.getlist('remove')
-#     id_add_recipes = request.form.getlist('add')
-
-#     remove = []
-#     for recipe_id in id_remove_recipes:
-#         recipe = Recipe.query.get(recipe_id)
-#         remove.append(recipe)
-
-#     add = []
-#     for recipe_id in id_add_recipes:
-#         recipe = Recipe.query.get(recipe_id)
-#         add.append(recipe)
-
-#     for recipe in remove:
-#         recipes.remove(recipe)
-#         db.session.commit()
-
-#     for recipe in add:
-#         if recipe not in recipes:
-#             recipes.append(recipe)
-#             db.session.commit()
-#         else:
-#             flash('recipe already in mealplan')
-
-#     flash('Recipes removed and added')
-#     return render_template('events.html', recipes=recipes, mealplan=mealplan)
-
-
 @app.route("/api/login", methods=['POST'])
 def login_user():
     """log in user, return either jsonify(user name and id), or no user with this email"""
@@ -135,11 +66,11 @@ def login_user():
     password = data['password']
 
     user = user_by_email(email)
-
-
-    user_verified = verify_user(password, user)
-
-    return jsonify(user_verified)
+    if user:
+        user_verified = verify_user(password, user)
+        return jsonify(user_verified)
+    else:
+        return jsonify("no user with this email")
 
 
 @app.route("/api/new_user", methods=['POST'])
@@ -166,7 +97,7 @@ def user_mealplans():
     """show user's mealplans"""
     data = request.get_json()
     print("data coming into mealplans", data)
-    
+
     user_id = data['user_id']
     print("****mealplans user id", user_id)
     user = user_by_id(user_id)
@@ -214,16 +145,17 @@ def create():
     data = request.get_json()
     print("****data", data)
 
+    user_id = data['user_id']
     ingredients = data['ingredients']  # string: carrot, egg
     num_recipes = int(data['num_recipes_day'])
-    start = data['start_date']
-    end = data['end_date']
-    user_id = data['user_id']
+    start = data['start_date'][:10]
+    end = data['end_date'][:10]
 
     start_date, end_date = convert_dates(start, end)
     days = num_days(start_date, end_date)
+    print("********days", days)
     num = num_recipes * days
-    print("****num", num)
+    print("************num", num)
 
     user = user_by_id(user_id)
 
@@ -231,7 +163,6 @@ def create():
     print("***db recipes based on ingredients", db_recipes)
     master_list = create_recipe_list(ingredients, num, db_recipes)
     recipe_list = master_list[0]
-    print("*****************************final recipe list should have num recipes", recipe_list)
 
     mealplans = mealplan_dates(start_date, end_date, user)
     mealplans_list = []
@@ -249,8 +180,6 @@ def create():
 
         mealplans_list.append(mp)
 
-    print("****list of mealplans after create", mealplans_list)
-
     return jsonify(mealplans_list)
 
 
@@ -266,9 +195,11 @@ def calendar_event():
     cal_id = 'tl9a33nl5al9k337lh45f40av8@group.calendar.google.com'
 
     data = request.get_json()
+    print("*******data", data)
 
     mealplan_id = data['mealplan_id']
     recipe_ids = data['recipe_ids']
+
     altrecipe_ids = data['recipe_ids']
 
     mealplan = MealPlan.query.get(mealplan_id)
@@ -294,4 +225,4 @@ def calendar_event():
 
 if __name__ == "__main__":
     connect_to_db(app)
-    app.run(debug=True, host='0.0.0.0')
+    app.run(debug=False, host='0.0.0.0')

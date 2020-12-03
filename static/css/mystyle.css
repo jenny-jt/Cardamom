@@ -1,20 +1,70 @@
+/* FLEX */
+.flex-container-center {
+    display: flex; /* or inline-flex */
+    justify-content: center;
+    align-items: center
+  }
 
+.flex-item-welcome {
+    width: 5rem;
+    height: 5rem;
+    margin: 10rem
+}
+
+.flex-item-search {
+    width: 40rem;
+    height: 20rem;
+    margin: 10rem
+}
+
+
+.other-item {
+    order: 5; /* default is 0 */
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: 0; /*will grow much more if start at 0*/
+    /* align-self: center; */
+    /* order: 1; */
+    /* can also do flex: 1 (grow) 1(shrink) 1 (basis) */
+  }
+
+.flex-wrap {
+    flex-wrap: wrap;
+  }
+
+.flex-center {
+    justify-content: center + safe /* flex-start | flex-end | space-between | space-around | space-evenly | start | end | left | right ... + safe | unsafe; */
+  }
+
+.flex-cross-align {
+    align-items: center /*justify-content version for the cross-axis (perpendicular to the main-axis).*/
+}
+
+/* multi-line flexible containers, where flex-flow is set to either wrap or wrap-reverse */
+.container {
+    align-content: space-around + safe ;
+  }
+/* BACKGROUND IMAGE */
 .bg {
     background-color:#fff4c2; /* fallback if background image fails */
     background-repeat: no-repeat;
-    background-image: url('static/img/Salt spoon.jpeg');
     background-position: center;
-    height: 100%;
     background-repeat: no-repeat;
     background-size: cover;
-
     /* filter: blur(2px); */
-    width: 100%;
-    height: 40rem;
-    position: absolute;
-    top: 0;
-    left: 0;
     z-index: -1;
+  }
+
+.bg-salt {
+    background-image: url('../img/salt.jpeg');
+    width: 100%;
+    height: 95vh;
+  }
+
+.bg-seasoning {
+    background-image: url('../img/seasoning.jpeg');
+    width: 100%;
+    height: 95vh;
   }
 
 .navbar-color {
@@ -28,8 +78,22 @@ color: white;
 
 .navbar-color .nav-link {
     color: #13205c;
-  }
+    /* font */
+}
   
+
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    height: 60px;
+    line-height: 60px;
+    background-color: #929EAF;
+}
+
+/* Recipe Cards */
+
 .card {
     position: relative;
     display: -ms-flexbox;
@@ -56,11 +120,22 @@ color: white;
     height: 20vh;
 }
 
-.footer {
+/* Dates */
+
+.dateSelect {
     position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 60px;
-    line-height: 60px;
-    background-color: #929EAF;
+    z-index: 999999;
+    padding: 9px;
+    background-color:#5993df;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.25);
+    color: #FEFEFE;
+    font-family: Tajawal;
+    line-height: 0.5rem;
+}
+
+.dateSelect-month {
+    display: grid;
+    background-color:#5993df;
+    grid-template-columns: auto;
+    grid-gap: 1px;
 }

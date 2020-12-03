@@ -113,8 +113,7 @@ def create_db_recipes(ingredients):
     """takes list of ingredients from form and outputs unique list of recipes associated with those ingredients"""
     ingredients = ingredients.split(", ")
     print("*****ingredients in create db recipes", ingredients)
-    location = ["freezer", "fridge", "pantry"]
-    
+
     db_recipes = []
     for ingredient in ingredients:
         ingr_list = Ingredient.query.filter(Ingredient.name.ilike(f'%{ingredient}%')).all()
@@ -123,7 +122,6 @@ def create_db_recipes(ingredients):
         #     ingr = add_ingredient(name=ingredient, location=choice(location))
         for ingr in ingr_list:
             ingr_recipes = ingr.recipes_r
-            print("********** recipes assoc with ingredients", ingr_recipes)
             db_recipes.extend(ingr_recipes)
             print("******** db_recipes as updating", db_recipes)
 
@@ -138,7 +136,6 @@ def mealplan_add_recipe(mealplan, recipes_list, num_recipes):
     adds recipes to mealplan via a method, removes those from recipes_list
     returns list of unique recipes associated with mealplan obj
     """
-
     recipes = mealplan.recipes_r
 
     while len(recipes) < num_recipes:
@@ -147,6 +144,18 @@ def mealplan_add_recipe(mealplan, recipes_list, num_recipes):
                 mealplan.add_recipe_to_mealplan(item)
                 recipes_list.remove(item)
                 db.session.commit()
+                print('*********len of recipes after recipe added', len(recipes))  
+    #     recipes = mealplan.recipes_r
+    # count = 0
+
+    # while count < num_recipes:
+    #     for item in recipes_list:
+    #         if item not in mealplan.recipes_r:
+    #             print("*************recipe added to mp", item)
+    #             mealplan.add_recipe_to_mealplan(item)
+    #             recipes_list.remove(item)
+    #             db.session.commit()
+    #             count += 1
 
     print(f"\n crud version: recipe objects associated with mealplan: {recipes}\n")
     return recipes
@@ -173,7 +182,6 @@ def recipe_info(api_id):
        if recipe not in db, make new recipe obj, return recipe object"""
     response = api.get_recipe_information(id=api_id)
     data = response.json()
-    print("***************data", data)
 
     name = str(data['title'])
     cook_time = int(data['readyInMinutes'])
@@ -229,12 +237,15 @@ def user_by_email(email):
 
 def updated_recipes(recipe_ids):
     """generate updated list of recipes from ids to update mealplan"""
+    print("*****recipe ids", recipe_ids)
+
     recipes = []
 
     for id in recipe_ids:
         recipe = Recipe.query.get(id)
+        print("****recipe", recipe)
         recipes.append(recipe)
-    
+
     return recipes
 
 
