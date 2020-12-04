@@ -1,7 +1,7 @@
 from flask import Flask, request, render_template, redirect, session, flash, jsonify
 import os
 
-from model import db, connect_to_db, MealPlan, Recipe
+from model import db, connect_to_db, MealPlan
 from helper import make_cal_event, cred_dict, convert_date, create_recipe_list, create_alt_recipes, data_mealplans, data_recipes, data_user, convert_dates, mealplan_dates, num_days, verify_user
 from crud import all_recipes, create_db_recipes, add_user, user_by_id, user_by_email, mealplan_add_recipe, mealplan_add_altrecipe, updated_recipes
 
@@ -134,7 +134,6 @@ def modify_mp(mealplan_id):
     altrecipes_info = data_recipes(altrecipes)
 
     mealplan_recipes = {'recipes': recipes_info, 'altrecipes': altrecipes_info, 'date': mealplan_date}
-    print("*****mealplan data sending back to front", mealplan_recipes)
 
     return jsonify(mealplan_recipes)
 
@@ -171,9 +170,7 @@ def create():
     for mealplan in mealplans:
         alt_recipes = create_alt_recipes(master_list, ingredients, mealplan)
         altrecipes = mealplan_add_altrecipe(mealplan, alt_recipes)
-        print("****** alt recipes", alt_recipes)
         recipes = mealplan_add_recipe(mealplan, recipe_list, num_recipes)
-        print("****** recipes", recipes)
 
         recipes_info = data_recipes(recipes)
         alt_recipes_info = data_recipes(altrecipes)

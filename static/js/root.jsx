@@ -327,8 +327,8 @@ function Mealplans(props) {
                     <i className="far fa-calendar-alt" aria-hidden="false" href={`/mealplan/${mp.id}`}/>
                   </div>
                   <div className="flex-item-mp-recipes">
-                    <br></br><p className="justify"> Mealplan for </p>
-                    <a className="justify" href={`/mealplan/${mp.id}`}> {mp.date} </a>
+                    <br></br><p className="justify" id="mp-font"> Mealplan for </p>
+                    <a className="justify" id="mp-link-font" href={`/mealplan/${mp.id}`}> {mp.date} </a>
                   </div>
                 </div>
               </div>

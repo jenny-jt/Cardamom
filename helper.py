@@ -95,7 +95,8 @@ def data_mealplans(mealplans):
     for mealplan in mealplans:
         mp = {}
         mp['id'] = mealplan.id
-        mp['date'] = mealplan.date.strftime("%Y-%m-%d")
+        mp['date'] = mealplan.date.strftime("%A | %b %d, %Y")
+
         mealplans_info.append(mp)
 
     return mealplans_info

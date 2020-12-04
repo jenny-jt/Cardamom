@@ -159,10 +159,12 @@ def mealplan_add_altrecipe(mealplan, alt_recipes):
     adds recipes to mealplan via a method, removes those from recipes_list
     returns list of unique recipes associated with mealplan obj
     """
-    for item in alt_recipes:
-        if item not in mealplan.recipes_r:
-            mealplan.add_altrecipe_to_mealplan(item)
-            db.session.commit()
+    while len(mealplan.recipes_r) < 5:
+        for item in alt_recipes:
+            if item not in mealplan.recipes_r:
+                break
+        mealplan.add_altrecipe_to_mealplan(item)
+        db.session.commit()
 
     altrecipes = mealplan.altrecipes_r
 

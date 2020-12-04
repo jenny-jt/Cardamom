@@ -39,6 +39,18 @@ h1, h2, h3, h4, h5, h6 {
     /* text-shadow: 2px 2px black; */
 }
 
+#mp-font {
+    font-family: "Source Sans Pro";
+    font-weight: 400;
+    font-size: 24px;
+    color: #A7C2E5
+}
+
+#mp-link-font {
+    color: rgb(66, 65, 65);
+    font-size: 19.5px;
+}
+
 /* FLEX */
 .flex-container-center {
     display: flex; /* or inline-flex */
@@ -83,7 +95,7 @@ h1, h2, h3, h4, h5, h6 {
 .flex-container-stuck {
     display: flex;
     flex-direction: row;
-    justify-content: start;
+    justify-content: center;
     align-items: center;
     height: 10vh;
     width: 20rem
@@ -136,7 +148,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .flex-item-mp-icon {
     width: 4rem;
-    height: 1rem;
     display: flex;
     justify-content: center;
 }
@@ -174,7 +185,7 @@ h1, h2, h3, h4, h5, h6 {
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;    
-    z-index: -1; */ */
+    z-index: -1; */
     /* filter: blur(2px); */
     background: url(images/bg.jpg) no-repeat center center fixed; 
     -webkit-background-size: cover;
@@ -309,7 +320,8 @@ body, html {
 
 .justify {
     text-align: center; 
-    font-family: "Futura"
+    font-family: "Futura";
+    margin: 0
 }
 
 .button-border {
@@ -333,14 +345,14 @@ body, html {
 /* ICONS */
 
 .far {
-    color:rgb(34, 177, 177);
-    font-size: 20px;
+    color:rgb(38, 193, 240);
+    font-size: 42px;
     margin: 0.25rem
 }
 
 .fas {
     color:rgb(34, 177, 177);
-    font-size: 20px;
+    font-size: 42px;
     margin: 0.25rem
 }
 
