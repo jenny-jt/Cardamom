@@ -1,22 +1,145 @@
+/* FONTS */
+body { 
+    font-family: "Source Sans Pro", sans-serif;
+    font-weight: 500px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Source Sans Pro", sans-serif;
+  font-weight: 900px;
+}
+
+#h2-font-size {
+    font-size: 20px;
+    text-align: center;
+    font-family: "Futura";
+    font-weight: 400
+}
+
+#mp-date-font-size {
+    font-size: 17px;
+    text-align: center;
+    color: teal;
+    font-weight: lighter
+}
+
+.welcome-font {
+    font-family: "Arial";
+    font-weight: 900;
+    font-size: 60px;
+    color: white;
+    text-align: center;
+}
+
+.create-form-font {
+    font-family: "Futura";
+    font-weight: 500;
+    font-size: 18px;
+    color: rgb(176, 245, 248, 1);
+    /* text-shadow: 2px 2px black; */
+}
+
 /* FLEX */
 .flex-container-center {
     display: flex; /* or inline-flex */
     justify-content: center;
-    align-items: center
+    align-items: center;
+    flex-direction: column;
   }
 
+.flex-container-wrap {
+    display: flex; /* or inline-flex */
+    justify-content: center;
+    align-items: space-around;
+    flex-wrap: wrap;
+    align-content: space-around 
+  }
+
+.flex-container-recipes {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    align-content: space-around 
+  }
+
+.flex-container-mp {
+    display: flex; /* or inline-flex */
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    align-content: space-around;
+    height: 45vh
+  }
+
+.flex-container-divider {
+    justify-content: flex-end;
+    align-items: start;
+    height: 3vh;
+    width: 100%
+}
+
+.flex-container-stuck {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    height: 10vh;
+    width: 20rem
+}
+
 .flex-item-welcome {
-    width: 5rem;
-    height: 5rem;
-    margin: 10rem
+    width: fit-content;
+    height: 6rem;
+    margin: 0.5rem
+}
+
+.flex-item-welcome2 {
+    width: fit-content;
+    height: 10rem;
+    margin: 0.5rem
+}
+
+.flex-item-divider {
+    width: 30rem;
+    height: 2rem;
+    margin: 3rem;
+    font-family: "Futura";
+}
+
+.flex-item-button {
+    width: 9rem;
+    height: 2rem;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 2rem
 }
 
 .flex-item-search {
-    width: 40rem;
-    height: 20rem;
-    margin: 10rem
+    width: 19rem;
+    height: 26rem;
+    margin: 9rem
 }
 
+.flex-item-mp {
+    width: 25rem;
+    height: 6rem;
+    margin: 1.5rem
+}
+
+.flex-item-mp-recipes {
+    width: fit-content;
+    height: fit-content;
+    margin-left: 0.75rem
+}
+
+.flex-item-mp-icon {
+    width: 4rem;
+    height: 1rem;
+    display: flex;
+    justify-content: center;
+}
 
 .other-item {
     order: 5; /* default is 0 */
@@ -46,13 +169,35 @@
   }
 /* BACKGROUND IMAGE */
 .bg {
+    /* background-color:#fff4c2; /* fallback if background image fails */
+    /* background-repeat: no-repeat;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;    
+    z-index: -1; */ */
+    /* filter: blur(2px); */
+    background: url(images/bg.jpg) no-repeat center center fixed; 
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+    
+  }
+
+  .bg-blur {
     background-color:#fff4c2; /* fallback if background image fails */
     background-repeat: no-repeat;
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;
-    /* filter: blur(2px); */
-    z-index: -1;
+    filter: blur(1px);
+    z-index: -5;
+  }
+
+.bg-lemons {
+    background-image: url('../img/lemons.jpeg');
+    width: 100%;
+    height: 95vh;
   }
 
 .bg-salt {
@@ -65,23 +210,43 @@
     background-image: url('../img/seasoning.jpeg');
     width: 100%;
     height: 95vh;
+    /* filter: blur(2px); */
   }
 
-.navbar-color {
-background: linear-gradient(to left, #D8E2F0, #b6cae5);
+/* SCROLLING   */
+body, html {
+    height: 100%;
+  }
+
+.parallax {
+    /* The image used */
+    background-image: url('../img/salt.jpeg');
+  
+    /* Set a specific height */
+    height: 100%;
+  
+    /* Create the parallax scrolling effect */
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+/* NAVBAR */
+.navbar-background-color {
+    background: linear-gradient(to left, #D8E2F0, #b6cae5);
 }
 
-.navbar-color .navbar-brand:hover,
-.navbar-color .navbar-brand:focus {
-color: white;
+.navbar-brand:hover, .navbar-brand:focus {
+    color: blue;
 }
 
 .navbar-color .nav-link {
-    color: #13205c;
+    color: white;
     /* font */
 }
-  
 
+/* FOOTER */
 
 .footer {
     position: absolute;
@@ -96,28 +261,28 @@ color: white;
 
 .card {
     position: relative;
-    display: -ms-flexbox;
     display: flex;
-    -ms-flex-direction: column;
     flex-direction: column;
-    width: 18rem;
-    max-width: 16rem;
-    word-wrap: break-word;
+    /* width: 12rem;
+    height: 10rem; */
+    text-align: center; 
     background-color: #FEFEFE;
-    color:#000A14;
-    /* box-shadow:2rem, 2rem, 2rem rgba(0,0,0,0.2); */
+    color:#021931;
     border-radius:1rem;
     background-clip: border-box;
-    /* border: 0.5rem solid rgba(0,0,0,.125); */
+    border: 0.125rem solid rgba(0,0,0,.125);
     border-radius: .50rem;
-    margin-right: 1rem;
-    margin-bottom: 1rem;
-    margin-top: 5rem;
   }
 
 .card-img {
     width: 100%;
     height: 20vh;
+    border-top-left-radius: 0.45rem;
+    border-top-right-radius: 0.45rem;
+}
+
+.card-body {
+
 }
 
 /* Dates */
@@ -129,7 +294,7 @@ color: white;
     background-color:#5993df;
     box-shadow: 0 1px 3px rgba(0,0,0,0.25);
     color: #FEFEFE;
-    font-family: Tajawal;
+    font-family: Source Sans pro;
     line-height: 0.5rem;
 }
 
@@ -138,4 +303,52 @@ color: white;
     background-color:#5993df;
     grid-template-columns: auto;
     grid-gap: 1px;
+}
+
+/* BUTTON */
+
+.justify {
+    text-align: center; 
+    font-family: "Futura"
+}
+
+.button-border {
+    border-style:solid;
+    border-width:10px;
+    border-color: white;
+}
+
+/* COLOR */
+.form-background {
+    background: rgba(16,16,16, 0.63);
+}
+
+#create-button {
+    color: rgb(9, 92, 216, 0.9);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* ICONS */
+
+.far {
+    color:rgb(34, 177, 177);
+    font-size: 20px;
+    margin: 0.25rem
+}
+
+.fas {
+    color:rgb(34, 177, 177);
+    font-size: 20px;
+    margin: 0.25rem
+}
+
+/* LINKS */
+
+a {
+    color: #004085;
+    text-decoration: none;
+    background-color: transparent;
+    font-size: 17.5px;
 }

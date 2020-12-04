@@ -17,7 +17,7 @@ def create_alt_recipes(master_list, ingredients, mealplan):
         print("crud: alt recipes without api", alt_recipes)
 
     if len(alt_recipes) < 3:
-        new_api_recipes = create_api_recipes(ingredients, 3)
+        new_api_recipes = create_api_recipes(ingredients, 2)
         for recipe in new_api_recipes:
             if recipe not in mealplan.recipes_r:
                 alt_recipes.append(recipe)
@@ -33,11 +33,11 @@ def create_recipe_list(ingredients, num, db_recipes):
        also returns leftover db_recipes (lists[1]) and api_recipes (lists[2]) lists
     """
     db_num = len(db_recipes)
-    api_num = num - db_num + 4
+    api_num = num - db_num + 7
 
     if db_num < num:
         api_recipes = create_api_recipes(ingredients, api_num)
-        print("*********api recipes", api_num)
+        print("*********getting api recipes", api_num)
         master_list = make_recipe_lists(num, db_recipes, api_recipes)
     else:
         master_list = make_recipe_lists(num, db_recipes)
@@ -66,6 +66,16 @@ def convert_dates(start, end):
     return start_date, end_date
 
 
+def convert_date(date):
+    """take in dto from mealplan date and converts to string"""
+
+    dt_format = "%B %d, %Y"
+
+    mealplan_date = datetime.strftime(date, dt_format)
+
+    return mealplan_date
+
+
 def cred_dict(credentials):
     """Takes in credentials from OAuth and returns in dictionary format"""
 
@@ -87,7 +97,7 @@ def data_mealplans(mealplans):
         mp['id'] = mealplan.id
         mp['date'] = mealplan.date.strftime("%Y-%m-%d")
         mealplans_info.append(mp)
-    
+
     return mealplans_info
 
 
@@ -109,7 +119,7 @@ def data_recipes(recipes):
 
 def data_user(user):
     """takes in user obj, sets session with user id and return jsonified user info"""
-    
+
     session['user_id'] = user.id
     user_info = {'name': user.name, 'id': user.id}
 
@@ -135,13 +145,13 @@ def make_cal_event(recipe, date):
 
 def make_recipe_lists(num, db_recipes, api_recipes=[]):
     """takes in db and api recipe lists, selects number of them to generate recipe list
-       returns recipe list and leftovers of the db and api lists
+       returns recipe list of num +2 extra and leftovers of the db and api lists
     """
 
     count = 0
     recipe_list = []
 
-    while count < num:
+    while count < (num+2):
         if db_recipes:
             item = pick_recipes(db_recipes)
             db_recipes.remove(item)

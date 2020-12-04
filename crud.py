@@ -101,9 +101,9 @@ def api_recipes_list(api_ids):
     return api_recipes
 
 
-def create_api_recipes(ingredients, num):
-    """takes in ingredients and num, returns list api recipes num long"""
-    api_ids = api_id_search(ingredients, num)
+def create_api_recipes(ingredients, api_num):
+    """takes in ingredients and num, returns list api recipes api_num long"""
+    api_ids = api_id_search(ingredients, api_num)
     api_recipes = api_recipes_list(api_ids)
 
     return api_recipes
@@ -136,29 +136,22 @@ def mealplan_add_recipe(mealplan, recipes_list, num_recipes):
     adds recipes to mealplan via a method, removes those from recipes_list
     returns list of unique recipes associated with mealplan obj
     """
-    recipes = mealplan.recipes_r
 
-    while len(recipes) < num_recipes:
+    while len(mealplan.recipes_r) < num_recipes:
+        print("length", len(mealplan.recipes_r))
+        print("num", num_recipes)
+        print("length of recipe list", len(recipes_list))
         for item in recipes_list:
             if item not in mealplan.recipes_r:
-                mealplan.add_recipe_to_mealplan(item)
-                recipes_list.remove(item)
-                db.session.commit()
-                print('*********len of recipes after recipe added', len(recipes))  
-    #     recipes = mealplan.recipes_r
-    # count = 0
+                break
+        mealplan.add_recipe_to_mealplan(item)
+        print("recipe added in for loop mealplan recipes", item)
+        recipes_list.remove(item)
+        print("length of recipes should grow", len(mealplan.recipes_r))
+        print("num_recipes should stay same", num_recipes)
+        db.session.commit()
 
-    # while count < num_recipes:
-    #     for item in recipes_list:
-    #         if item not in mealplan.recipes_r:
-    #             print("*************recipe added to mp", item)
-    #             mealplan.add_recipe_to_mealplan(item)
-    #             recipes_list.remove(item)
-    #             db.session.commit()
-    #             count += 1
-
-    print(f"\n crud version: recipe objects associated with mealplan: {recipes}\n")
-    return recipes
+    return mealplan.recipes_r
 
 
 def mealplan_add_altrecipe(mealplan, alt_recipes):

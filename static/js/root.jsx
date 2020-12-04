@@ -1,8 +1,18 @@
 function Homepage(props) {
+  const history = useHistory()
+
+  function handleClick(evt) {
+    evt.preventDefault
+    history.push('/create');
+  }
+
   return (
     <React.Fragment>
       <div className="bg-salt bg flex-container-center"> 
-        <div className="flex-item-welcome"> Welcome {props.user.name} </div>
+        <div className="flex-item-welcome welcome-font"> Welcome {props.user.name} </div>
+        <div className="flex-item-welcome2"> 
+          <Button href="/create_mealplan" onClick={handleClick} variant="outline-primary" size="lg"> Get Started </Button>
+        </div>
       </div>
     </React.Fragment>
   ) 
@@ -199,32 +209,37 @@ function CreateMealPlan(props) {
   return (
     <React.Fragment>
       <div className="bg-seasoning bg flex-container-center">
-        <div className="flex-item-search">
-          <Form onSubmit={handleCreate} >
-            <Form.Group>
-              <Form.Label>Ingredients:</Form.Label>
-              <Form.Control type="text" value={ingredients} placeholder="enter ingredients here" onChange={handleIngredients}></Form.Control>
+        <div className="form-background">
+          <div className="flex-item-search create-form-font">
+            <Form onSubmit={handleCreate} >
+              <Form.Group>
+                <Form.Label>Ingredients:</Form.Label>
+                <Form.Control type="text" value={ingredients} placeholder="enter ingredients here" onChange={handleIngredients}></Form.Control>
+              </Form.Group>
+            <br></br>
+            <Form.Group controlId="exampleForm.ControlSelect1">
+              <Form.Label>Number of Recipes per day:</Form.Label>
+              <Form.Control onChange={handleChange} value={num_recipes_day} as="select">
+                  <option selected>Select Number</option>
+                  <option name="recipes_per_day" value="1">1</option>
+                  <option name="recipes_per_day" value="2">2</option>
+                  <option name="recipes_per_day" value="3">3</option>
+                  <option name="recipes_per_day" value="4">4</option>
+                  <option name="recipes_per_day" value="5">5</option>
+              </Form.Control>
             </Form.Group>
-
-          <Form.Group controlId="exampleForm.ControlSelect1">
-            <Form.Label>Number of Recipes per day:</Form.Label>
-            <Form.Control onChange={handleChange} value={num_recipes_day} as="select">
-                <option selected>Select Number</option>
-                <option name="recipes_per_day" value="1">1</option>
-                <option name="recipes_per_day" value="2">2</option>
-                <option name="recipes_per_day" value="3">3</option>
-                <option name="recipes_per_day" value="4">4</option>
-                <option name="recipes_per_day" value="5">5</option>
-            </Form.Control>
-          </Form.Group>
-
-          <Form.Group>
-            <Form.Label>Dates you would like meal plans for:</Form.Label><br></br>
-              <DatePicker setPicker={setPicker}/>
-          </Form.Group>
-
-          <Button type="submit">Create</Button>
-          </Form>
+            <br></br>
+            <Form.Group>
+              <Form.Label>Dates:</Form.Label><br></br>
+                <DatePicker setPicker={setPicker}/>
+            </Form.Group>
+            <br></br>
+            <br></br>
+            <div id="create-button">
+            <Button type="submit">Create</Button>
+            </div>
+            </Form>
+          </div>
         </div>
       </div> 
     </React.Fragment>
@@ -301,16 +316,25 @@ function Mealplans(props) {
 
   return (
     <React.Fragment>
-      <div className = "bg-salt bg flex-container-center">
-      {mealplans.map((mp) => {
-        return (
-          <div className="flex-item-search">
-            <ListGroup variant="flush">
-              <ListGroup.Item action href={`/mealplan/${mp.id}`}> Mealplan for {mp.date} </ListGroup.Item>
-            </ListGroup>
-          </div>
-        )
-      })}
+      <div className="parallax">
+        <div className="flex-container-wrap">
+          {mealplans.map((mp) => {
+            return (
+              <div className="flex-item-mp">
+                <div className="flex-container-stuck">
+                  <div className="flex-item-mp-icon">
+                    <i className="fas fa-utensils"></i>
+                    <i className="far fa-calendar-alt" aria-hidden="false" href={`/mealplan/${mp.id}`}/>
+                  </div>
+                  <div className="flex-item-mp-recipes">
+                    <br></br><p className="justify"> Mealplan for </p>
+                    <a className="justify" href={`/mealplan/${mp.id}`}> {mp.date} </a>
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
       </div>
     </React.Fragment>
   )
@@ -324,6 +348,7 @@ function Mealplan() {
 
   let recipe_ids = mealplan['recipes'].map(recipe => recipe['id']);
   let altrecipe_ids = mealplan['altrecipes'].map(recipe => recipe['id']);
+  const mealplan_date = mealplan['date']
   
   console.log(recipe_ids)
   console.log(altrecipe_ids)
@@ -396,40 +421,46 @@ function Mealplan() {
 
   return (
     <React.Fragment>
-      <Container fluid={true}>
-      <h3> Mealplan {mealplan_id} </h3>
-        Please select one of these recipes to REMOVE:
-        <ListGroup horizontal>
+      <div className="bg bg-lemons">
+      <h2 id="h2-font-size"> Mealplan {mealplan_id} </h2>
+        <p id="mp-date-font-size"> {mealplan_date} </p>
+        <div className="flex-container-divider">
+          <div className="flex-item-divider">
+          <p>Please select one of these recipes to REMOVE:</p>
+          </div>
+        </div>
+        <div className="flex-container-mp">
           {mealplan['recipes'].map((recipe) => {
             return (
-              <ListGroup.Item action variant="info">
-                <Recipe name={recipe['name']} image={recipe['image']} cook_time={recipe['cook_time']} url={recipe['url']}/>
-                <button onClick={() => moveToAlt(recipe['id'])} name="remove" value="{recipe['id']}" type="button" className="btn btn-outline-secondary btn-sm active" role="button" aria-pressed="true"> Remove </button>
-              </ListGroup.Item>
+              <div className="flex-item-mp-recipes">
+                  <Recipe onClick={() => moveToAlt(recipe['id'])} buttonName="Remove" value="{recipe['id']}" name={recipe['name']} image={recipe['image']} cook_time={recipe['cook_time']} url={recipe['url']}/>
+              </div>
               )
             })
           }
-        </ListGroup>
-      </Container>
-
-      <Container fluid={true}>
-        Please select one of these recipes to ADD:
-        <ListGroup horizontal>
+        </div>
+        <div className="flex-container-divider">
+          <div className="flex-item-divider">
+            <p>Please select one of these recipes to ADD:</p>
+          </div>
+        </div>
+        <div className="flex-container-mp">
           {mealplan['altrecipes'].map((alt_recipe) => {
             return (
-              <ListGroup.Item action variant="warning">
-                <Recipe name={alt_recipe['name']} image={alt_recipe['image']} cook_time={alt_recipe['cook_time']} url={alt_recipe['url']} />
-                <Card.Footer>
-                  <small className="text-muted">Last updated 3 mins ago</small>
-                </Card.Footer>
-                <button onClick={() => moveToRec(alt_recipe['id'])} name="add" value="{alt_recipe['id']}" type="button" className="btn btn-outline-warning btn-sm active" role="button" aria-pressed="true"> Add </button>
-              </ListGroup.Item>
+              <div className="flex-item-mp-recipes">
+                  <Recipe onClick={() => moveToRec(alt_recipe['id'])} buttonName="Add" value="{alt_recipe['id']}" name={alt_recipe['name']} image={alt_recipe['image']} cook_time={alt_recipe['cook_time']} url={alt_recipe['url']} />
+              </div>
               )
             })
           }
-      </ListGroup>
-      </Container>
-      Looks good <button type="button" className="btn btn-primary" onClick={handleClick}>Add to Calendar</button>
+        </div>
+        <div>
+          <div className="flex-item-button">
+            <button type="button" className="btn btn-primary" onClick={handleClick}>Add to Calendar</button>
+          </div>
+        </div>
+      
+      </div>
     </React.Fragment>  
 )
 }
@@ -438,19 +469,19 @@ function Mealplan() {
 function Recipe(props) {
 
   return (
-    <Card border="info" style={{ width: '18rem' }} className="card">
+    <Card border="info" style={{ width: '16.5rem' }} className="card">
       <Card.Img top width="100%" variant="top" src={props.image} className="card-img" alt="Card image cap" />
       <Card.Body>
         <Card.Title>{props.name} </Card.Title>
         <Card.Text>
           Cook time: {props.cook_time} minutes
         </Card.Text>
-        <Button variant="info" href={props.url}>Go to Recipe</Button>
+        <Button className="button-border" variant="info" href={props.url}>Go to Recipe</Button>
+        {props.buttonName? <Button className="button-border" onClick={props.onClick} variant="info" href={props.url}>{props.buttonName}</Button>: " "}
       </Card.Body>
     </Card>
   )
 }
-
 
 function Recipes() {
 
@@ -464,30 +495,19 @@ function Recipes() {
     })
   ), [])  
 
-  function generateRecipes() {
-    const recipeColumn = recipes.map((recipe) => {
-      return (
-        <Col xs={6} md={4}>
-          <Recipe name={recipe['name']} image={recipe['image']} cook_time={recipe['cook_time']} url={recipe['url']} />
-        </Col>
-      )
-    })
-
-    let rows = []
-
-    for (let i =0; i < recipeColumn.length; i+=3) {
-      rows.push(
-        <Row> {recipeColumn[i]} {recipeColumn[i+1]} {recipeColumn[i+2]} </Row>
-      )
-    }
-    return rows
-  }
-
   return (
     <React.Fragment>
-      <Container className="page-container">
-        {generateRecipes()}
-      </Container>
+      <div className="parallax">
+        <div className="flex-container-recipes"> 
+          {recipes.map((recipe) => {
+            return (
+              <div className="flex-item-mp-recipes">
+                <Recipe name={recipe['name']} image={recipe['image']} cook_time={recipe['cook_time']} url={recipe['url']} />
+              </div>
+            )
+          })}
+        </div>
+      </div>
     </React.Fragment>
   )
 }
@@ -524,8 +544,8 @@ function App() {
 
   return (
     <Router>
-      <Navbar bg="light" expand="lg" className="navbar-color">
-        <Navbar.Brand href="/">Meal Planner</Navbar.Brand>
+      <Navbar bg="light" expand="lg" className="navbar-color navbar-background-color">
+        <Navbar.Brand className="nav-link navbar-color navbar-brand:hover navbar-brand:focus" href="/">Meal Planner</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
@@ -534,12 +554,10 @@ function App() {
             <Nav.Link href="/recipes"> Recipes </Nav.Link>
             {user.id ? <Nav.Link href="/create_mealplan"> Create a Mealplan </Nav.Link> : ''}
             {user.id ? <Nav.Link href="/mealplans"> View My Mealplans </Nav.Link> : ''}
-            {user.id ? <Button href="/" onClick={logOut} variant="outline-primary"> Log Out </Button> : ''}
           </Nav>
-          {/* <Form inline>
-            <FormControl type="text" placeholder="Email" className="mr-sm-2" />
-            <Button variant="outline-success">Log In</Button>
-          </Form> */}
+          <Nav.Item className="ml-auto">
+            {user.id ? <Button href="/" onClick={logOut} variant="outline-secondary"> Log Out </Button> : ''}
+          </Nav.Item>
         </Navbar.Collapse>
       </Navbar>
 

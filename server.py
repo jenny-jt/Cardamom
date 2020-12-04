@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect, session, flash, jso
 import os
 
 from model import db, connect_to_db, MealPlan, Recipe
-from helper import make_cal_event, cred_dict, create_recipe_list, create_alt_recipes, data_mealplans, data_recipes, data_user, convert_dates, mealplan_dates, num_days, verify_user
+from helper import make_cal_event, cred_dict, convert_date, create_recipe_list, create_alt_recipes, data_mealplans, data_recipes, data_user, convert_dates, mealplan_dates, num_days, verify_user
 from crud import all_recipes, create_db_recipes, add_user, user_by_id, user_by_email, mealplan_add_recipe, mealplan_add_altrecipe, updated_recipes
 
 from google_auth_oauthlib.flow import Flow
@@ -96,15 +96,12 @@ def new_user():
 def user_mealplans():
     """show user's mealplans"""
     data = request.get_json()
-    print("data coming into mealplans", data)
 
     user_id = data['user_id']
     print("****mealplans user id", user_id)
     user = user_by_id(user_id)
-    print("***user retrieved in mealplans", user)
 
     mealplans = user.mealplans
-    print("****user mealplans", mealplans)
     mealplans_info = data_mealplans(mealplans)
 
     return jsonify(mealplans_info)
@@ -126,13 +123,18 @@ def modify_mp(mealplan_id):
     mealplan_id = int(mealplan_id)
     mealplan = MealPlan.query.get(mealplan_id)
 
+    date = mealplan.date
+    mealplan_date = convert_date(date)
+    print("****mealplan date", mealplan_date)
+
     recipes = mealplan.recipes_r
     recipes_info = data_recipes(recipes)
 
     altrecipes = mealplan.altrecipes_r
     altrecipes_info = data_recipes(altrecipes)
 
-    mealplan_recipes = {'recipes': recipes_info, 'altrecipes': altrecipes_info}
+    mealplan_recipes = {'recipes': recipes_info, 'altrecipes': altrecipes_info, 'date': mealplan_date}
+    print("*****mealplan data sending back to front", mealplan_recipes)
 
     return jsonify(mealplan_recipes)
 
@@ -153,16 +155,15 @@ def create():
 
     start_date, end_date = convert_dates(start, end)
     days = num_days(start_date, end_date)
-    print("********days", days)
     num = num_recipes * days
     print("************num", num)
 
     user = user_by_id(user_id)
 
     db_recipes = create_db_recipes(ingredients)
-    print("***db recipes based on ingredients", db_recipes)
     master_list = create_recipe_list(ingredients, num, db_recipes)
     recipe_list = master_list[0]
+    print("**********************recipe list has recipes", len(recipe_list))
 
     mealplans = mealplan_dates(start_date, end_date, user)
     mealplans_list = []
@@ -170,7 +171,9 @@ def create():
     for mealplan in mealplans:
         alt_recipes = create_alt_recipes(master_list, ingredients, mealplan)
         altrecipes = mealplan_add_altrecipe(mealplan, alt_recipes)
+        print("****** alt recipes", alt_recipes)
         recipes = mealplan_add_recipe(mealplan, recipe_list, num_recipes)
+        print("****** recipes", recipes)
 
         recipes_info = data_recipes(recipes)
         alt_recipes_info = data_recipes(altrecipes)
@@ -212,7 +215,7 @@ def calendar_event():
     print(f"\n updated mealplan recipes {mealplan.recipes_r}\n")
 
     alt_recipes = updated_recipes(altrecipe_ids)
-    mealplan.altrecipes_r = alt_recipes  # can i do this or do i have to .clear() and then add recipes?
+    mealplan.altrecipes_r = alt_recipes
     db.session.commit()
     print(f"\n updated alternate recipes {mealplan.altrecipes_r}\n")
 
@@ -221,7 +224,7 @@ def calendar_event():
         cal.events().insert(calendarId=cal_id, sendNotifications=True, body=event).execute()
 
     return jsonify('Recipes added to MealPlan calendar!')
-# hi
+
 
 if __name__ == "__main__":
     connect_to_db(app)
