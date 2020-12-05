@@ -6,10 +6,41 @@ from crud import add_mealplan, create_api_recipes
 from datetime import datetime, timedelta
 
 
+def check_mealplan(date, user):
+    """checks if mealplan exists, otherwise makes a new mealplan object"""
+    mealplan = MealPlan.query.filter(MealPlan.date == date).first()
+
+    if not mealplan:
+        mealplan = add_mealplan(date, user)
+
+    return mealplan
+
+
+def convert_dates(start, end):  
+    """take in start and end date strings from form, returns date time objects"""
+
+    dt_format = "%Y-%m-%d"
+
+    start_date = datetime.strptime(start, dt_format)
+    end_date = datetime.strptime(end, dt_format)
+
+    return start_date, end_date
+
+
+def convert_date(date):
+    """take in dto from mealplan date and converts to string"""
+
+    dt_format = "%B %d, %Y"
+
+    mealplan_date = datetime.strftime(date, dt_format)
+
+    return mealplan_date
+
+
 def create_alt_recipes(master_list, ingredients, mealplan):
     """creates list of alternate recipes"""
 
-    if len(master_list) > 2:
+    if len(master_list[2]) > 1:  # api_list not empty
         alt_recipes = master_list[1] + master_list[2]
         print("crud: alt recipes with api", alt_recipes)
     else:
@@ -43,37 +74,6 @@ def create_recipe_list(ingredients, num, db_recipes):
         master_list = make_recipe_lists(num, db_recipes)
 
     return master_list  # recipe_list, db_recipes, api_recipes
-
-
-def check_mealplan(date, user):
-    """checks if mealplan exists, otherwise makes a new mealplan object"""
-    mealplan = MealPlan.query.filter(MealPlan.date == date).first()
-
-    if not mealplan:
-        mealplan = add_mealplan(date, user)
-
-    return mealplan
-
-
-def convert_dates(start, end):  
-    """take in start and end date strings from form, returns date time objects"""
-
-    dt_format = "%Y-%m-%d"
-
-    start_date = datetime.strptime(start, dt_format)
-    end_date = datetime.strptime(end, dt_format)
-
-    return start_date, end_date
-
-
-def convert_date(date):
-    """take in dto from mealplan date and converts to string"""
-
-    dt_format = "%B %d, %Y"
-
-    mealplan_date = datetime.strftime(date, dt_format)
-
-    return mealplan_date
 
 
 def cred_dict(credentials):
@@ -188,11 +188,8 @@ def num_days(start_date, end_date):
     """take in start and end dates, returns number of days in date range"""
 
     date_range = end_date - start_date
-    print("****date range", date_range)
     x = date_range.days
-    print("date range days", x)
     num_days = date_range.days + 1
-    print("*****num_days", num_days)
 
     return num_days
 

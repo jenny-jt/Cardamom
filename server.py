@@ -155,16 +155,18 @@ def create():
     start_date, end_date = convert_dates(start, end)
     days = num_days(start_date, end_date)
     num = num_recipes * days
-    print("************num", num)
+    print("**********num", num)
 
     user = user_by_id(user_id)
 
     db_recipes = create_db_recipes(ingredients)
     master_list = create_recipe_list(ingredients, num, db_recipes)
+    print("master list", master_list)
     recipe_list = master_list[0]
-    print("**********************recipe list has recipes", len(recipe_list))
+    print("********recipe list has recipes", len(recipe_list))
 
     mealplans = mealplan_dates(start_date, end_date, user)
+    print("******mealplan", mealplans)
     mealplans_list = []
 
     for mealplan in mealplans:

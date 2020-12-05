@@ -12,8 +12,8 @@ h1, h2, h3, h4, h5, h6 {
 #h2-font-size {
     font-size: 20px;
     text-align: center;
-    font-family: "Futura";
-    font-weight: 400
+    font-weight: 400;
+    margin-top: 2rem;
 }
 
 #mp-date-font-size {
@@ -41,14 +41,15 @@ h1, h2, h3, h4, h5, h6 {
 
 #mp-font {
     font-family: "Source Sans Pro";
-    font-weight: 400;
-    font-size: 24px;
-    color: #A7C2E5
+    font-weight: 200;
+    font-size: 21px;
+    color: #608eca;
+    margin: 0
 }
 
 #mp-link-font {
     color: rgb(66, 65, 65);
-    font-size: 19.5px;
+    font-size: 15.5px;
 }
 
 /* FLEX */
@@ -63,7 +64,7 @@ h1, h2, h3, h4, h5, h6 {
     display: flex; /* or inline-flex */
     justify-content: center;
     align-items: space-around;
-    flex-wrap: wrap;
+    flex-wrap: wrap-reverse;
     align-content: space-around 
   }
 
@@ -89,16 +90,19 @@ h1, h2, h3, h4, h5, h6 {
     justify-content: flex-end;
     align-items: start;
     height: 3vh;
-    width: 100%
+    width: 100%;
+    margin-bottom: 1.5rem;
+    margin-top:0
 }
 
 .flex-container-stuck {
     display: flex;
     flex-direction: row;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    height: 10vh;
-    width: 20rem
+    height: 14vh;
+    width: 20rem;
+    margin-left: 5rem;
 }
 
 .flex-item-welcome {
@@ -135,9 +139,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .flex-item-mp {
-    width: 25rem;
+    width: 26rem;
     height: 6rem;
-    margin: 1.5rem
+    margin-left: 2;
+    margin-right: 1.5;
+    margin-top: 1;
+    margin-bottom: 1;
 }
 
 .flex-item-mp-recipes {
@@ -147,28 +154,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .flex-item-mp-icon {
-    width: 4rem;
+    width: 3rem;
+    height: 1.5rem;
     display: flex;
-    justify-content: center;
+    justify-content: end;
+    align-item: end
 }
-
-.other-item {
-    order: 5; /* default is 0 */
-    flex-grow: 0;
-    flex-shrink: 0;
-    flex-basis: 0; /*will grow much more if start at 0*/
-    /* align-self: center; */
-    /* order: 1; */
-    /* can also do flex: 1 (grow) 1(shrink) 1 (basis) */
-  }
-
-.flex-wrap {
-    flex-wrap: wrap;
-  }
-
-.flex-center {
-    justify-content: center + safe /* flex-start | flex-end | space-between | space-around | space-evenly | start | end | left | right ... + safe | unsafe; */
-  }
 
 .flex-cross-align {
     align-items: center /*justify-content version for the cross-axis (perpendicular to the main-axis).*/
@@ -178,6 +169,7 @@ h1, h2, h3, h4, h5, h6 {
 .container {
     align-content: space-around + safe ;
   }
+
 /* BACKGROUND IMAGE */
 .bg {
     /* background-color:#fff4c2; /* fallback if background image fails */
@@ -192,10 +184,9 @@ h1, h2, h3, h4, h5, h6 {
     -moz-background-size: cover;
     -o-background-size: cover;
     background-size: cover;
-    
   }
 
-  .bg-blur {
+.bg-blur {
     background-color:#fff4c2; /* fallback if background image fails */
     background-repeat: no-repeat;
     background-position: center;
@@ -205,10 +196,21 @@ h1, h2, h3, h4, h5, h6 {
     z-index: -5;
   }
 
+.blur-lemons {
+    background:url('../img/lemons.jpeg') no-repeat center;
+    background-size:cover;
+    filter: blur(3px);
+    position:absolute;
+    width:100%;
+    height:100vh;
+    z-index: -5
+}
+
 .bg-lemons {
     background-image: url('../img/lemons.jpeg');
     width: 100%;
     height: 95vh;
+    backdrop-filter: blur(10px);
   }
 
 .bg-salt {
@@ -222,6 +224,16 @@ h1, h2, h3, h4, h5, h6 {
     width: 100%;
     height: 95vh;
     /* filter: blur(2px); */
+  }
+
+.enable-blur {
+    filter: blur(1.2px);
+    z-index:0
+  }
+  
+.disable-blur {
+    filter: blur(0);
+    z-index:10
   }
 
 /* SCROLLING   */
@@ -344,15 +356,9 @@ body, html {
 
 /* ICONS */
 
-.far {
-    color:rgb(38, 193, 240);
-    font-size: 42px;
-    margin: 0.25rem
-}
-
 .fas {
-    color:rgb(34, 177, 177);
-    font-size: 42px;
+    color:rgb(38, 193, 240);
+    font-size: 44px;
     margin: 0.25rem
 }
 

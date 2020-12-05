@@ -62,7 +62,7 @@ function LogIn(props) {
 
   return (
     <React.Fragment>
-      <Container>
+      <div className="bg-salt bg flex-container-center">
         <Form onSubmit={handleLogin}>
           <Form.Group controlId="formBasicEmail">
           <Form.Label>Email address</Form.Label>
@@ -75,11 +75,11 @@ function LogIn(props) {
           <Form.Label>Password</Form.Label>
           <Form.Control type="password" value={password} onChange={handlePasswordChange} placeholder="Password" />
         </Form.Group>
-        <Button variant="primary" type="submit"> Log In </Button>
+        <Button className="flex-center" variant="primary" type="submit"> Log In </Button>
         </Form>
         Authorize with Google
-          <a className="btn btn-primary" href="/authorize" role="button"> Authorize</a>
-      </Container>
+          <a className="btn btn-primary" type="submit" href="/authorize" role="button"> Authorize</a>
+      </div>
     </React.Fragment>
   ) 
 }
@@ -323,11 +323,12 @@ function Mealplans(props) {
               <div className="flex-item-mp">
                 <div className="flex-container-stuck">
                   <div className="flex-item-mp-icon">
-                    <i className="fas fa-utensils"></i>
-                    <i className="far fa-calendar-alt" aria-hidden="false" href={`/mealplan/${mp.id}`}/>
+                    <div className="flex-container-i">
+                      <a href={`/mealplan/${mp.id}`}><i className="fas fa-utensils"></i></a>
+                    </div>
                   </div>
                   <div className="flex-item-mp-recipes">
-                    <br></br><p className="justify" id="mp-font"> Mealplan for </p>
+                    <br></br><p id="mp-font"> MEALPLAN FOR </p>
                     <a className="justify" id="mp-link-font" href={`/mealplan/${mp.id}`}> {mp.date} </a>
                   </div>
                 </div>
@@ -421,11 +422,12 @@ function Mealplan() {
 
   return (
     <React.Fragment>
-      <div className="bg bg-lemons">
+      <div className="blur-lemons"></div>
+      <div>
       <h2 id="h2-font-size"> Mealplan {mealplan_id} </h2>
         <p id="mp-date-font-size"> {mealplan_date} </p>
-        <div className="flex-container-divider">
-          <div className="flex-item-divider">
+        <div className="flex-container-divider disable-blur">
+          <div className="flex-item-divider diable-blur">
           <p>Please select one of these recipes to REMOVE:</p>
           </div>
         </div>
@@ -459,7 +461,6 @@ function Mealplan() {
             <button type="button" className="btn btn-primary" onClick={handleClick}>Add to Calendar</button>
           </div>
         </div>
-      
       </div>
     </React.Fragment>  
 )

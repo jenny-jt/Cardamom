@@ -151,7 +151,8 @@ def mealplan_add_recipe(mealplan, recipes_list, num_recipes):
         print("num_recipes should stay same", num_recipes)
         db.session.commit()
 
-    return mealplan.recipes_r
+    recipes = mealplan.recipes_r
+    return recipes
 
 
 def mealplan_add_altrecipe(mealplan, alt_recipes):
@@ -159,11 +160,12 @@ def mealplan_add_altrecipe(mealplan, alt_recipes):
     adds recipes to mealplan via a method, removes those from recipes_list
     returns list of unique recipes associated with mealplan obj
     """
-    while len(mealplan.recipes_r) < 5:
+    while len(mealplan.altrecipes_r) < 4:
         for item in alt_recipes:
-            if item not in mealplan.recipes_r:
+            if item not in mealplan.altrecipes_r:
                 break
         mealplan.add_altrecipe_to_mealplan(item)
+        print("length of alt recipes", len(mealplan.altrecipes_r))
         db.session.commit()
 
     altrecipes = mealplan.altrecipes_r
