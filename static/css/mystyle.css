@@ -10,23 +10,32 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #h2-font-size {
-    font-size: 20px;
+    font-size: 26px;
     text-align: center;
-    font-weight: 400;
-    margin-top: 2rem;
+    font-weight: 900;
+    margin-top: 0.75rem;
+    font-family: "Arial";
+    color: rgb(102, 101, 101);
 }
 
 #mp-date-font-size {
-    font-size: 17px;
+    font-size: 20px;
     text-align: center;
-    color: teal;
+    color: #3886dc;
+    font-weight: lighter
+}
+
+#mp-font-size {
+    font-size: 20px;
+    text-align: start;
+    color: #3886dc;
     font-weight: lighter
 }
 
 .welcome-font {
     font-family: "Arial";
     font-weight: 900;
-    font-size: 60px;
+    font-size: 70px;
     color: white;
     text-align: center;
 }
@@ -47,10 +56,33 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0
 }
 
+.recipe-font {
+    font-family: "Source Sans Pro";
+    font-weight: 200;
+    font-size: 30px;
+    margin: 0
+}
+
 #mp-link-font {
     color: rgb(66, 65, 65);
     font-size: 15.5px;
 }
+
+.wood-text {
+    background: url('../img/wood.jpg') no-repeat center center;
+    background-size: cover;
+    color: #fff;
+    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    -moz-background-clip:text;
+    background-clip:text; 
+    /* font-family:Catamaran,sans-serif; */
+    /* font-size:10em; */
+    padding:0;
+    margin:0;
+    text-align:center;
+    -webkit-text-stroke: 1px saddlebrown;
+ }
 
 /* FLEX */
 .flex-container-center {
@@ -78,13 +110,21 @@ h1, h2, h3, h4, h5, h6 {
   }
 
 .flex-container-mp {
-    display: flex; /* or inline-flex */
+    display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: end;
     flex-wrap: wrap;
-    align-content: space-around;
-    height: 45vh
+    /* align-content: space-betweeen; */
+    height: 40vh;
   }
+
+.recipe-container-divider {
+    justify-content: center;
+    align-items: end;
+    height: 5vh;
+    width: 100%;
+    margin-bottom: 1.5rem;
+}
 
 .flex-container-divider {
     justify-content: flex-end;
@@ -102,7 +142,7 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
     height: 14vh;
     width: 20rem;
-    margin-left: 5rem;
+    margin-left: 1rem;
 }
 
 .flex-item-welcome {
@@ -126,10 +166,11 @@ h1, h2, h3, h4, h5, h6 {
 
 .flex-item-button {
     width: 9rem;
-    height: 2rem;
+    height: 5rem;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 2rem
+    margin-top: 4rem;
+    margin-bottom: 2rem;
 }
 
 .flex-item-search {
@@ -139,7 +180,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .flex-item-mp {
-    width: 26rem;
+    width: 22rem;
     height: 6rem;
     margin-left: 2;
     margin-right: 1.5;
@@ -148,17 +189,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .flex-item-mp-recipes {
-    width: fit-content;
-    height: fit-content;
-    margin-left: 0.75rem
+    width: 21rem;
+    height: 27rem;
+    margin-left: 2.75rem;
+    margin-right: -2rem;
 }
 
 .flex-item-mp-icon {
-    width: 3rem;
-    height: 1.5rem;
+    width: 10rem;
+    height: 4.5rem;
     display: flex;
     justify-content: end;
-    align-item: end
 }
 
 .flex-cross-align {
@@ -172,13 +213,6 @@ h1, h2, h3, h4, h5, h6 {
 
 /* BACKGROUND IMAGE */
 .bg {
-    /* background-color:#fff4c2; /* fallback if background image fails */
-    /* background-repeat: no-repeat;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;    
-    z-index: -1; */
-    /* filter: blur(2px); */
     background: url(images/bg.jpg) no-repeat center center fixed; 
     -webkit-background-size: cover;
     -moz-background-size: cover;
@@ -226,22 +260,12 @@ h1, h2, h3, h4, h5, h6 {
     /* filter: blur(2px); */
   }
 
-.enable-blur {
-    filter: blur(1.2px);
-    z-index:0
-  }
-  
-.disable-blur {
-    filter: blur(0);
-    z-index:10
-  }
-
 /* SCROLLING   */
 body, html {
     height: 100%;
   }
 
-.parallax {
+.parallax-salt {
     /* The image used */
     background-image: url('../img/salt.jpeg');
   
@@ -255,6 +279,29 @@ body, html {
     background-size: cover;
   }
 
+.parallax-meals {
+    /* The image used */
+    background-image: url('../img/lemons.png');
+  
+    /* Set a specific height */
+    height: 100%;
+  
+    /* Create the parallax scrolling effect */
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    padding-top: 12px;
+  }
+
+.blur .parallax-lemons { 
+      -webkit-filter: blur(15px); 
+      -moz-filter: blur(15px); 
+      -o-filter: blur(15px); 
+      -ms-filter: blur(15px); 
+      filter: blur(15px); 
+}
+
 /* NAVBAR */
 .navbar-background-color {
     background: linear-gradient(to left, #D8E2F0, #b6cae5);
@@ -266,9 +313,32 @@ body, html {
 
 .navbar-color .nav-link {
     color: white;
+    padding-right: 3.5rem;
+    padding-left: 3.5rem;
     /* font */
 }
 
+.navbar-light .navbar-nav .nav-link {
+    color: rgba(0,0,0,.5);
+    font-size: 19px;
+    padding-right: 3rem;
+}
+
+.navbar-brand {
+    display: inline-block;
+    padding-top: .3125rem;
+    padding-bottom: .3125rem;
+    padding-left: 3.5rem;
+    padding-right: 3rem;
+    margin-right: 1rem;
+    font-size: 2rem;
+    line-height: inherit;
+    white-space: nowrap;
+}
+
+.navbar-expand-lg .navbar-nav .nav-link {
+    padding-left: 6rem;
+}
 /* FOOTER */
 
 .footer {
@@ -304,10 +374,6 @@ body, html {
     border-top-right-radius: 0.45rem;
 }
 
-.card-body {
-
-}
-
 /* Dates */
 
 .dateSelect {
@@ -338,7 +404,7 @@ body, html {
 
 .button-border {
     border-style:solid;
-    border-width:10px;
+    border-width:6px;
     border-color: white;
 }
 
@@ -362,11 +428,43 @@ body, html {
     margin: 0.25rem
 }
 
+.fa-inverse {
+    color: #e9ecef;
+    font-size: 1.25em;
+}
+
+.fa-stack {
+    display: inline-block;
+    /* height: 0.5em; */
+    line-height: 2em;
+    position: relative;
+    vertical-align: middle;
+    width: 3em;
+}
+
+i { vertical-align: middle; }
+
+.fa, .fab, .fad, .fal, .far, .fas {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1.5;
+
 /* LINKS */
 
 a {
     color: #004085;
     text-decoration: none;
     background-color: transparent;
-    font-size: 17.5px;
+    font-size: 19.5px;
+}
+
+#circle {
+    background: whitesmoke;
+    border-radius: 50%;
+    width: 15px;
+    height: 15px;
 }

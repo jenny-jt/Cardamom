@@ -9,7 +9,7 @@ function Homepage(props) {
   return (
     <React.Fragment>
       <div className="bg-salt bg flex-container-center"> 
-        <div className="flex-item-welcome welcome-font"> Welcome {props.user.name} </div>
+        <div className="flex-item-welcome welcome-font wood-text"> Welcome {props.user.name} </div>
         <div className="flex-item-welcome2"> 
           <Button href="/create_mealplan" onClick={handleClick} variant="outline-primary" size="lg"> Get Started </Button>
         </div>
@@ -316,7 +316,7 @@ function Mealplans(props) {
 
   return (
     <React.Fragment>
-      <div className="parallax">
+      <div className="parallax-salt">
         <div className="flex-container-wrap">
           {mealplans.map((mp) => {
             return (
@@ -324,10 +324,15 @@ function Mealplans(props) {
                 <div className="flex-container-stuck">
                   <div className="flex-item-mp-icon">
                     <div className="flex-container-i">
-                      <a href={`/mealplan/${mp.id}`}><i className="fas fa-utensils"></i></a>
+                      <a href={`/mealplan/${mp.id}`}>
+                        <span class="fa-stack fa-2x">
+                          <i class="fas fa-circle fa-stack-2x fa-inverse fa-xs"></i>
+                          <i class="fas fa-utensils fa-stack-1x fa-xs"></i>
+                        </span>
+                      </a>
                     </div>
                   </div>
-                  <div className="flex-item-mp-recipes">
+                  <div className="flex-item-mp">
                     <br></br><p id="mp-font"> MEALPLAN FOR </p>
                     <a className="justify" id="mp-link-font" href={`/mealplan/${mp.id}`}> {mp.date} </a>
                   </div>
@@ -422,13 +427,12 @@ function Mealplan() {
 
   return (
     <React.Fragment>
-      <div className="blur-lemons"></div>
-      <div>
+      <div className="parallax-meals">
       <h2 id="h2-font-size"> Mealplan {mealplan_id} </h2>
         <p id="mp-date-font-size"> {mealplan_date} </p>
-        <div className="flex-container-divider disable-blur">
-          <div className="flex-item-divider diable-blur">
-          <p>Please select one of these recipes to REMOVE:</p>
+        <div className="flex-container-divider">
+          <div className="flex-item-divider">
+          <p id="mp-font-size">Select recipe(s) to REMOVE:      </p>
           </div>
         </div>
         <div className="flex-container-mp">
@@ -443,7 +447,7 @@ function Mealplan() {
         </div>
         <div className="flex-container-divider">
           <div className="flex-item-divider">
-            <p>Please select one of these recipes to ADD:</p>
+            <p id="mp-font-size">Select recipe(s) to ADD:        </p>
           </div>
         </div>
         <div className="flex-container-mp">
@@ -498,7 +502,10 @@ function Recipes() {
 
   return (
     <React.Fragment>
-      <div className="parallax">
+      <div className="parallax-salt">
+        <div className="recipe-container-divider"> 
+        <p className="recipe-font wood-text"> Recipes </p>
+        </div>
         <div className="flex-container-recipes"> 
           {recipes.map((recipe) => {
             return (
@@ -546,7 +553,7 @@ function App() {
   return (
     <Router>
       <Navbar bg="light" expand="lg" className="navbar-color navbar-background-color">
-        <Navbar.Brand className="nav-link navbar-color navbar-brand:hover navbar-brand:focus" href="/">Meal Planner</Navbar.Brand>
+        <Navbar.Brand className="nav-link navbar-color navbar-brand:hover navbar-brand:focus" href="/"> cardamom </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
