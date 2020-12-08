@@ -326,12 +326,12 @@ function Mealplans(props) {
                 <div className="flex-container-stuck">
                   <div className="flex-item-mp-icon">
                     <div className="flex-container-i">
-                      <a href={`/mealplan/${mp.id}`}>
-                        <span class="fa-stack fa-2x">
-                          <i class="fas fa-circle fa-stack-2x fa-inverse fa-xs"></i>
-                          <i class="fas fa-utensils fa-stack-1x fa-xs"></i>
+                      <Link to={`/mealplan/${mp.id}`}>
+                        <span className="fa-stack fa-2x">
+                          <i className="fas fa-circle fa-stack-2x fa-inverse fa-xs"></i>
+                          <i className="fas fa-utensils fa-stack-1x fa-xs"></i>
                         </span>
-                      </a>
+                      </Link>
                     </div>
                   </div>
                   <div className="flex-item-mp">
@@ -441,7 +441,8 @@ function Mealplan() {
           {mealplan['recipes'].map((recipe) => {
             return (
               <div className="flex-item-mp-recipes">
-                  <Recipe onClick={() => moveToAlt(recipe['id'])} buttonName="Remove" value="{recipe['id']}" name={recipe['name']} image={recipe['image']} cook_time={recipe['cook_time']} url={recipe['url']}/>
+                  <Recipe key={recipe['id']} onClick={() => moveToAlt(recipe['id'])} buttonName="Remove" value="{recipe['id']}" 
+                          name={recipe['name']} image={recipe['image']} cook_time={recipe['cook_time']} url={recipe['url']}/>
               </div>
               )
             })
@@ -456,7 +457,8 @@ function Mealplan() {
           {mealplan['altrecipes'].map((alt_recipe) => {
             return (
               <div className="flex-item-mp-recipes">
-                  <Recipe onClick={() => moveToRec(alt_recipe['id'])} buttonName="Add" value="{alt_recipe['id']}" name={alt_recipe['name']} image={alt_recipe['image']} cook_time={alt_recipe['cook_time']} url={alt_recipe['url']} />
+                  <Recipe key={alt_recipe['id']} onClick={() => moveToRec(alt_recipe['id'])} buttonName="Add" value="{alt_recipe['id']}" 
+                          name={alt_recipe['name']} image={alt_recipe['image']} cook_time={alt_recipe['cook_time']} url={alt_recipe['url']} />
               </div>
               )
             })
@@ -477,14 +479,14 @@ function Recipe(props) {
 
   return (
     <Card border="info" style={{ width: '16.5rem' }} className="card">
-      <Card.Img top width="100%" variant="top" src={props.image} className="card-img" alt="Card image cap" />
+      <Card.Img top="true" width="100%" variant="top" src={props.image} className="card-img" alt="Card image cap" />
       <Card.Body>
         <Card.Title>{props.name} </Card.Title>
         <Card.Text>
           Cook time: {props.cook_time} minutes
         </Card.Text>
         <Button className="button-border" variant="info" href={props.url}>Go to Recipe</Button>
-        {props.buttonName? <Button className="button-border absolute" onClick={props.onClick} variant="info" href={props.url}>{props.buttonName}</Button>: " "}
+        {props.buttonName? <Button className="button-border absolute" onClick={props.onClick} variant="info">{props.buttonName}</Button>: " "}
       </Card.Body>
     </Card>
   )
