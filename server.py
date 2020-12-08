@@ -200,7 +200,7 @@ def calendar_event():
     mealplan_id = data['mealplan_id']
     recipe_ids = data['recipe_ids']
 
-    altrecipe_ids = data['recipe_ids']
+    altrecipe_ids = data['altrecipe_ids']
 
     mealplan = MealPlan.query.get(mealplan_id)
     date = str(mealplan.date)[:10]

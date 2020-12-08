@@ -233,7 +233,7 @@ def user_by_email(email):
 
 
 def updated_recipes(recipe_ids):
-    """generate updated list of recipes from ids to update mealplan"""
+    """generate updated list of recipe objects from ids to update mealplan"""
     print("*****recipe ids", recipe_ids)
 
     recipes = []
