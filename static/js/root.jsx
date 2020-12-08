@@ -75,7 +75,7 @@ function LogIn(props) {
           <Form.Label>Password</Form.Label>
           <Form.Control type="password" value={password} onChange={handlePasswordChange} placeholder="Password" />
         </Form.Group>
-        <Button className="flex-center" variant="primary" type="submit"> Log In </Button>
+        <Button id="center" variant="outline-primary" type="submit"> Log In </Button>
         </Form>
         Authorize with Google
           <a className="btn btn-primary" type="submit" href="/authorize" role="button"> Authorize</a>
@@ -133,24 +133,26 @@ function CreateUser(props) {
 
   return (
     <React.Fragment>
-      <Form onSubmit={handleNewUser}>
-        <Form.Group>
-          <Form.Label>Name</Form.Label>
-          <Form.Control type="text" value={name} onChange={handleNameChange} placeholder="Name" />
-        </Form.Group>
-          <Form.Group controlId="formBasicEmail">
-          <Form.Label>Email address</Form.Label>
-          <Form.Control type="text" value={email} onChange={handleEmailChange} placeholder="Enter email" />
-          <Form.Text className="text-muted" >
-            We'll never share your email with anyone else.
-          </Form.Text>
-        </Form.Group>
-        <Form.Group controlId="formBasicPassword">
-          <Form.Label>Password</Form.Label>
-          <Form.Control type="password" value={password} onChange={handlePasswordChange} placeholder="Password" />
-        </Form.Group>
-        <Button variant="primary" type="submit"> Log In </Button>
-      </Form>
+      <div className="bg-salt bg flex-container-center">
+        <Form onSubmit={handleNewUser}>
+          <Form.Group>
+            <Form.Label>Name</Form.Label>
+            <Form.Control type="text" value={name} onChange={handleNameChange} placeholder="Name" />
+          </Form.Group>
+            <Form.Group controlId="formBasicEmail">
+            <Form.Label>Email address</Form.Label>
+            <Form.Control type="text" value={email} onChange={handleEmailChange} placeholder="Enter email" />
+            <Form.Text className="text-muted" >
+              We'll never share your email with anyone else.
+            </Form.Text>
+          </Form.Group>
+          <Form.Group controlId="formBasicPassword">
+            <Form.Label>Password</Form.Label>
+            <Form.Control type="password" value={password} onChange={handlePasswordChange} placeholder="Password" />
+          </Form.Group>
+          <Button id="center" variant="outline-primary" type="submit"> Create Account </Button>
+        </Form>
+      </div>
     </React.Fragment>
   ) 
 }
@@ -212,13 +214,13 @@ function CreateMealPlan(props) {
         <div className="form-background">
           <div className="flex-item-search create-form-font">
             <Form onSubmit={handleCreate} >
-              <Form.Group>
+              <Form.Group id="search-input-font">
                 <Form.Label>Ingredients:</Form.Label>
-                <Form.Control type="text" value={ingredients} placeholder="enter ingredients here" onChange={handleIngredients}></Form.Control>
+                <Form.Control type="text" value={ingredients} id="search-input-font" placeholder="enter ingredients here" onChange={handleIngredients}></Form.Control>
               </Form.Group>
             <br></br>
             <Form.Group controlId="exampleForm.ControlSelect1">
-              <Form.Label>Number of Recipes per day:</Form.Label>
+              <Form.Label>Recipes per day:</Form.Label>
               <Form.Control onChange={handleChange} value={num_recipes_day} as="select">
                   <option selected>Select Number</option>
                   <option name="recipes_per_day" value="1">1</option>
@@ -231,7 +233,7 @@ function CreateMealPlan(props) {
             <br></br>
             <Form.Group>
               <Form.Label>Dates:</Form.Label><br></br>
-                <DatePicker setPicker={setPicker}/>
+                <DatePicker className="lightpicker" setPicker={setPicker}/>
             </Form.Group>
             <br></br>
             <br></br>
@@ -334,7 +336,7 @@ function Mealplans(props) {
                   </div>
                   <div className="flex-item-mp">
                     <br></br><p id="mp-font"> MEALPLAN FOR </p>
-                    <a className="justify" id="mp-link-font" href={`/mealplan/${mp.id}`}> {mp.date} </a>
+                    <a className="justify" id="mp-link-font"> {mp.date} </a>
                   </div>
                 </div>
               </div>
@@ -432,7 +434,7 @@ function Mealplan() {
         <p id="mp-date-font-size"> {mealplan_date} </p>
         <div className="flex-container-divider">
           <div className="flex-item-divider">
-          <p id="mp-font-size">Select recipe(s) to REMOVE:      </p>
+          <p id="mp-font-size">Select recipe(s) to REMOVE:</p>
           </div>
         </div>
         <div className="flex-container-mp">
@@ -447,7 +449,7 @@ function Mealplan() {
         </div>
         <div className="flex-container-divider">
           <div className="flex-item-divider">
-            <p id="mp-font-size">Select recipe(s) to ADD:        </p>
+            <p id="mp-font-size">Select recipe(s) to ADD:</p>
           </div>
         </div>
         <div className="flex-container-mp">
@@ -482,7 +484,7 @@ function Recipe(props) {
           Cook time: {props.cook_time} minutes
         </Card.Text>
         <Button className="button-border" variant="info" href={props.url}>Go to Recipe</Button>
-        {props.buttonName? <Button className="button-border" onClick={props.onClick} variant="info" href={props.url}>{props.buttonName}</Button>: " "}
+        {props.buttonName? <Button className="button-border absolute" onClick={props.onClick} variant="info" href={props.url}>{props.buttonName}</Button>: " "}
       </Card.Body>
     </Card>
   )
@@ -530,7 +532,6 @@ function Footer() {
   )
 }
 
-
 function App() {
   const [user, setUser] = React.useState({}) //USER LOCALLY DEFINED
 
@@ -553,7 +554,12 @@ function App() {
   return (
     <Router>
       <Navbar bg="light" expand="lg" className="navbar-color navbar-background-color">
-        <Navbar.Brand className="nav-link navbar-color navbar-brand:hover navbar-brand:focus" href="/"> cardamom </Navbar.Brand>
+        <Navbar.Brand className="nav-link navbar-color navbar-brand:hover navbar-brand:focus" href="/"> 
+          <div className="navbar-brand">
+            <span id="gray">carda</span>
+            <span id="purple">mom</span>
+          </div>
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav"/>
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">

@@ -30,7 +30,7 @@ def convert_dates(start, end):
 def convert_date(date):
     """take in dto from mealplan date and converts to string"""
 
-    dt_format = "%B %d, %Y"
+    dt_format = "%A | %b %d, %Y"
 
     mealplan_date = datetime.strftime(date, dt_format)
 
