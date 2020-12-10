@@ -20,7 +20,7 @@ __APIs:__ Google Calendar, Spoonacular<br/>
 1. Enter ingredients you would like to use
 ![Image of ingredients](http://0.0.0.0:5000/static/img/readme_img/ingredients.png)
 2. Select number of recipes per day you would like
-![Image of num of reicpes](http://0.0.0.0:5000/static/img/readme_img/num_recipes.png)
+![Image of num of recipes](demo/num_recipes.png)
 3. Select range of dates for mealplans to be generated for
 ![Image of dates](http://0.0.0.0:5000/static/img/readme_img/dates.png)
 
