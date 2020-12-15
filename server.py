@@ -209,12 +209,10 @@ def calendar_event():
     cal_recipes = updated_recipes(recipe_ids)
     mealplan.recipes_r = cal_recipes
     db.session.commit()
-    print(f"\n updated mealplan recipes {mealplan.recipes_r}\n")
 
     alt_recipes = updated_recipes(altrecipe_ids)
     mealplan.altrecipes_r = alt_recipes
     db.session.commit()
-    print(f"\n updated alternate recipes {mealplan.altrecipes_r}\n")
 
     for recipe in cal_recipes:
         event = make_cal_event(recipe, date)
