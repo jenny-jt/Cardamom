@@ -8,6 +8,7 @@ from crud import add_user, add_ingredient, add_recipe, add_mealplan
 from server import app
 from random import choice
 
+# try to use functions instead of these commands. ? how would i set these up in functions
 os.system('dropdb meals')
 os.system('createdb meals')
 
