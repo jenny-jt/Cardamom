@@ -4,7 +4,6 @@ import os
 
 db = SQLAlchemy()
 
-
 class Ingredient(db.Model):
     """list of ingredients that will be searched for/used in recipes """
 

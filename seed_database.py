@@ -153,3 +153,6 @@ for user in users:
     user = add_user(name=user['name'], email=user['email'], password=user['password'])
     db.session.add(user)
     db.session.commit()
+
+if __name__ = "__main__":
+    ###
