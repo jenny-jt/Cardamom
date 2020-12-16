@@ -300,17 +300,8 @@ function Mealplans(props) {
   console.log("data in Mealplans which contains user id", data)
 
   React.useEffect(() => {
-
-    const options = {
-      method: 'POST',
-      body: JSON.stringify(data),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-    }
-
     if (props.user.id) {
-      fetch("api/mealplans", options)
+      fetch(`api/mealplans?user_id=${props.user.id}`)
       .then(response => response.json())
       .then(data => setMealplans(data));
     }
