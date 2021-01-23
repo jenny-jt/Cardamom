@@ -2,6 +2,10 @@
 
 Cardamom is a web application that syncs up with your Google Calendar to manage meal planning. Simply input the ingredients you have on hand, or want to use, and Cardamom will generate meals and organize them for you. Modification is easy with a click of a button, and recipe events will be added automatically to your calendar once you approve.
 
+## Demo Video
+A 2 minute demo video that walks through creating a meal plan and adding it to Google Calendar
+https://www.youtube.com/watch?v=yZrD6VvsQDc&t=5s
+
 ## Contents
 * [Tech Stack](#tech-stack)
 * [Installation](#installation)
