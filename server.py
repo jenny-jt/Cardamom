@@ -98,7 +98,6 @@ def user_mealplans():
     data = request.get_json()
 
     user_id = data['user_id']
-    print("****mealplans user id", user_id)
     user = user_by_id(user_id)
 
     mealplans = user.mealplans
@@ -125,7 +124,6 @@ def modify_mp(mealplan_id):
 
     date = mealplan.date
     mealplan_date = convert_date(date)
-    print("****mealplan date", mealplan_date)
 
     recipes = mealplan.recipes_r
     recipes_info = data_recipes(recipes)
@@ -144,7 +142,6 @@ def create():
         return jsonified obj with mealplan ids of mealplans list
     """
     data = request.get_json()
-    print("****data", data)
 
     user_id = data['user_id']
     ingredients = data['ingredients']  # string: carrot, egg
@@ -155,14 +152,12 @@ def create():
     start_date, end_date = convert_dates(start, end)
     days = num_days(start_date, end_date)
     num = num_recipes * days
-    print("**********num", num)
 
     user = user_by_id(user_id)
 
     db_recipes = create_db_recipes(ingredients)
     master_list = create_recipe_list(ingredients, num, db_recipes)
     recipe_list = master_list[0]
-    print("********recipe list has recipes", len(recipe_list))
 
     mealplans = mealplan_dates(start_date, end_date, user)
     mealplans_list = []
@@ -195,7 +190,6 @@ def calendar_event():
     cal_id = 'tl9a33nl5al9k337lh45f40av8@group.calendar.google.com'
 
     data = request.get_json()
-    print("*******data", data)
 
     mealplan_id = data['mealplan_id']
     recipe_ids = data['recipe_ids']

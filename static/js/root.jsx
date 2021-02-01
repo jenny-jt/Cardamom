@@ -41,7 +41,6 @@ function LogIn(props) {
     fetch('/api/login', options) 
     .then(response => response.json())
     .then(data => {
-      console.log("fetch is running", data);
       if (data !== 'no user with this email') {
         props.setUser(data);
         localStorage.setItem('user', JSON.stringify(data));
@@ -109,7 +108,6 @@ function CreateUser(props) {
     fetch('/api/new_user', options) 
     .then(response => response.json())
     .then(data => {
-      console.log("new user data", data);
       if (data !== 'user with this email already exists') {
         props.setUser(data);
         localStorage.setItem('user', JSON.stringify(data));
@@ -172,9 +170,7 @@ function CreateMealPlan(props) {
     evt.preventDefault();
 
     const start_date = picker.getStartDate().toISOString()
-    console.log(start_date)
     const end_date = picker.getEndDate().toISOString()
-    console.log(end_date)
 
     const data = {
       ingredients: ingredients,
@@ -294,10 +290,8 @@ function DatePicker(props) {
 
 
 function Mealplans(props) {
-  console.log("mealplans being rendered", props.user)
   const[mealplans, setMealplans] = React.useState([])
   const data = {"user_id": props.user.id}
-  console.log("data in Mealplans which contains user id", data)
 
   React.useEffect(() => {
 
@@ -358,9 +352,6 @@ function Mealplan() {
   let altrecipe_ids = mealplan['altrecipes'].map(recipe => recipe['id']);
   const mealplan_date = mealplan['date']
   
-  console.log(recipe_ids)
-  console.log(altrecipe_ids)
-  
   React.useEffect(() => {
     fetch(`/api/mealplan/${mealplan_id}`)
     .then(response => response.json())
@@ -374,7 +365,6 @@ function Mealplan() {
       recipe_ids: recipe_ids,
       altrecipe_ids: altrecipe_ids,
     }
-    console.log("data", data)
 
     const options = {
       method: 'POST',
@@ -402,10 +392,8 @@ function Mealplan() {
     const new_mealplan = {'recipes':[{}], 'altrecipes' :[{}]}
     let recipe_to_move = {}
     for (const recipe of mealplan['altrecipes']) {
-      console.log("recipe", recipe)
       if (recipe['id'] === alt_recipe_id) {
         recipe_to_move = recipe
-        console.log("new recipe to move", recipe_to_move)
       }
     }
     new_mealplan['recipes'] = mealplan['recipes'].concat([recipe_to_move])
@@ -419,7 +407,6 @@ function Mealplan() {
     for (const recipe of mealplan['recipes']) {
       if (recipe['id'] === recipe_id) {
         recipe_to_move = recipe
-        console.log("old recipe to move", recipe_to_move)
       }
     }
     new_mealplan['altrecipes'] = mealplan['altrecipes'].concat([recipe_to_move])
@@ -543,9 +530,6 @@ function App() {
       setUser(JSON.parse(user_in_storage));
     }
   },[]);
-
-  console.log("user in storage", user);
-  console.log("user id", user.id)
 
   function logOut() {
     setUser({});

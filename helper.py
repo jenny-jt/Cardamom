@@ -42,17 +42,14 @@ def create_alt_recipes(master_list, ingredients, mealplan):
 
     if len(master_list[2]) > 1:  # api_list not empty
         alt_recipes = master_list[1] + master_list[2]
-        print("crud: alt recipes with api", alt_recipes)
     else:
         alt_recipes = master_list[1]
-        print("crud: alt recipes without api", alt_recipes)
 
     if len(alt_recipes) < 3:
         new_api_recipes = create_api_recipes(ingredients, 2)
         for recipe in new_api_recipes:
             if recipe not in mealplan.recipes_r:
                 alt_recipes.append(recipe)
-        print("crud: alt recipes after new api", alt_recipes)
 
     return alt_recipes
 
@@ -68,7 +65,6 @@ def create_recipe_list(ingredients, num, db_recipes):
 
     if db_num < num:
         api_recipes = create_api_recipes(ingredients, api_num)
-        print("*********getting api recipes", api_num)
         master_list = make_recipe_lists(num, db_recipes, api_recipes)
     else:
         master_list = make_recipe_lists(num, db_recipes)

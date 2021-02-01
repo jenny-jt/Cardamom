@@ -112,18 +112,16 @@ def create_api_recipes(ingredients, api_num):
 def create_db_recipes(ingredients):
     """takes list of ingredients from form and outputs unique list of recipes associated with those ingredients"""
     ingredients = ingredients.split(", ")
-    print("*****ingredients in create db recipes", ingredients)
 
     db_recipes = []
     for ingredient in ingredients:
         ingr_list = Ingredient.query.filter(Ingredient.name.ilike(f'%{ingredient}%')).all()
-        print("********** ingr", ingr_list)
+
         # if not ingr:
         #     ingr = add_ingredient(name=ingredient, location=choice(location))
         for ingr in ingr_list:
             ingr_recipes = ingr.recipes_r
             db_recipes.extend(ingr_recipes)
-            print("******** db_recipes as updating", db_recipes)
 
     db_recipes = set(db_recipes)
     db_recipes = list(db_recipes)
@@ -138,17 +136,11 @@ def mealplan_add_recipe(mealplan, recipes_list, num_recipes):
     """
 
     while len(mealplan.recipes_r) < num_recipes:
-        print("length", len(mealplan.recipes_r))
-        print("num", num_recipes)
-        print("length of recipe list", len(recipes_list))
         for item in recipes_list:
             if item not in mealplan.recipes_r:
                 break
         mealplan.add_recipe_to_mealplan(item)
-        print("recipe added in for loop mealplan recipes", item)
         recipes_list.remove(item)
-        print("length of recipes should grow", len(mealplan.recipes_r))
-        print("num_recipes should stay same", num_recipes)
         db.session.commit()
 
     recipes = mealplan.recipes_r
@@ -165,12 +157,10 @@ def mealplan_add_altrecipe(mealplan, alt_recipes):
             if item not in mealplan.altrecipes_r:
                 break
         mealplan.add_altrecipe_to_mealplan(item)
-        print("length of alt recipes", len(mealplan.altrecipes_r))
         db.session.commit()
 
     altrecipes = mealplan.altrecipes_r
 
-    print(f"\n crud version: alternate recipe objects associated with mealplan: {altrecipes}\n")
     return altrecipes
 
 
@@ -187,7 +177,6 @@ def recipe_info(api_id):
 
     ingr_data = data['extendedIngredients']
     recipe_ingredients = recipe_ingr(ingr_data)
-    print("*******************recipe_ingredients", recipe_ingredients)
 
     check_db = Recipe.query.filter(Recipe.name == name).first()
 
@@ -234,13 +223,11 @@ def user_by_email(email):
 
 def updated_recipes(recipe_ids):
     """generate updated list of recipe objects from ids to update mealplan"""
-    print("*****recipe ids", recipe_ids)
 
     recipes = []
 
     for id in recipe_ids:
         recipe = Recipe.query.get(id)
-        print("****recipe", recipe)
         recipes.append(recipe)
 
     return recipes
