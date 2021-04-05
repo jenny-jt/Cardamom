@@ -13,6 +13,7 @@ app = Flask(__name__)
 app.secret_key = os.environ['secret_key']
 
 CLIENT_SECRETS_FILE = 'client_secret.json'
+
 API_SERVICE_NAME = 'cal'
 API_VERSION = 'v3'
 SCOPES = ['https://www.googleapis.com/auth/calendar', 'https://www.googleapis.com/auth/calendar.events']

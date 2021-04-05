@@ -2,3 +2,4 @@ env
 .DS_Store
 secrets.sh
 python-client/
+client_secret.json
